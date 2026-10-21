@@ -31,6 +31,7 @@ export const FindingDetail: React.FC<FindingDetailProps> = ({ finding, onClose, 
         <div className="flex items-center gap-2">
           {onOpenRemediation && (
             <button
+              data-testid="ai-remediation-btn"
               onClick={onOpenRemediation}
               className="flex items-center gap-1.5 px-3 py-1 rounded bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs transition shadow"
             >

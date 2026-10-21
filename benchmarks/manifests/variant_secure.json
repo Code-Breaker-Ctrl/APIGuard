@@ -1,0 +1,5 @@
+{
+  "variant": "variant_secure",
+  "description": "All endpoints strictly enforce authorization rules (zero vulnerabilities)",
+  "vulnerable_endpoints": []
+}

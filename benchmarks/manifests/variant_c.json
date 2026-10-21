@@ -1,0 +1,11 @@
+{
+  "variant": "variant_c",
+  "description": "Defect C only: mutating BOLA on PATCH /projects/{project_id}",
+  "vulnerable_endpoints": [
+    {
+      "method": "PATCH",
+      "endpoint": "/projects/{project_id}",
+      "type": "mutating_bola"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "variant": "variant_a",
+  "description": "Defect A only: direct BOLA on primary GET /projects/{project_id}",
+  "vulnerable_endpoints": [
+    {
+      "method": "GET",
+      "endpoint": "/projects/{project_id}",
+      "type": "direct_bola"
+    }
+  ]
+}

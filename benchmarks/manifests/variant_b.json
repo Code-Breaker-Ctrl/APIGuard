@@ -1,0 +1,11 @@
+{
+  "variant": "variant_b",
+  "description": "Defect B only: indirect BOLA on GET /projects/{project_id}/export (primary read is secure)",
+  "vulnerable_endpoints": [
+    {
+      "method": "GET",
+      "endpoint": "/projects/{project_id}/export",
+      "type": "indirect_propagated_bola"
+    }
+  ]
+}

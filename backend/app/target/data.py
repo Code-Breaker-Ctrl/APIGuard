@@ -1,0 +1,62 @@
+import copy
+from typing import Dict, Any
+
+SEEDED_USERS = {
+    "alice@acme.corp": {
+        "id": "usr_alice_101",
+        "username": "alice@acme.corp",
+        "password": "password_alice_123",
+        "role": "customer",
+        "token": "tok_live_alice_8921"
+    },
+    "bob@adversary.io": {
+        "id": "usr_bob_202",
+        "username": "bob@adversary.io",
+        "password": "password_bob_456",
+        "role": "customer",
+        "token": "tok_live_bob_9934"
+    },
+    "admin@corp.internal": {
+        "id": "usr_admin_001",
+        "username": "admin@corp.internal",
+        "password": "password_admin_999",
+        "role": "admin",
+        "token": "tok_live_admin_1111"
+    },
+    "support@corp.internal": {
+        "id": "usr_support_002",
+        "username": "support@corp.internal",
+        "password": "password_support_777",
+        "role": "support",
+        "token": "tok_live_support_2222"
+    }
+}
+
+SEEDED_PROJECTS = {
+    "proj_42": {
+        "id": "proj_42",
+        "owner_id": "usr_alice_101",
+        "owner_email": "alice@acme.corp",
+        "name": "Project Aegis Quantum",
+        "confidential_data": "QNTM-SECRET-PROD-KEY-9981",
+        "budget": "$240,000",
+        "billing_card": "**** **** **** 4242",
+        "created_at": "2026-10-21T21:00:00Z"
+    }
+}
+
+TOKEN_TO_USER: Dict[str, Dict[str, Any]] = {}
+PROJECTS_STORE: Dict[str, Dict[str, Any]] = {}
+
+def reset_db():
+    global TOKEN_TO_USER, PROJECTS_STORE
+    TOKEN_TO_USER.clear()
+    PROJECTS_STORE.clear()
+
+    # Repopulate
+    for user in SEEDED_USERS.values():
+        TOKEN_TO_USER[user["token"]] = user
+
+    PROJECTS_STORE.update(copy.deepcopy(SEEDED_PROJECTS))
+
+reset_db()

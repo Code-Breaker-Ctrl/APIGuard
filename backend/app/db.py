@@ -77,6 +77,13 @@ async def save_finding(scan_id: str, finding: Finding):
         )
         await db.commit()
 
+async def clear_db():
+    async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute("DELETE FROM findings")
+        await db.execute("DELETE FROM scan_events")
+        await db.execute("DELETE FROM scans")
+        await db.commit()
+
 async def get_findings(scan_id: Optional[str] = None) -> List[Dict[str, Any]]:
     async with aiosqlite.connect(DB_PATH) as db:
         db.row_factory = aiosqlite.Row

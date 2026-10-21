@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect } from 'react';
 import {
   ReactFlow,
   MiniMap,
@@ -8,6 +8,7 @@ import {
   MarkerType,
   Handle,
   Position,
+  useReactFlow,
 } from '@xyflow/react';
 import type { Node, Edge } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
@@ -139,6 +140,17 @@ const nodeTypes = {
   identifierNode: IdentifierNode,
 };
 
+const FitViewOnUpdate: React.FC<{ dep: any }> = ({ dep }) => {
+  const { fitView } = useReactFlow();
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fitView({ padding: 0.15, duration: 250 });
+    }, 40);
+    return () => clearTimeout(timer);
+  }, [dep, fitView]);
+  return null;
+};
+
 export const GraphView: React.FC<GraphViewProps> = ({
   backendNodes,
   backendEdges,
@@ -148,7 +160,7 @@ export const GraphView: React.FC<GraphViewProps> = ({
 }) => {
   const { nodes, edges } = useMemo(() => {
     const g = new dagre.graphlib.Graph();
-    g.setGraph({ rankdir: 'LR', nodesep: 50, ranksep: 75 });
+    g.setGraph({ rankdir: 'LR', nodesep: 75, ranksep: 95 });
     g.setDefaultEdgeLabel(() => ({}));
 
     backendNodes.forEach((node) => {
@@ -197,7 +209,7 @@ export const GraphView: React.FC<GraphViewProps> = ({
         animated: edge.type === 'NESTED_UNDER' || isVulnerableEdge,
         style: {
           stroke: strokeColor,
-          strokeWidth: Math.max(1.5, edge.confidence * 2.8),
+          strokeWidth: Math.max(1.8, edge.confidence * 2.8),
           strokeDasharray: isPropagated ? '5,5' : undefined,
         },
         markerEnd: {
@@ -207,8 +219,10 @@ export const GraphView: React.FC<GraphViewProps> = ({
           height: 15,
         },
         label: edge.type.replace('_', ' ').toLowerCase(),
-        labelStyle: { fill: '#94a3b8', fontSize: 10, fontFamily: 'monospace' },
-        labelBgStyle: { fill: '#0a0d14', fillOpacity: 0.8 },
+        labelStyle: { fill: '#cbd5e1', fontSize: 10, fontFamily: 'monospace', fontWeight: 600 },
+        labelBgStyle: { fill: '#121826', fillOpacity: 0.95 },
+        labelBgPadding: [6, 3] as [number, number],
+        labelBgBorderRadius: 4,
       };
     });
 
@@ -225,8 +239,9 @@ export const GraphView: React.FC<GraphViewProps> = ({
         fitView
         className="bg-[#090b10]"
       >
+        <FitViewOnUpdate dep={backendNodes.length} />
         <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="#1c2433" />
-        <Controls className="!bg-[#111520] !border-[#202738] !fill-slate-300 [&>button]:!border-[#202738]" />
+        <Controls className="!bg-[#0d121c] !border !border-[#20293d] !rounded-lg text-slate-300 [&>button]:!bg-[#0d121c] [&>button]:!border-b [&>button]:!border-[#1f283d] [&>button]:!fill-slate-300 [&>button:hover]:!bg-[#1a2336]" />
         <MiniMap
           nodeColor={(n) => {
             if (nodeStates[n.id] === 'vulnerable') return '#f43f5e';
@@ -234,7 +249,8 @@ export const GraphView: React.FC<GraphViewProps> = ({
             if (nodeStates[n.id] === 'probing') return '#f59e0b';
             return '#1e293b';
           }}
-          className="!bg-[#0c0f17] !border-[#202738] rounded-lg overflow-hidden"
+          maskColor="rgba(9, 11, 16, 0.75)"
+          className="!bg-[#0c0f17] !border !border-[#202738] rounded-lg overflow-hidden shadow-xl"
         />
       </ReactFlow>
 

@@ -352,7 +352,15 @@ class GraphGuidedScanner:
                         )
                         findings.append(f_del)
 
-        return findings
+        # Deduplicate findings so each endpoint/method only appears once per scan
+        unique_findings = []
+        seen_keys = set()
+        for f in findings:
+            key = (f.method, f.endpoint)
+            if key not in seen_keys:
+                seen_keys.add(key)
+                unique_findings.append(f)
+        return unique_findings
 
     def _create_adhoc_hyp(self, op: Operation, resource_type: str = "Resource"):
         from app.engine.models import Rule, RuleType, Hypothesis

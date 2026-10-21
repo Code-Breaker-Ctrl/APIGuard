@@ -1,12 +1,15 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { 
   Play, 
   RotateCcw, 
   Layers, 
-  AlertTriangle,
-  Server,
-  RefreshCw,
-  GitBranch
+  AlertTriangle, 
+  Server, 
+  RefreshCw, 
+  GitBranch,
+  BarChart3,
+  Cpu,
+  HelpCircle
 } from 'lucide-react';
 import { useGraph } from './hooks/useGraph';
 import { useScan } from './hooks/useScan';
@@ -15,12 +18,25 @@ import { ScanConsole } from './components/ScanConsole';
 import { FindingsList } from './components/FindingsList';
 import { FindingDetail } from './components/FindingDetail';
 import { SpecPanel } from './components/SpecPanel';
-import type { Finding } from './types';
+import { DryRunModal } from './components/DryRunModal';
+import { BenchmarkPanel } from './components/BenchmarkPanel';
+import { RemediationModal } from './components/RemediationModal';
+import { GuidedDemoModal } from './components/GuidedDemoModal';
+import type { Finding, DryRunResponse } from './types';
 import { apiClient } from './api/client';
 
 export default function App() {
   const { nodes, edges, isLoading: isGraphLoading, importSpec, loadGraph } = useGraph();
-  const { isScanning, events, findings, nodeStates, startScan, resetAll } = useScan();
+  const { 
+    isScanning, 
+    events, 
+    findings, 
+    nodeStates, 
+    showAllHistory,
+    setShowAllHistory,
+    startScan, 
+    resetAll 
+  } = useScan();
 
   const [selectedFinding, setSelectedFinding] = useState<Finding | null>(null);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
@@ -28,8 +44,16 @@ export default function App() {
   const [enableMutations, setEnableMutations] = useState(false);
   const [dryRun, setDryRun] = useState(false);
 
+  // Modals state
+  const [showDryRunModal, setShowDryRunModal] = useState(false);
+  const [dryRunData, setDryRunData] = useState<DryRunResponse | null>(null);
+  const [isDryRunLoading, setIsDryRunLoading] = useState(false);
+  const [showBenchmarkModal, setShowBenchmarkModal] = useState(false);
+  const [showRemediationFinding, setShowRemediationFinding] = useState<Finding | null>(null);
+  const [showGuidedDemo, setShowGuidedDemo] = useState(false);
+
   // Health check on mount
-  const checkBackendHealth = async () => {
+  const checkBackendHealth = useCallback(async () => {
     try {
       await apiClient.getHealth();
       setBackendOffline(false);
@@ -37,11 +61,11 @@ export default function App() {
     } catch {
       setBackendOffline(true);
     }
-  };
+  }, [loadGraph]);
 
   useEffect(() => {
     checkBackendHealth();
-  }, []);
+  }, [checkBackendHealth]);
 
   const handleRunScan = async () => {
     await startScan({
@@ -55,7 +79,39 @@ export default function App() {
     await resetAll();
     setSelectedFinding(null);
     setSelectedNodeId(null);
+    setShowRemediationFinding(null);
   };
+
+  const handleOpenDryRun = async () => {
+    setShowDryRunModal(true);
+    setIsDryRunLoading(true);
+    try {
+      const res = await apiClient.getDryRun({ budget: 30, enable_mutations: enableMutations });
+      setDryRunData(res);
+    } catch (err) {
+      console.error('Failed to preview dry-run:', err);
+    } finally {
+      setIsDryRunLoading(false);
+    }
+  };
+
+  // Keyboard shortcut handler ('D' for guided demo, Escape to close modals)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      if (e.key === 'd' || e.key === 'D') {
+        setShowGuidedDemo((prev) => !prev);
+      } else if (e.key === 'Escape') {
+        setShowGuidedDemo(false);
+        setShowBenchmarkModal(false);
+        setShowDryRunModal(false);
+        setShowRemediationFinding(null);
+        setSelectedFinding(null);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const selectedNodeObj = nodes.find((n) => n.id === selectedNodeId);
 
@@ -110,12 +166,29 @@ export default function App() {
             <span className="text-[10px] text-emerald-400 font-bold ml-1">ALLOWLISTED</span>
           </div>
 
-          <div className={`px-2.5 py-1 rounded-md border text-xs font-semibold flex items-center gap-1.5 ${
-            dryRun ? 'bg-amber-950/40 border-amber-800 text-amber-300' : 'bg-emerald-950/40 border-emerald-800 text-emerald-300'
-          }`}>
-            <span className={`w-1.5 h-1.5 rounded-full ${dryRun ? 'bg-amber-400' : 'bg-emerald-400 animate-pulse'}`} />
-            {dryRun ? 'DRY RUN' : 'LIVE AUDIT'}
-          </div>
+          <button
+            onClick={() => setShowGuidedDemo(true)}
+            className="hidden sm:flex items-center gap-1 px-2.5 py-1 rounded-md bg-emerald-950/40 hover:bg-emerald-900/60 border border-emerald-800 text-emerald-300 font-semibold transition"
+          >
+            <HelpCircle className="w-3.5 h-3.5" />
+            <span>Guided Demo [D]</span>
+          </button>
+
+          <button
+            onClick={() => setShowBenchmarkModal(true)}
+            className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-cyan-950/40 hover:bg-cyan-900/60 border border-cyan-800 text-cyan-300 font-semibold transition"
+          >
+            <BarChart3 className="w-3.5 h-3.5" />
+            <span>Benchmarks</span>
+          </button>
+
+          <button
+            onClick={handleOpenDryRun}
+            className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-950/40 hover:bg-amber-900/60 border border-amber-800 text-amber-300 font-semibold transition"
+          >
+            <Cpu className="w-3.5 h-3.5" />
+            <span>Dry-Run Table</span>
+          </button>
         </div>
 
         {/* Action Controls */}
@@ -227,6 +300,8 @@ export default function App() {
               findings={findings}
               selectedFindingId={selectedFinding?.id || null}
               onSelectFinding={(f) => setSelectedFinding(f)}
+              showAllHistory={showAllHistory}
+              onToggleHistory={() => setShowAllHistory(!showAllHistory)}
             />
           </div>
         </section>
@@ -240,6 +315,66 @@ export default function App() {
             <FindingDetail
               finding={selectedFinding}
               onClose={() => setSelectedFinding(null)}
+              onOpenRemediation={() => {
+                setShowRemediationFinding(selectedFinding);
+                setSelectedFinding(null);
+              }}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* DRY-RUN PREVIEW MODAL */}
+      {showDryRunModal && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6">
+          <div className="w-full max-w-5xl h-[85vh] bg-[#0b0e14] rounded-2xl overflow-hidden border border-[#232c40] shadow-2xl">
+            <DryRunModal
+              data={dryRunData}
+              isLoading={isDryRunLoading}
+              onClose={() => setShowDryRunModal(false)}
+              onExecuteLive={() => {
+                setShowDryRunModal(false);
+                handleRunScan();
+              }}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* BENCHMARK MODAL */}
+      {showBenchmarkModal && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6">
+          <div className="w-full max-w-5xl h-[85vh] bg-[#0b0e14] rounded-2xl overflow-hidden border border-[#232c40] shadow-2xl">
+            <BenchmarkPanel onClose={() => setShowBenchmarkModal(false)} />
+          </div>
+        </div>
+      )}
+
+      {/* AI REMEDIATION MODAL */}
+      {showRemediationFinding && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6">
+          <div className="w-full max-w-5xl h-[85vh] bg-[#0b0e14] rounded-2xl overflow-hidden border border-[#232c40] shadow-2xl">
+            <RemediationModal
+              finding={showRemediationFinding}
+              onClose={() => setShowRemediationFinding(null)}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* INTERACTIVE GUIDED DEMO MODAL */}
+      {showGuidedDemo && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6">
+          <div className="w-full max-w-3xl h-[65vh] bg-[#0b0e14] rounded-2xl overflow-hidden border border-[#232c40] shadow-2xl">
+            <GuidedDemoModal
+              onClose={() => setShowGuidedDemo(false)}
+              onLoadSpec={() => {
+                importSpec();
+                handleReset();
+              }}
+              onOpenDryRun={() => handleOpenDryRun()}
+              onRunAudit={() => handleRunScan()}
+              onOpenBenchmark={() => setShowBenchmarkModal(true)}
             />
           </div>
         </div>
@@ -254,8 +389,11 @@ export default function App() {
           <span className="flex items-center gap-1 text-cyan-400 font-semibold">
             <span className="w-1.5 h-1.5 rounded-full bg-cyan-400"></span> Working: React Flow + Dagre DAG
           </span>
+          <span className="flex items-center gap-1 text-purple-400 font-semibold">
+            <span className="w-1.5 h-1.5 rounded-full bg-purple-400"></span> Working: Gemini / Offline AST Remediation
+          </span>
           <span className="flex items-center gap-1 text-amber-400 font-semibold">
-            <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span> Planned: Slice 2 Gemini Patch Engine
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span> Working: Empirical Ground Truth Benchmarks
           </span>
         </div>
         <div>

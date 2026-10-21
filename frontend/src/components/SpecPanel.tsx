@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Upload, FileCode, AlertTriangle, Users, RefreshCw } from 'lucide-react';
-import type { BackendNode } from '../types';
+import type { BackendNode, IdentityInfo } from '../types';
+import { apiClient } from '../api/client';
 
 interface SpecPanelProps {
   nodes: BackendNode[];
@@ -11,6 +12,13 @@ interface SpecPanelProps {
 export const SpecPanel: React.FC<SpecPanelProps> = ({ nodes, onImportSpec, isLoading }) => {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState(false);
+  const [identities, setIdentities] = useState<IdentityInfo[]>([]);
+
+  useEffect(() => {
+    apiClient.getIdentities()
+      .then(setIdentities)
+      .catch((err) => console.error('Failed to load identities:', err));
+  }, []);
 
   const handleFileUpload = async (file: File) => {
     setErrorMsg(null);
@@ -96,23 +104,23 @@ export const SpecPanel: React.FC<SpecPanelProps> = ({ nodes, onImportSpec, isLoa
             <span className="flex items-center gap-1.5">
               <Users className="w-3.5 h-3.5 text-emerald-400" /> Test Identities
             </span>
-            <span className="text-[9px] px-1.5 py-0.2 rounded bg-slate-800 text-slate-400">Target Seeded</span>
+            <span className="text-[9px] px-1.5 py-0.2 rounded bg-slate-800 text-slate-400">Target Dynamic</span>
           </div>
           <div className="space-y-1.5 text-[10px]">
-            <div className="p-1.5 rounded bg-[#07090e] border border-[#181f2e] flex items-center justify-between">
-              <div>
-                <span className="text-emerald-400 font-bold">User A (Alice):</span>{' '}
-                <span className="text-slate-300">alice@acme.corp</span>
+            {identities.map((id) => (
+              <div key={id.identity_id} className="p-1.5 rounded bg-[#07090e] border border-[#181f2e] flex items-center justify-between">
+                <div>
+                  <span className={`font-bold ${id.key === 'user_a' ? 'text-emerald-400' : id.key === 'user_b' ? 'text-rose-400' : 'text-blue-400'}`}>
+                    {id.username.split('@')[0]} ({id.role}):
+                  </span>{' '}
+                  <span className="text-slate-300">{id.username}</span>
+                </div>
+                <span className="text-[9px] text-slate-500 font-mono">[REDACTED]</span>
               </div>
-              <span className="text-[9px] text-slate-500 font-mono">[REDACTED]</span>
-            </div>
-            <div className="p-1.5 rounded bg-[#07090e] border border-[#181f2e] flex items-center justify-between">
-              <div>
-                <span className="text-rose-400 font-bold">User B (Bob):</span>{' '}
-                <span className="text-slate-300">bob@adversary.io</span>
-              </div>
-              <span className="text-[9px] text-slate-500 font-mono">[REDACTED]</span>
-            </div>
+            ))}
+            {identities.length === 0 && (
+              <div className="text-[10px] text-slate-500 italic">Loading identities from backend...</div>
+            )}
           </div>
         </div>
 

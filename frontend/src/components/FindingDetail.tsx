@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
-import { Copy, Check, GitBranch, Terminal, ShieldAlert } from 'lucide-react';
+import { Copy, Check, GitBranch, Terminal, ShieldAlert, Sparkles } from 'lucide-react';
 import type { Finding } from '../types';
 
 interface FindingDetailProps {
   finding: Finding;
   onClose?: () => void;
+  onOpenRemediation?: () => void;
 }
 
-export const FindingDetail: React.FC<FindingDetailProps> = ({ finding, onClose }) => {
+export const FindingDetail: React.FC<FindingDetailProps> = ({ finding, onClose, onOpenRemediation }) => {
   const [copied, setCopied] = useState(false);
 
   const handleCopyCurl = () => {
@@ -27,11 +28,21 @@ export const FindingDetail: React.FC<FindingDetailProps> = ({ finding, onClose }
             {finding.severity}
           </span>
         </div>
-        {onClose && (
-          <button onClick={onClose} className="text-slate-400 hover:text-white text-xs px-2 py-1 rounded bg-slate-800">
-            Close
-          </button>
-        )}
+        <div className="flex items-center gap-2">
+          {onOpenRemediation && (
+            <button
+              onClick={onOpenRemediation}
+              className="flex items-center gap-1.5 px-3 py-1 rounded bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs transition shadow"
+            >
+              <Sparkles className="w-3.5 h-3.5" /> AI Remediation
+            </button>
+          )}
+          {onClose && (
+            <button onClick={onClose} className="text-slate-400 hover:text-white text-xs px-2.5 py-1 rounded bg-slate-800">
+              Close
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="flex-1 p-5 overflow-y-auto space-y-5">

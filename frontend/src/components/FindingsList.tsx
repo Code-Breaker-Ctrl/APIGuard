@@ -6,12 +6,16 @@ interface FindingsListProps {
   findings: Finding[];
   selectedFindingId: string | null;
   onSelectFinding: (finding: Finding) => void;
+  showAllHistory?: boolean;
+  onToggleHistory?: () => void;
 }
 
 export const FindingsList: React.FC<FindingsListProps> = ({
   findings,
   selectedFindingId,
   onSelectFinding,
+  showAllHistory,
+  onToggleHistory,
 }) => {
   return (
     <div className="flex flex-col h-full bg-[#0d1017] border border-[#1e2536] rounded-xl overflow-hidden shadow-lg">
@@ -20,9 +24,23 @@ export const FindingsList: React.FC<FindingsListProps> = ({
           <ShieldAlert className="w-3.5 h-3.5 text-rose-400" />
           <span className="font-semibold text-slate-200">Confirmed Findings</span>
         </div>
-        <span className="text-[10px] px-2 py-0.5 rounded bg-rose-950/60 text-rose-300 border border-rose-800/40 font-bold">
-          {findings.length} Flagged
-        </span>
+        <div className="flex items-center gap-2">
+          {onToggleHistory && (
+            <button
+              onClick={onToggleHistory}
+              className={`text-[9px] px-1.5 py-0.5 rounded border transition font-mono ${
+                showAllHistory
+                  ? 'bg-purple-950/60 border-purple-800 text-purple-300'
+                  : 'bg-slate-900 border-slate-700 text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              {showAllHistory ? 'All History' : 'Current Run'}
+            </button>
+          )}
+          <span className="text-[10px] px-2 py-0.5 rounded bg-rose-950/60 text-rose-300 border border-rose-800/40 font-bold">
+            {findings.length}
+          </span>
+        </div>
       </div>
 
       <div className="flex-1 p-3 overflow-y-auto space-y-2.5">

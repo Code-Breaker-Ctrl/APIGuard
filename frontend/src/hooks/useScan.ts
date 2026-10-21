@@ -4,19 +4,32 @@ import type { ScanEvent, Finding } from '../types';
 
 export function useScan() {
   const [isScanning, setIsScanning] = useState(false);
+  const [currentScanId, setCurrentScanId] = useState<string | null>(null);
   const [events, setEvents] = useState<ScanEvent[]>([]);
   const [findings, setFindings] = useState<Finding[]>([]);
+  const [showAllHistory, setShowAllHistory] = useState(false);
   const [nodeStates, setNodeStates] = useState<Record<string, 'idle' | 'probing' | 'vulnerable' | 'secure' | 'candidate'>>({});
   const [error, setError] = useState<string | null>(null);
 
-  const loadFindings = useCallback(async () => {
+  const dedupeFindings = (items: Finding[]): Finding[] => {
+    const seen = new Set<string>();
+    return items.filter((f) => {
+      const key = `${f.method}_${f.endpoint}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  };
+
+  const loadFindings = useCallback(async (targetScanId?: string | null) => {
     try {
-      const data = await apiClient.getFindings();
-      setFindings(data || []);
+      const activeId = showAllHistory ? undefined : (targetScanId ?? currentScanId ?? undefined);
+      const data = await apiClient.getFindings(activeId);
+      setFindings(dedupeFindings(data || []));
     } catch (err: any) {
       console.error('Failed to load findings:', err);
     }
-  }, []);
+  }, [currentScanId, showAllHistory]);
 
   useEffect(() => {
     loadFindings();
@@ -25,11 +38,13 @@ export function useScan() {
   const startScan = useCallback(async (options: { dry_run?: boolean; budget?: number; enable_mutations?: boolean } = {}) => {
     setIsScanning(true);
     setEvents([]);
+    setFindings([]);
     setError(null);
     setNodeStates({});
 
     try {
       const { scan_id } = await apiClient.triggerScan(options);
+      setCurrentScanId(scan_id);
 
       const unsubscribe = apiClient.subscribeScanEvents(
         scan_id,
@@ -46,10 +61,7 @@ export function useScan() {
               setNodeStates((prev) => ({ ...prev, [confirmedOp]: 'vulnerable' }));
             }
             if (event.data && event.data.id) {
-              setFindings((prev) => {
-                const exists = prev.some((f) => f.id === event.data?.id);
-                return exists ? prev : [...prev, event.data as Finding];
-              });
+              setFindings((prev) => dedupeFindings([...prev, event.data as Finding]));
             }
           } else if (event.event_type === 'hypothesis_propagated' && opId) {
             setNodeStates((prev) => ({ ...prev, [opId]: 'candidate' }));
@@ -62,12 +74,12 @@ export function useScan() {
         },
         () => {
           setIsScanning(false);
-          loadFindings();
+          loadFindings(scan_id);
         },
         (err) => {
           console.error('SSE Error:', err);
           setIsScanning(false);
-          loadFindings();
+          loadFindings(scan_id);
         }
       );
 
@@ -80,6 +92,7 @@ export function useScan() {
 
   const resetAll = useCallback(async () => {
     await apiClient.resetTarget();
+    setCurrentScanId(null);
     setEvents([]);
     setFindings([]);
     setNodeStates({});
@@ -87,10 +100,13 @@ export function useScan() {
 
   return {
     isScanning,
+    currentScanId,
     events,
     findings,
     nodeStates,
     error,
+    showAllHistory,
+    setShowAllHistory,
     startScan,
     resetAll,
     loadFindings,

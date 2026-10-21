@@ -73,6 +73,48 @@ export interface Finding {
   minimized_sequence?: string[];
 }
 
+export interface IdentityInfo {
+  key: string;
+  identity_id: string;
+  username: string;
+  role: string;
+  token: string;
+}
+
+export interface DryRunStep {
+  step_id: string;
+  operation_id: string;
+  method: string;
+  url: string;
+  identity: string;
+  purpose: string;
+  phase: string;
+  cleanup: boolean;
+  headers: Record<string, string>;
+  body_preview: Record<string, any>;
+}
+
+export interface DryRunResponse {
+  planned_steps: DryRunStep[];
+  total_planned: number;
+  total_budget: number;
+  mutations_enabled: boolean;
+  budget_remaining: number;
+}
+
+export interface RemediationResponse {
+  finding_id: string;
+  endpoint: string;
+  mode: 'gemini' | 'offline_template';
+  v1_prompt: string;
+  v1_output: string;
+  v2_prompt: string;
+  v2_output: string;
+  code_patch: string;
+  explanation: string;
+  unit_test: string;
+}
+
 export interface BenchmarkData {
   timestamp: string;
   target: string;

@@ -15,13 +15,15 @@ from app.engine.spec import OpenAPIParser, DEMO_SPEC_YAML
 from app.engine.graph import ResourceGraph
 from app.engine.executor import SafeExecutor
 from app.engine.scanner import GraphGuidedScanner
+from app.engine.planner import TestPlanner
+from app.engine.remediation import RemediationEngine
 from app.engine.benchmark import run_benchmark
-from app.engine.auth import AuthRegistry
+from app.engine.auth import AuthRegistry, DEFAULT_CREDENTIALS
 from app.engine.models import IdentityProfile, ScanEvent
 from app.target.app import target_app
 from app.target.data import reset_db
 from app.target.config import update_target_config
-from app.db import init_db, save_scan, save_scan_event, save_finding, get_findings
+from app.db import init_db, save_scan, save_scan_event, save_finding, get_findings, clear_db
 
 current_spec_yaml = DEMO_SPEC_YAML
 current_graph = ResourceGraph()
@@ -104,6 +106,42 @@ async def trigger_scan(opts: ScanTriggerInput):
     asyncio.create_task(_execute_scan_task(scan_id, opts, queue))
 
     return {"scan_id": scan_id, "status": "initiated"}
+
+@app.post("/api/scan/dry-run")
+async def preview_dry_run(opts: ScanTriggerInput):
+    parser = OpenAPIParser(current_spec_yaml)
+    operations = parser.extract_operations()
+    planner = TestPlanner(current_graph, base_url="http://127.0.0.1:8000/target")
+
+    user_a = IdentityProfile(identity_id="usr_alice_101", username="alice@acme.corp", password="mock_alice_password", role="customer", token="[DRY_RUN_ALICE_TOKEN]")
+    user_b = IdentityProfile(identity_id="usr_bob_202", username="bob@adversary.io", password="mock_bob_password", role="customer", token="[DRY_RUN_BOB_TOKEN]")
+
+    all_steps = []
+    budget_allocated = opts.budget
+    for op in operations:
+        steps = planner.plan_audit_for_operation(op, user_a, user_b, enable_mutations=opts.enable_mutations)
+        for s in steps:
+            all_steps.append({
+                "step_id": s.step_id,
+                "operation_id": s.operation_id,
+                "method": s.method,
+                "url": s.url,
+                "identity": s.identity_id,
+                "purpose": s.purpose,
+                "phase": "A" if s.purpose in ["setup", "control_owner"] else "B",
+                "cleanup": s.cleanup,
+                "headers": {"Authorization": "[REDACTED]"},
+                "body_preview": s.json_body or {}
+            })
+
+    planned_steps = all_steps[:budget_allocated]
+    return {
+        "planned_steps": planned_steps,
+        "total_planned": len(planned_steps),
+        "total_budget": budget_allocated,
+        "mutations_enabled": opts.enable_mutations,
+        "budget_remaining": max(0, budget_allocated - len(planned_steps))
+    }
 
 async def _execute_scan_task(scan_id: str, opts: ScanTriggerInput, queue: asyncio.Queue):
     try:
@@ -193,12 +231,27 @@ async def stream_scan_events(scan_id: str):
     return StreamingResponse(event_generator(), media_type="text/event-stream")
 
 @app.get("/api/findings")
-async def list_findings():
-    return await get_findings()
+async def list_findings(scan_id: Optional[str] = None):
+    return await get_findings(scan_id=scan_id)
+
+@app.get("/api/identities")
+async def get_identities():
+    return [
+        {
+            "key": key,
+            "identity_id": creds["identity_id"],
+            "username": creds["username"],
+            "role": creds["role"],
+            "token": "[REDACTED]"
+        }
+        for key, creds in DEFAULT_CREDENTIALS.items()
+    ]
 
 @app.post("/api/target/reset")
-def reset_target():
+async def reset_target():
     reset_db()
+    await clear_db()
+    ACTIVE_EVENT_QUEUES.clear()
     return {"status": "target_reset_success"}
 
 @app.get("/api/benchmark/latest")
@@ -216,3 +269,8 @@ async def get_latest_benchmark():
 async def execute_benchmark_run():
     async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://127.0.0.1:8000") as asgi_client:
         return await run_benchmark("http://127.0.0.1:8000/target", client=asgi_client)
+
+@app.post("/api/remediate")
+async def remediate_vulnerability(payload: Dict[str, Any]):
+    engine = RemediationEngine()
+    return await engine.generate_remediation(payload)

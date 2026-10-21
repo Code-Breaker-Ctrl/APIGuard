@@ -1,4 +1,4 @@
-import type { GraphResponse, Finding, ScanEvent, BenchmarkData } from '../types';
+import type { GraphResponse, Finding, ScanEvent, BenchmarkData, IdentityInfo, DryRunResponse, RemediationResponse } from '../types';
 
 export const apiClient = {
   async getHealth(): Promise<{ status: string }> {
@@ -72,9 +72,43 @@ export const apiClient = {
     };
   },
 
-  async getFindings(): Promise<Finding[]> {
-    const res = await fetch('/api/findings');
+  async getFindings(scanId?: string): Promise<Finding[]> {
+    const url = scanId ? `/api/findings?scan_id=${encodeURIComponent(scanId)}` : '/api/findings';
+    const res = await fetch(url);
     if (!res.ok) throw new Error(`Failed to load findings: HTTP ${res.status}`);
+    return res.json();
+  },
+
+  async getIdentities(): Promise<IdentityInfo[]> {
+    const res = await fetch('/api/identities');
+    if (!res.ok) throw new Error(`Failed to load identities: HTTP ${res.status}`);
+    return res.json();
+  },
+
+  async getDryRun(options: { budget?: number; enable_mutations?: boolean }): Promise<DryRunResponse> {
+    const res = await fetch('/api/scan/dry-run', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ dry_run: true, ...options }),
+    });
+    if (!res.ok) throw new Error(`Failed to fetch dry-run preview: HTTP ${res.status}`);
+    return res.json();
+  },
+
+  async remediate(finding: Finding): Promise<RemediationResponse> {
+    const res = await fetch('/api/remediate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        finding_id: finding.id,
+        endpoint: finding.endpoint,
+        method: finding.method,
+        resource_type: finding.resource_type,
+        diff_fields: finding.diff_fields,
+        hypothesis: finding.hypothesis
+      }),
+    });
+    if (!res.ok) throw new Error(`Failed to trigger remediation: HTTP ${res.status}`);
     return res.json();
   },
 

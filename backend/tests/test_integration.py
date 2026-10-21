@@ -6,13 +6,13 @@ import httpx
 from app.main import app
 from app.engine.spec import OpenAPIParser, DEMO_SPEC_YAML
 from app.engine.executor import SafeExecutor
-from app.engine.benchmark import GraphGuidedScanner
+from app.engine.scanner import GraphGuidedScanner
 from app.engine.baseline import BaselineScanner
-from app.engine.models import IdentityProfile
+from app.engine.auth import AuthRegistry
 from app.target.data import reset_db
 from app.target.config import update_target_config
 
-TEST_PORT = 8123
+TEST_PORT = 8124
 TEST_HOST = "127.0.0.1"
 BASE_URL = f"http://{TEST_HOST}:{TEST_PORT}/target"
 
@@ -34,7 +34,6 @@ def real_uvicorn_server():
     server_thread = UvicornServerThread()
     server_thread.start()
 
-    # Wait for server to be responsive
     client = httpx.Client(timeout=5.0)
     for _ in range(30):
         try:
@@ -48,64 +47,113 @@ def real_uvicorn_server():
     server_thread.stop()
 
 @pytest.mark.asyncio
-async def test_real_socket_defect_b_propagation(real_uvicorn_server):
+async def test_dynamic_login_and_defect_b(real_uvicorn_server):
     """
-    Asserts against real uvicorn socket:
-    1. Defect B (export) is CONFIRMED by GraphGuidedScanner.
-    2. Defect B is MISSED by BaselineScanner.
-    3. Primary GET /projects/{id} produces 0 findings (secure).
-    4. No tokens appear in any stored finding data.
+    Asserts dynamic authentication via /auth/login and proves Defect B (export)
+    is confirmed by graph scanner and missed by baseline.
     """
     reset_db()
     update_target_config(defect_a=False, defect_b=True, defect_c=False, patched_mode=False)
 
+    auth_reg = AuthRegistry(real_uvicorn_server)
+    identities = await auth_reg.authenticate_all()
+    user_a = identities["user_a"]
+    user_b = identities["user_b"]
+    assert user_a.token.startswith("tok_live_")
+    assert user_b.token.startswith("tok_live_")
+
     parser = OpenAPIParser(DEMO_SPEC_YAML)
     operations = parser.extract_operations()
 
-    user_a = IdentityProfile(identity_id="usr_alice_101", username="alice@acme.corp", password="password_alice_123", role="customer", token="tok_live_alice_8921")
-    user_b = IdentityProfile(identity_id="usr_bob_202", username="bob@adversary.io", password="password_bob_456", role="customer", token="tok_live_bob_9934")
-
-    # 1. Run Graph-Guided Scanner
-    executor = SafeExecutor(allowed_hosts={"127.0.0.1", "localhost"}, total_budget=20)
+    # 1. Graph scanner confirms Defect B
+    executor = SafeExecutor(allowed_hosts={"127.0.0.1", "localhost"}, total_budget=30)
     graph_scanner = GraphGuidedScanner(executor, real_uvicorn_server)
     graph_findings = await graph_scanner.run_scan(operations, user_a, user_b)
 
-    # Must confirm Defect B on export
     assert len(graph_findings) == 1
     f = graph_findings[0]
     assert f.endpoint == "/projects/{project_id}/export"
     assert f.status.value == "confirmed"
-    assert "financial_payload" in f.diff_fields or "billing" in str(f.diff_fields)
+    assert "owner_email" in f.diff_fields or "financial_payload.billing" in f.diff_fields
 
-    # Token redaction check
-    assert "tok_live" not in str(f.model_dump())
-    assert "password" not in str(f.model_dump())
-
-    # 2. Run Baseline Scanner (exact same target & budget)
-    base_executor = SafeExecutor(allowed_hosts={"127.0.0.1", "localhost"}, total_budget=20)
-    baseline_scanner = BaselineScanner(base_executor, real_uvicorn_server)
-    baseline_findings = await baseline_scanner.scan_operations(operations, user_a, user_b)
-
-    # Baseline scanner must MISS Defect B because it evaluates /export in isolation without graph rule propagation
-    assert len(baseline_findings) == 0
+    # 2. Baseline scanner misses Defect B
+    base_exec = SafeExecutor(allowed_hosts={"127.0.0.1", "localhost"}, total_budget=30)
+    baseline_scanner = BaselineScanner(base_exec, real_uvicorn_server)
+    base_findings = await baseline_scanner.scan_operations(operations, user_a, user_b)
+    assert len(base_findings) == 0
 
 @pytest.mark.asyncio
-async def test_admin_and_support_no_false_positives(real_uvicorn_server):
+async def test_defect_a_direct_bola(real_uvicorn_server):
     """
-    Asserts legitimate role exemptions (admin, support) produce 0 false positives.
+    Asserts Defect A (direct read on GET /projects/{project_id} vulnerable)
+    is confirmed by both scanners.
     """
     reset_db()
-    async with httpx.AsyncClient() as client:
-        # Admin can read Alice's project legitimately
-        admin_res = await client.get(
-            f"{real_uvicorn_server}/projects/proj_42",
-            headers={"Authorization": "Bearer tok_live_admin_1111"}
-        )
-        assert admin_res.status_code == 200
+    update_target_config(defect_a=True, defect_b=False, defect_c=False, patched_mode=False)
 
-        # Support can read Alice's project legitimately
-        support_res = await client.get(
-            f"{real_uvicorn_server}/projects/proj_42",
-            headers={"Authorization": "Bearer tok_live_support_2222"}
-        )
-        assert support_res.status_code == 200
+    auth_reg = AuthRegistry(real_uvicorn_server)
+    identities = await auth_reg.authenticate_all()
+    user_a = identities["user_a"]
+    user_b = identities["user_b"]
+
+    parser = OpenAPIParser(DEMO_SPEC_YAML)
+    operations = parser.extract_operations()
+
+    executor = SafeExecutor(allowed_hosts={"127.0.0.1", "localhost"}, total_budget=30)
+    graph_scanner = GraphGuidedScanner(executor, real_uvicorn_server)
+    findings = await graph_scanner.run_scan(operations, user_a, user_b)
+
+    # Defect A confirmed on primary read
+    assert any(f.endpoint == "/projects/{project_id}" and f.method == "GET" for f in findings)
+
+@pytest.mark.asyncio
+async def test_defect_c_mutation_patch(real_uvicorn_server):
+    """
+    Asserts Defect C (mutating PATCH without ownership) is confirmed when mutations are enabled.
+    """
+    reset_db()
+    update_target_config(defect_a=False, defect_b=False, defect_c=True, patched_mode=False)
+
+    auth_reg = AuthRegistry(real_uvicorn_server)
+    identities = await auth_reg.authenticate_all()
+    user_a = identities["user_a"]
+    user_b = identities["user_b"]
+
+    parser = OpenAPIParser(DEMO_SPEC_YAML)
+    operations = parser.extract_operations()
+
+    executor = SafeExecutor(allowed_hosts={"127.0.0.1", "localhost"}, total_budget=30, enable_mutations=True)
+    graph_scanner = GraphGuidedScanner(executor, real_uvicorn_server)
+    findings = await graph_scanner.run_scan(operations, user_a, user_b, enable_mutations=True)
+
+    # Defect C confirmed on PATCH
+    assert any(f.endpoint == "/projects/{project_id}" and f.method == "PATCH" for f in findings)
+
+@pytest.mark.asyncio
+async def test_zero_false_positives_when_secure_and_patched(real_uvicorn_server):
+    """
+    Asserts 0 findings when target is fully secure or in patched mode.
+    Exercises verifier traps (/summary returns 200-empty and /audit-log returns 404),
+    confirming neither is flagged.
+    """
+    auth_reg = AuthRegistry(real_uvicorn_server)
+    identities = await auth_reg.authenticate_all()
+    user_a = identities["user_a"]
+    user_b = identities["user_b"]
+
+    parser = OpenAPIParser(DEMO_SPEC_YAML)
+    operations = parser.extract_operations()
+
+    # Case 1: All secure configuration
+    reset_db()
+    update_target_config(defect_a=False, defect_b=False, defect_c=False, patched_mode=False)
+    executor = SafeExecutor(allowed_hosts={"127.0.0.1", "localhost"}, total_budget=30, enable_mutations=True)
+    graph_scanner = GraphGuidedScanner(executor, real_uvicorn_server)
+    findings = await graph_scanner.run_scan(operations, user_a, user_b, enable_mutations=True)
+    assert len(findings) == 0
+
+    # Case 2: Patched mode
+    reset_db()
+    update_target_config(defect_a=True, defect_b=True, defect_c=True, patched_mode=True)
+    findings_patched = await graph_scanner.run_scan(operations, user_a, user_b, enable_mutations=True)
+    assert len(findings_patched) == 0

@@ -1,12 +1,13 @@
 import sys
 import asyncio
 import argparse
+import httpx
 from app.engine.spec import OpenAPIParser, DEMO_SPEC_YAML
 from app.engine.graph import ResourceGraph
 from app.engine.planner import TestPlanner
 from app.engine.executor import SafeExecutor
-from app.engine.benchmark import GraphGuidedScanner
-from app.engine.models import IdentityProfile
+from app.engine.scanner import GraphGuidedScanner
+from app.engine.auth import AuthRegistry
 from app.target.data import reset_db
 from app.target.config import update_target_config
 
@@ -16,16 +17,17 @@ def main():
 
     scan_parser = subparsers.add_parser("scan", help="Run authorization scan")
     scan_parser.add_argument("--dry-run", action="store_true", help="Print execution plan without sending HTTP requests")
-    scan_parser.add_argument("--target", default="http://localhost:8000/target", help="Target base URL")
+    scan_parser.add_argument("--target", default="http://127.0.0.1:8000/target", help="Target base URL")
+    scan_parser.add_argument("--mutations", action="store_true", help="Enable mutating tests (PATCH, DELETE)")
 
     args = parser.parse_args()
 
     if args.command == "scan":
-        asyncio.run(run_cli_scan(dry_run=args.dry_run, target_url=args.target))
+        asyncio.run(run_cli_scan(dry_run=args.dry_run, target_url=args.target, enable_mutations=args.mutations))
     else:
         parser.print_help()
 
-async def run_cli_scan(dry_run: bool, target_url: str):
+async def run_cli_scan(dry_run: bool, target_url: str, enable_mutations: bool = False):
     print("=" * 65)
     print("  APIGuard CLI Engine — Graph-Guided BOLA Scanner")
     print("=" * 65)
@@ -38,28 +40,7 @@ async def run_cli_scan(dry_run: bool, target_url: str):
     graph.build_from_operations(operations)
     print(f"[*] Dependency DAG constructed: {len(graph.nodes)} nodes, {len(graph.edges)} edges.")
 
-    user_a = IdentityProfile(identity_id="usr_alice_101", username="alice@acme.corp", password="password_alice_123", role="customer", token="tok_live_alice_8921")
-    user_b = IdentityProfile(identity_id="usr_bob_202", username="bob@adversary.io", password="password_bob_456", role="customer", token="tok_live_bob_9934")
-
-    if dry_run:
-        print("\n[DRY RUN MODE ENABLED - ZERO REQUESTS SENT]")
-        planner = TestPlanner(graph, target_url)
-        for op in operations:
-            steps = planner.plan_audit_for_operation(op, user_a, user_b)
-            if steps:
-                print(f"\nPlanned sequence for {op.method} {op.path}:")
-                for s in steps:
-                    print(f"  - [{s.purpose}] {s.method} {s.url} (Identity: {s.identity_id})")
-        print("\n[SUCCESS] Dry-run completed. All prerequisite paths validated.")
-        return
-
-    print("\n[*] Initiating Dual-Token Graph Execution...")
-    reset_db()
-    update_target_config(defect_a=False, defect_b=True, defect_c=False, patched_mode=False)
-
-    # Check if target server is live; if not, use in-process ASGI client
-    import httpx
-    from app.main import app
+    # Check if target server is live
     is_live = False
     try:
         async with httpx.AsyncClient(timeout=0.5) as check_client:
@@ -69,22 +50,50 @@ async def run_cli_scan(dry_run: bool, target_url: str):
     except Exception:
         is_live = False
 
-    executor = SafeExecutor(total_budget=30, per_endpoint_budget=6)
-    scanner = GraphGuidedScanner(executor, target_url)
-
     if is_live:
         print("[*] Connected to live target server at", target_url)
-        findings = await scanner.run_scan(operations, user_a, user_b)
+        auth_reg = AuthRegistry(target_url)
+        identities = await auth_reg.authenticate_all()
+        client = None
     else:
         print("[*] Live server not detected on port; executing against in-process target...")
-        async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://localhost:8000") as asgi_client:
-            # Override execute_step to use asgi_client
-            orig_execute = executor.execute_step
-            executor.execute_step = lambda step: orig_execute(step, client=asgi_client)
-            findings = await scanner.run_scan(operations, user_a, user_b)
+        from app.main import app
+        asgi_client = httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://127.0.0.1:8000")
+        auth_reg = AuthRegistry(target_url)
+        identities = await auth_reg.authenticate_all(client=asgi_client)
+        client = asgi_client
+
+    user_a = identities["user_a"]
+    user_b = identities["user_b"]
+    print(f"[*] Dynamic login verified: User A ({user_a.username}), User B ({user_b.username})")
+
+    if dry_run:
+        print("\n[DRY RUN MODE ENABLED - ZERO REQUESTS SENT]")
+        planner = TestPlanner(graph, target_url)
+        for op in operations:
+            steps = planner.plan_audit_for_operation(op, user_a, user_b, enable_mutations=enable_mutations)
+            if steps:
+                print(f"\nPlanned sequence for {op.method} {op.path}:")
+                for s in steps:
+                    print(f"  - [{s.purpose}] {s.method} {s.url} (Identity: {s.identity_id})")
+        print("\n[SUCCESS] Dry-run completed. All prerequisite paths validated.")
+        if client:
+            await client.aclose()
+        return
+
+    print("\n[*] Initiating Dual-Token Graph Execution...")
+    reset_db()
+    update_target_config(defect_a=False, defect_b=True, defect_c=False, patched_mode=False)
+
+    executor = SafeExecutor(allowed_hosts={"127.0.0.1", "localhost"}, total_budget=30, enable_mutations=enable_mutations)
+    scanner = GraphGuidedScanner(executor, target_url)
+
+    t0 = asyncio.get_event_loop().time()
+    findings = await scanner.run_scan(operations, user_a, user_b, enable_mutations=enable_mutations, client=client)
+    duration_ms = round((asyncio.get_event_loop().time() - t0) * 1000, 1)
 
     print("\n" + "=" * 65)
-    print(f"  AUDIT COMPLETE: {len(findings)} CONFIRMED VULNERABILITIES")
+    print(f"  AUDIT COMPLETE: {len(findings)} CONFIRMED VULNERABILITIES ({duration_ms}ms)")
     print("=" * 65)
 
     for f in findings:
@@ -95,6 +104,9 @@ async def run_cli_scan(dry_run: bool, target_url: str):
         print(f"    DAG Path:      {' -> '.join(f.graph_path)}")
         print(f"    Leaked Fields: {f.diff_fields}")
         print(f"    Repro Curl:    {f.repro_curl}")
+
+    if client:
+        await client.aclose()
 
 if __name__ == "__main__":
     main()

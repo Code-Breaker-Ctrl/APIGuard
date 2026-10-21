@@ -20,10 +20,12 @@ class GraphGuidedScanner:
     def __init__(
         self,
         executor: SafeExecutor,
-        base_url: str = "http://127.0.0.1:8000/target"
+        base_url: str = "http://127.0.0.1:8000/target",
+        disable_propagation: bool = False
     ):
         self.executor = executor
         self.base_url = base_url.rstrip("/")
+        self.disable_propagation = disable_propagation
         self.graph = ResourceGraph()
         self.inference = InferenceEngine(self.graph)
 
@@ -142,7 +144,11 @@ class GraphGuidedScanner:
                 purpose="setup"
             )
             setup_res = await self._execute_and_emit(setup_step, on_event, client=client)
-            harvested_id = setup_res.body.get("id", "proj_42") if isinstance(setup_res.body, dict) else "proj_42"
+            if not isinstance(setup_res.body, dict) or "id" not in setup_res.body:
+                await self._emit(on_event, "log", f"[INCONCLUSIVE] Failed to harvest dynamic ID from {producer_op.operation_id}", "A")
+                continue
+            harvested_id = setup_res.body["id"]
+            derived_resource_type = res_node.label or resource_name.capitalize()
 
             # 2. Dynamically find primary control read operation for this resource
             # (GET op with param matching id_node that operates on this resource)
@@ -191,16 +197,17 @@ class GraphGuidedScanner:
                     data={"hypothesis_id": hyp.id, "confidence": hyp.confidence}
                 )
 
-                # Propagate rule across graph edges to adjacent ops
-                propagated = self.inference.propagate_rules(primary_read_op.operation_id)
-                for p_hyp in propagated:
-                    await self._emit(
-                        on_event,
-                        event_type="hypothesis_propagated",
-                        phase="B",
-                        message=f"[PROPAGATION] Propagated candidate ownership rule to {p_hyp.operation_id}",
-                        data={"candidate_id": p_hyp.id, "confidence": p_hyp.confidence}
-                    )
+                # Propagate rule across graph edges to adjacent ops (unless disabled)
+                if not self.disable_propagation:
+                    propagated = self.inference.propagate_rules(primary_read_op.operation_id)
+                    for p_hyp in propagated:
+                        await self._emit(
+                            on_event,
+                            event_type="hypothesis_propagated",
+                            phase="B",
+                            message=f"[PROPAGATION] Propagated candidate ownership rule to {p_hyp.operation_id}",
+                            data={"candidate_id": p_hyp.id, "confidence": p_hyp.confidence}
+                        )
 
             # Check if primary read itself was vulnerable (Defect A)
             if hyp is None and probe_res.status_code == 200:
@@ -235,8 +242,11 @@ class GraphGuidedScanner:
 
             ordered_test_ops = read_ops + (patch_ops if enable_mutations else [])
 
+            if self.disable_propagation:
+                ordered_test_ops = []
+
             for test_op in ordered_test_ops:
-                op_hyp = self.inference.hypotheses.get(test_op.operation_id) or self._create_adhoc_hyp(test_op)
+                op_hyp = self.inference.hypotheses.get(test_op.operation_id) or self._create_adhoc_hyp(test_op, derived_resource_type)
 
                 # Compute real graph path via BFS
                 real_graph_path = self._compute_bfs_graph_path(primary_read_op.operation_id, test_op.operation_id)
@@ -344,11 +354,11 @@ class GraphGuidedScanner:
 
         return findings
 
-    def _create_adhoc_hyp(self, op: Operation):
+    def _create_adhoc_hyp(self, op: Operation, resource_type: str = "Resource"):
         from app.engine.models import Rule, RuleType, Hypothesis
         return Hypothesis(
             id=f"hyp_adhoc_{op.operation_id}",
-            rule=Rule(rule_type=RuleType.OWNER_ONLY, resource_type="Project"),
+            rule=Rule(rule_type=RuleType.OWNER_ONLY, resource_type=resource_type),
             operation_id=op.operation_id,
             confidence=0.50,
             provenance=Provenance.PROPAGATED

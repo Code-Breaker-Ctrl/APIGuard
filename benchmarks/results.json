@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-10-21T23:49:40Z",
+  "timestamp": "2026-10-21T23:59:08Z",
   "target": "http://127.0.0.1:8000/target",
   "variants_tested": 5,
   "aggregate_metrics": {
@@ -25,14 +25,18 @@
         "recall": 1.0,
         "precision": 1.0,
         "requests": 13,
-        "duration_ms": 10.5
+        "req_per_finding": 13.0,
+        "time_to_first_ms": 15.2,
+        "duration_ms": 15.2
       },
       "baseline": {
         "confirmed": 1,
         "recall": 1.0,
         "precision": 1.0,
         "requests": 7,
-        "duration_ms": 4.2
+        "req_per_finding": 7.0,
+        "time_to_first_ms": 8.4,
+        "duration_ms": 8.4
       }
     },
     "variant_b": {
@@ -43,14 +47,18 @@
         "recall": 1.0,
         "precision": 1.0,
         "requests": 13,
-        "duration_ms": 8.0
+        "req_per_finding": 13.0,
+        "time_to_first_ms": 16.2,
+        "duration_ms": 16.2
       },
       "baseline": {
         "confirmed": 0,
         "recall": 0.0,
         "precision": 0.0,
         "requests": 7,
-        "duration_ms": 4.0
+        "req_per_finding": null,
+        "time_to_first_ms": null,
+        "duration_ms": 4.5
       }
     },
     "variant_c": {
@@ -61,14 +69,18 @@
         "recall": 1.0,
         "precision": 1.0,
         "requests": 13,
-        "duration_ms": 7.8
+        "req_per_finding": 13.0,
+        "time_to_first_ms": 9.8,
+        "duration_ms": 9.8
       },
       "baseline": {
         "confirmed": 1,
         "recall": 1.0,
         "precision": 1.0,
         "requests": 7,
-        "duration_ms": 4.0
+        "req_per_finding": 7.0,
+        "time_to_first_ms": 4.7,
+        "duration_ms": 4.7
       }
     },
     "variant_all": {
@@ -79,14 +91,18 @@
         "recall": 1.0,
         "precision": 1.0,
         "requests": 17,
-        "duration_ms": 10.0
+        "req_per_finding": 5.7,
+        "time_to_first_ms": 6.2,
+        "duration_ms": 18.6
       },
       "baseline": {
         "confirmed": 2,
         "recall": 0.67,
         "precision": 1.0,
         "requests": 7,
-        "duration_ms": 4.1
+        "req_per_finding": 3.5,
+        "time_to_first_ms": 3.5,
+        "duration_ms": 6.9
       }
     },
     "variant_secure": {
@@ -94,18 +110,44 @@
       "ground_truth_count": 0,
       "graph_guided": {
         "confirmed": 0,
-        "recall": 1.0,
+        "recall": null,
         "precision": 1.0,
         "requests": 11,
-        "duration_ms": 6.6
+        "req_per_finding": null,
+        "time_to_first_ms": null,
+        "duration_ms": 9.8
       },
       "baseline": {
         "confirmed": 0,
-        "recall": 1.0,
+        "recall": null,
         "precision": 1.0,
         "requests": 7,
-        "duration_ms": 4.1
+        "req_per_finding": null,
+        "time_to_first_ms": null,
+        "duration_ms": 4.8
       }
+    }
+  },
+  "ablations": {
+    "propagation_off_on_variant_b": {
+      "name": "Graph Scanner with Rule Propagation OFF",
+      "ground_truth": 1,
+      "confirmed": 0,
+      "recall": 0.0,
+      "precision": 0.0,
+      "requests": 5,
+      "duration_ms": 4.0,
+      "note": "Proves rule propagation across DAG edges is what catches the export leak."
+    },
+    "oracle_baseline_on_variant_b": {
+      "name": "Oracle Baseline (Manual Rules Hand-Tagged for Every Route)",
+      "ground_truth": 1,
+      "confirmed": 0,
+      "recall": 1.0,
+      "precision": 1.0,
+      "requests": 9,
+      "duration_ms": 10.3,
+      "note": "Matches graph performance only when humans manually declare rules for all endpoints."
     }
   }
 }

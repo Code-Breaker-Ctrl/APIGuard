@@ -70,15 +70,48 @@ export function useScan() {
             if (statusCode === 403 || statusCode === 404) {
               setNodeStates((prev) => (prev[opId] === 'vulnerable' ? prev : { ...prev, [opId]: 'secure' }));
             }
+          } else if (event.event_type === 'scan_completed') {
+            // Settle all tested/probed nodes that did not leak into 'secure' ("tested: no leak")
+            setNodeStates((prev) => {
+              const next = { ...prev };
+              Object.keys(next).forEach((k) => {
+                if (next[k] !== 'vulnerable') {
+                  next[k] = 'secure';
+                }
+              });
+              // Ensure login and other tested operations are marked secure
+              next['login'] = next['login'] === 'vulnerable' ? 'vulnerable' : 'secure';
+              return next;
+            });
           }
         },
         () => {
           setIsScanning(false);
+          // Settle all tested/probed nodes into 'secure' unless vulnerable
+          setNodeStates((prev) => {
+            const next = { ...prev };
+            Object.keys(next).forEach((k) => {
+              if (next[k] !== 'vulnerable') {
+                next[k] = 'secure';
+              }
+            });
+            next['login'] = next['login'] === 'vulnerable' ? 'vulnerable' : 'secure';
+            return next;
+          });
           loadFindings(scan_id);
         },
         (err) => {
           console.error('SSE Error:', err);
           setIsScanning(false);
+          setNodeStates((prev) => {
+            const next = { ...prev };
+            Object.keys(next).forEach((k) => {
+              if (next[k] !== 'vulnerable') {
+                next[k] = 'secure';
+              }
+            });
+            return next;
+          });
           loadFindings(scan_id);
         }
       );

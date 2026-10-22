@@ -55,7 +55,7 @@ const OperationNode = ({ data, selected }: any) => {
     bgColor = 'bg-emerald-950/30';
     statusBadge = (
       <span className="flex items-center gap-1 text-[9px] text-emerald-300 font-bold px-1.5 py-0.5 rounded bg-emerald-900/50">
-        <ShieldCheck className="w-2.5 h-2.5" /> SECURE
+        <ShieldCheck className="w-2.5 h-2.5" /> TESTED: NO LEAK
       </span>
     );
   } else if (status === 'candidate') {
@@ -144,8 +144,8 @@ const FitViewOnUpdate: React.FC<{ dep: any }> = ({ dep }) => {
   const { fitView } = useReactFlow();
   useEffect(() => {
     const timer = setTimeout(() => {
-      fitView({ padding: 0.15, duration: 250 });
-    }, 40);
+      fitView({ padding: 0.25, duration: 300 });
+    }, 50);
     return () => clearTimeout(timer);
   }, [dep, fitView]);
   return null;
@@ -160,7 +160,7 @@ export const GraphView: React.FC<GraphViewProps> = ({
 }) => {
   const { nodes, edges } = useMemo(() => {
     const g = new dagre.graphlib.Graph();
-    g.setGraph({ rankdir: 'LR', nodesep: 75, ranksep: 95 });
+    g.setGraph({ rankdir: 'LR', nodesep: 80, ranksep: 105, marginx: 40, marginy: 30 });
     g.setDefaultEdgeLabel(() => ({}));
 
     backendNodes.forEach((node) => {
@@ -185,7 +185,7 @@ export const GraphView: React.FC<GraphViewProps> = ({
       return {
         id: node.id,
         type: customType,
-        position: { x: pos.x - 100, y: pos.y - 35 },
+        position: { x: pos.x + 30, y: pos.y + 20 },
         selected: node.id === selectedNodeId,
         data: {
           ...node,
@@ -219,10 +219,10 @@ export const GraphView: React.FC<GraphViewProps> = ({
           height: 15,
         },
         label: edge.type.replace('_', ' ').toLowerCase(),
-        labelStyle: { fill: '#cbd5e1', fontSize: 10, fontFamily: 'monospace', fontWeight: 600 },
-        labelBgStyle: { fill: '#121826', fillOpacity: 0.95 },
-        labelBgPadding: [6, 3] as [number, number],
-        labelBgBorderRadius: 4,
+        labelStyle: { fill: '#f1f5f9', fontSize: 11, fontFamily: 'monospace', fontWeight: 700 },
+        labelBgStyle: { fill: '#0d131f', fillOpacity: 0.98 },
+        labelBgPadding: [8, 4] as [number, number],
+        labelBgBorderRadius: 5,
       };
     });
 

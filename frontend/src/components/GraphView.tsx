@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
   ReactFlow,
   MiniMap,
@@ -9,6 +9,8 @@ import {
   Handle,
   Position,
   useReactFlow,
+  useNodesState,
+  useEdgesState,
 } from '@xyflow/react';
 import type { Node, Edge, ReactFlowInstance } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
@@ -95,7 +97,6 @@ const OperationNode = ({ data, selected }: any) => {
       </span>
     );
   } else {
-    // Default for operations never probed (e.g. PATCH/DELETE with mutations off)
     borderColor = 'border-[#263043]';
     bgColor = 'bg-[#10141e]';
     statusBadge = (
@@ -115,9 +116,10 @@ const OperationNode = ({ data, selected }: any) => {
 
   return (
     <div
-      className={`px-2.5 py-1.5 rounded-lg border text-left shadow-lg transition-all duration-200 cursor-pointer w-[155px] ${bgColor} ${borderColor} ${
+      className={`px-2.5 py-1.5 rounded-lg border text-left shadow-lg transition-all duration-200 cursor-pointer w-[155px] h-[50px] box-border ${bgColor} ${borderColor} ${
         selected ? 'ring-2 ring-emerald-400' : ''
       }`}
+      style={{ width: 155, height: 50, boxSizing: 'border-box' }}
     >
       <Handle type="target" position={Position.Top} className="w-2 h-2 bg-slate-500 border border-slate-800" />
       <div className="flex items-center justify-between gap-1 mb-1">
@@ -140,9 +142,10 @@ const OperationNode = ({ data, selected }: any) => {
 // Custom Node for Resource Collections
 const ResourceNode = ({ data, selected }: any) => (
   <div
-    className={`px-2 py-1.5 rounded-lg border border-emerald-500/40 bg-[#091a18] text-left shadow-md w-[110px] ${
+    className={`px-2 py-1.5 rounded-lg border border-emerald-500/40 bg-[#091a18] text-left shadow-md w-[110px] h-[36px] box-border ${
       selected ? 'ring-2 ring-emerald-400' : ''
     }`}
+    style={{ width: 110, height: 36, boxSizing: 'border-box' }}
   >
     <Handle type="target" position={Position.Top} className="w-2 h-2 bg-emerald-500" />
     <div className="flex items-center gap-1 text-[8.5px] font-bold text-emerald-400 font-mono mb-0.5">
@@ -157,9 +160,10 @@ const ResourceNode = ({ data, selected }: any) => (
 // Custom Node for Identifiers
 const IdentifierNode = ({ data, selected }: any) => (
   <div
-    className={`px-2 py-1.5 rounded-md border border-amber-500/40 bg-[#16120b] text-left shadow-sm w-[110px] ${
+    className={`px-2 py-1.5 rounded-md border border-amber-500/40 bg-[#16120b] text-left shadow-sm w-[110px] h-[36px] box-border ${
       selected ? 'ring-2 ring-amber-400' : ''
     }`}
+    style={{ width: 110, height: 36, boxSizing: 'border-box' }}
   >
     <Handle type="target" position={Position.Top} className="w-2 h-2 bg-amber-500" />
     <div className="flex items-center gap-1 text-[8px] font-bold text-amber-400 font-mono mb-0.5">
@@ -205,9 +209,27 @@ export const GraphView: React.FC<GraphViewProps> = ({
 }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const rfInstanceRef = useRef<ReactFlowInstance | null>(null);
+  const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
 
-  // Compute Dagre hierarchical top-to-bottom layout
-  const { nodes, edges } = useMemo(() => {
+  const nodeStatesRef = useRef(nodeStates);
+  useEffect(() => {
+    nodeStatesRef.current = nodeStates;
+  }, [nodeStates]);
+
+  const selectedNodeIdRef = useRef(selectedNodeId);
+  useEffect(() => {
+    selectedNodeIdRef.current = selectedNodeId;
+  }, [selectedNodeId]);
+
+  // (3) Run Dagre layout ONLY when the graph (spec) changes, NOT on scan events
+  useEffect(() => {
+    if (!backendNodes || backendNodes.length === 0) {
+      setNodes([]);
+      setEdges([]);
+      return;
+    }
+
     const g = new dagre.graphlib.Graph();
     g.setGraph({ rankdir: 'TB', nodesep: 18, ranksep: 36, marginx: 15, marginy: 15 });
     g.setDefaultEdgeLabel(() => ({}));
@@ -235,8 +257,12 @@ export const GraphView: React.FC<GraphViewProps> = ({
 
     dagre.layout(g);
 
-    const flowNodes: Node[] = backendNodes.map((node) => {
+    // (1) Give EVERY node explicit width and height matching dagre dimensions (155x50 / 110x36)
+    const newNodes: Node[] = backendNodes.map((node) => {
       const pos = g.node(node.id) || { x: 0, y: 0 };
+      const isOp = node.type === 'operation';
+      const width = isOp ? 155 : 110;
+      const height = isOp ? 50 : 36;
       let customType = 'operationNode';
       if (node.type === 'resource_type') customType = 'resourceNode';
       if (node.type === 'identifier') customType = 'identifierNode';
@@ -245,18 +271,23 @@ export const GraphView: React.FC<GraphViewProps> = ({
         id: node.id,
         type: customType,
         position: { x: pos.x, y: pos.y },
-        selected: node.id === selectedNodeId,
+        width,
+        height,
+        initialWidth: width,
+        initialHeight: height,
+        style: { width: `${width}px`, height: `${height}px` },
+        selected: node.id === selectedNodeIdRef.current,
         data: {
           ...node,
-          status: nodeStates[node.id] || 'idle',
+          status: nodeStatesRef.current[node.id] || 'idle',
         },
       };
     });
 
-    const flowEdges: Edge[] = backendEdges.map((edge, idx) => {
+    const newEdges: Edge[] = backendEdges.map((edge, idx) => {
       const isPropagated = edge.provenance === 'propagated' || edge.provenance === 'heuristic';
       const isVulnerableEdge =
-        nodeStates[edge.to_node] === 'vulnerable' || nodeStates[edge.from_node] === 'vulnerable';
+        nodeStatesRef.current[edge.to_node] === 'vulnerable' || nodeStatesRef.current[edge.from_node] === 'vulnerable';
 
       let strokeColor = isPropagated ? '#38bdf8' : '#64748b';
       if (isVulnerableEdge) strokeColor = '#f43f5e';
@@ -285,23 +316,86 @@ export const GraphView: React.FC<GraphViewProps> = ({
       };
     });
 
-    return { nodes: flowNodes, edges: flowEdges };
-  }, [backendNodes, backendEdges, nodeStates, selectedNodeId]);
+    setNodes(newNodes);
+    setEdges(newEdges);
 
-  // (1) Call fitView when nodes+layout are set
+    // (4) Call fitView after layout
+    requestAnimationFrame(() => {
+      rfInstanceRef.current?.fitView({ padding: 0.15 });
+    });
+    const timer = setTimeout(() => {
+      rfInstanceRef.current?.fitView({ padding: 0.15 });
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [backendNodes, backendEdges, setNodes, setEdges]);
+
+  // (2) When updating node state, update ONLY node.data via setNodes, never rebuild node array from layout
   useEffect(() => {
-    if (rfInstanceRef.current && nodes.length > 0) {
-      requestAnimationFrame(() => {
-        rfInstanceRef.current?.fitView({ padding: 0.15 });
-      });
-      const timer = setTimeout(() => {
-        rfInstanceRef.current?.fitView({ padding: 0.15 });
-      }, 100);
-      return () => clearTimeout(timer);
-    }
-  }, [nodes, edges]);
+    setNodes((prevNodes) =>
+      prevNodes.map((n) => {
+        const currentStatus = (n.data as any)?.status;
+        const newStatus = nodeStates[n.id] || 'idle';
+        if (currentStatus === newStatus) return n;
+        return {
+          ...n,
+          data: {
+            ...n.data,
+            status: newStatus,
+          },
+        };
+      })
+    );
 
-  // (2) ResizeObserver on container re-running fitView({ padding: 0.15 })
+    setEdges((prevEdges) =>
+      prevEdges.map((e) => {
+        const isVulnerableEdge =
+          nodeStates[e.target] === 'vulnerable' || nodeStates[e.source] === 'vulnerable';
+        const edgeDef = backendEdges.find(
+          (be) => be.from_node === e.source && be.to_node === e.target
+        );
+        const isPropagated =
+          edgeDef?.provenance === 'propagated' || edgeDef?.provenance === 'heuristic';
+        let strokeColor = isPropagated ? '#38bdf8' : '#64748b';
+        if (isVulnerableEdge) strokeColor = '#f43f5e';
+
+        const shouldAnimate = edgeDef?.type === 'NESTED_UNDER' || isVulnerableEdge;
+        if (e.style?.stroke === strokeColor && e.animated === shouldAnimate) {
+          return e;
+        }
+
+        return {
+          ...e,
+          animated: shouldAnimate,
+          style: {
+            ...e.style,
+            stroke: strokeColor,
+          },
+          markerEnd: {
+            type: MarkerType.ArrowClosed,
+            color: strokeColor,
+            width: 14,
+            height: 14,
+          },
+        };
+      })
+    );
+  }, [nodeStates, backendEdges, setNodes, setEdges]);
+
+  // Update selection without rebuilding
+  useEffect(() => {
+    setNodes((prevNodes) =>
+      prevNodes.map((n) => {
+        const isSelected = n.id === selectedNodeId;
+        if (n.selected === isSelected) return n;
+        return {
+          ...n,
+          selected: isSelected,
+        };
+      })
+    );
+  }, [selectedNodeId, setNodes]);
+
+  // ResizeObserver on container re-running fitView({ padding: 0.15 })
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -333,7 +427,7 @@ export const GraphView: React.FC<GraphViewProps> = ({
       className="w-full h-full relative bg-[#090b10] min-h-0"
       style={{ width: '100%', height: '100%' }}
     >
-      {/* (4) Fit view button overlay */}
+      {/* Fit view button overlay */}
       <div className="absolute top-3 right-3 z-10 flex items-center gap-2">
         <button
           type="button"
@@ -349,11 +443,12 @@ export const GraphView: React.FC<GraphViewProps> = ({
       <ReactFlow
         nodes={nodes}
         edges={edges}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
         nodeTypes={nodeTypes}
         onNodeClick={(_, node) => onSelectNode(node.id)}
         onInit={(instance) => {
           rfInstanceRef.current = instance;
-          // (1) Call fitView from onInit AND requestAnimationFrame / short timeout
           instance.fitView({ padding: 0.15 });
           requestAnimationFrame(() => {
             instance.fitView({ padding: 0.15 });
@@ -369,7 +464,7 @@ export const GraphView: React.FC<GraphViewProps> = ({
         fitViewOptions={{ padding: 0.15 }}
         className="bg-[#090b10]"
       >
-        <FitViewInternal dep={nodeStates} />
+        <FitViewInternal dep={backendNodes} />
         <Background variant={BackgroundVariant.Dots} gap={18} size={1} color="#1c2433" />
         <Controls
           showFitView={true}

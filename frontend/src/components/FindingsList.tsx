@@ -63,8 +63,9 @@ export const FindingsList: React.FC<FindingsListProps> = ({
             return (
               <div
                 key={f.id}
+                data-testid="finding-card"
                 onClick={() => onSelectFinding(f)}
-                className={`p-3 rounded-lg border transition-all cursor-pointer ${
+                className={`finding-card p-3 rounded-lg border transition-all cursor-pointer ${
                   isSelected
                     ? 'border-rose-500 bg-rose-950/30 ring-1 ring-rose-500'
                     : 'border-[#1e2538] bg-[#090c12] hover:border-slate-700'

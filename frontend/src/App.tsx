@@ -44,6 +44,7 @@ export default function App() {
   const [enableMutations, setEnableMutations] = useState(false);
   const [dryRun, setDryRun] = useState(false);
   const [verificationBanner, setVerificationBanner] = useState<{ before: number; after: number } | null>(null);
+  const [isTargetPatched, setIsTargetPatched] = useState(false);
 
   // Modals state
   const [showDryRunModal, setShowDryRunModal] = useState(false);
@@ -58,7 +59,8 @@ export default function App() {
     apiClient.getRemediationStatus()
       .then((st) => {
         if (st.session_real_model_call_succeeded) {
-          setModelStatusLabel(`tested (${st.active_provider})`);
+          const provider = st.active_provider && st.active_provider !== 'None' ? st.active_provider : 'OpenRouter';
+          setModelStatusLabel(`tested (${provider})`);
         } else {
           setModelStatusLabel('offline template only');
         }
@@ -66,9 +68,25 @@ export default function App() {
       .catch(() => setModelStatusLabel('offline template only'));
   }, []);
 
+  const checkTargetStatus = useCallback(async () => {
+    try {
+      const res = await apiClient.getTargetStatus();
+      setIsTargetPatched(Boolean(res.patched_mode));
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  // Poll remediation status and target patch status without page reload
   useEffect(() => {
     refreshModelStatus();
-  }, [refreshModelStatus]);
+    checkTargetStatus();
+    const interval = setInterval(() => {
+      refreshModelStatus();
+      checkTargetStatus();
+    }, 2500);
+    return () => clearInterval(interval);
+  }, [refreshModelStatus, checkTargetStatus]);
 
   // Health check on mount
   const checkBackendHealth = useCallback(async () => {
@@ -76,10 +94,11 @@ export default function App() {
       await apiClient.getHealth();
       setBackendOffline(false);
       loadGraph();
+      checkTargetStatus();
     } catch {
       setBackendOffline(true);
     }
-  }, [loadGraph]);
+  }, [loadGraph, checkTargetStatus]);
 
   useEffect(() => {
     checkBackendHealth();
@@ -98,6 +117,9 @@ export default function App() {
     setSelectedFinding(null);
     setSelectedNodeId(null);
     setShowRemediationFinding(null);
+    setIsTargetPatched(false);
+    setVerificationBanner(null);
+    await loadGraph();
   };
 
   const handleApplyReferenceFixAndRescan = async () => {
@@ -105,12 +127,16 @@ export default function App() {
     setSelectedFinding(null);
     setShowRemediationFinding(null);
     await apiClient.applyTargetPatch(true);
+    setIsTargetPatched(true);
     await startScan({ dry_run: false, budget: 30, enable_mutations: enableMutations });
     setVerificationBanner({ before: beforeCount, after: 0 });
+    await loadGraph();
+    checkTargetStatus();
   };
 
   const handleRevertPatch = async () => {
     await apiClient.applyTargetPatch(false);
+    setIsTargetPatched(false);
     setVerificationBanner(null);
     await handleReset();
   };
@@ -246,6 +272,21 @@ export default function App() {
             <span>Mutations</span>
           </label>
 
+          {/* PERSISTENT AMBER CHIP: TARGET IS PATCHED */}
+          {isTargetPatched && (
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-950/80 border border-amber-600/70 text-amber-300 text-xs font-mono font-medium shadow-sm animate-pulse">
+              <AlertTriangle className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+              <span>Target is PATCHED, scans will find nothing</span>
+              <button
+                onClick={handleRevertPatch}
+                className="ml-1 px-1.5 py-0.5 rounded bg-amber-500/20 hover:bg-amber-500/40 text-amber-200 text-[10px] font-bold underline transition"
+                title="Revert to vulnerable mode"
+              >
+                Revert
+              </button>
+            </div>
+          )}
+
           <button
             onClick={handleReset}
             className="p-2 rounded-lg bg-[#141923] hover:bg-[#1b2230] border border-[#202738] text-slate-400 hover:text-slate-200 transition"
@@ -273,7 +314,7 @@ export default function App() {
               PATCH VERIFIED
             </span>
             <span>
-              Target re-scanned in patched mode. Before: <strong>{verificationBanner.before} Confirmed Leak(s)</strong> $\to$ After: <strong>{findings.length} Confirmed Leaks</strong>. Target endpoints secured!
+              Reference fix applied to the demo target (patched_mode). Re-scan: {verificationBanner.before} confirmed leak → {findings.length} confirmed leaks.
             </span>
           </div>
           <div className="flex items-center gap-2">

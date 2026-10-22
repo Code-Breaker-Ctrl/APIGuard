@@ -63,7 +63,13 @@ ACTIVE_EVENT_QUEUES: Dict[str, asyncio.Queue] = {}
 
 @app.get("/api/health")
 def health():
-    return {"status": "healthy", "service": "APIGuard Engine", "target_mounted": True}
+    cfg = get_target_config()
+    return {
+        "status": "healthy",
+        "service": "APIGuard Engine",
+        "target_mounted": True,
+        "target_patched": cfg.patched_mode
+    }
 
 @app.post("/api/spec/import")
 async def import_spec(file: Optional[UploadFile] = File(None), raw_spec: Optional[str] = Form(None)):
@@ -256,7 +262,24 @@ async def reset_target():
     reset_db()
     await clear_db()
     ACTIVE_EVENT_QUEUES.clear()
-    return {"status": "target_reset_success"}
+    cfg = get_target_config()
+    update_target_config(
+        defect_a=cfg.defect_a,
+        defect_b=cfg.defect_b,
+        defect_c=cfg.defect_c,
+        patched_mode=False
+    )
+    return {"status": "target_reset_success", "patched_mode": False}
+
+@app.get("/api/target/status")
+def get_target_status():
+    cfg = get_target_config()
+    return {
+        "patched_mode": cfg.patched_mode,
+        "defect_a": cfg.defect_a,
+        "defect_b": cfg.defect_b,
+        "defect_c": cfg.defect_c
+    }
 
 @app.get("/api/benchmark/latest")
 async def get_latest_benchmark():

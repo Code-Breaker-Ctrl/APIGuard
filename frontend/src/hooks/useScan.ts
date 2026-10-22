@@ -59,6 +59,7 @@ export function useScan() {
 
       const setupOps = new Set<string>(['login', 'createProject']);
       const testedNoLeakOps = new Set<string>();
+      const emptyBodyTrapOps = new Set<string>();
       const inconclusiveOps = new Set<string>();
       const vulnerableOps = new Set<string>();
 
@@ -77,14 +78,21 @@ export function useScan() {
             }
           });
 
-          // 3. Only show "TESTED: NO LEAK" when owner succeeded AND non-owner denied
-          testedNoLeakOps.forEach((id) => {
+          // 3. Empty-body trap operations: NO LEAK (empty response)
+          emptyBodyTrapOps.forEach((id) => {
             if (!vulnerableOps.has(id) && !inconclusiveOps.has(id)) {
+              next[id] = 'secure_empty';
+            }
+          });
+
+          // 4. Only show "TESTED: NO LEAK" when owner succeeded AND non-owner denied
+          testedNoLeakOps.forEach((id) => {
+            if (!vulnerableOps.has(id) && !inconclusiveOps.has(id) && !emptyBodyTrapOps.has(id)) {
               next[id] = 'secure';
             }
           });
 
-          // 4. Vulnerable operations
+          // 5. Vulnerable operations
           vulnerableOps.forEach((id) => {
             next[id] = 'vulnerable';
           });
@@ -129,9 +137,15 @@ export function useScan() {
               setFindings((prev) => dedupeFindings([...prev, event.data as Finding]));
             }
           } else if (event.event_type === 'probe_denied') {
+            const isTrapEmpty = event.data?.status === 'secure_empty_body' || event.message?.includes('empty response');
             if (opId && !inconclusiveOps.has(opId) && !vulnerableOps.has(opId)) {
-              testedNoLeakOps.add(opId);
-              setNodeStates((prev) => ({ ...prev, [opId]: 'secure' }));
+              if (isTrapEmpty) {
+                emptyBodyTrapOps.add(opId);
+                setNodeStates((prev) => ({ ...prev, [opId]: 'secure_empty' }));
+              } else {
+                testedNoLeakOps.add(opId);
+                setNodeStates((prev) => ({ ...prev, [opId]: 'secure' }));
+              }
             }
           } else if (event.event_type === 'hypothesis_propagated' && opId) {
             if (!setupOps.has(opId) && !vulnerableOps.has(opId) && !testedNoLeakOps.has(opId) && !inconclusiveOps.has(opId)) {

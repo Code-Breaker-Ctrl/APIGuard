@@ -143,39 +143,39 @@ def test_verifier_trap_legitimate_denial():
 
 def test_verifier_owner_control_failed_inconclusive():
     """
-    If the owner's CONTROL request does not return success (e.g. 404 because
+    If the owner's CONTROL request does not return success (e.g. /members 404 because
     the route doesn't exist on the target), the verification must return
     FindingStatus.INCONCLUSIVE, NEVER None (which signifies legitimate denial/secure).
     """
     hyp = Hypothesis(
-        id="hyp_test_404",
+        id="hyp_test_members_404",
         rule=Rule(rule_type=RuleType.OWNER_ONLY, resource_type="Project"),
-        operation_id="getNonexistentRoute",
+        operation_id="getProjectMembers",
         confidence=0.85,
         provenance=Provenance.OBSERVED
     )
 
     # Owner got 404 (route does not exist on target)
     owner_res = ExecutionResult(
-        step_id="c_nonexistent", operation_id="getNonexistentRoute", identity_id="a",
-        method="GET", url="http://loc/projects/p1/nonexistent",
+        step_id="c_members", operation_id="getProjectMembers", identity_id="a",
+        method="GET", url="http://loc/projects/p1/members",
         status_code=404, duration_ms=5, sanitized_headers={},
         body={"detail": "Not Found"}, correlation_id="1"
     )
     # Probe also gets 404
     probe_res = ExecutionResult(
-        step_id="p_nonexistent", operation_id="getNonexistentRoute", identity_id="b",
-        method="GET", url="http://loc/projects/p1/nonexistent",
+        step_id="p_members", operation_id="getProjectMembers", identity_id="b",
+        method="GET", url="http://loc/projects/p1/members",
         status_code=404, duration_ms=5, sanitized_headers={},
         body={"detail": "Not Found"}, correlation_id="2"
     )
 
     finding = DifferentialVerifier.verify(
-        operation_id="getNonexistentRoute",
-        endpoint="/projects/{id}/nonexistent",
+        operation_id="getProjectMembers",
+        endpoint="/projects/{id}/members",
         method="GET",
         hypothesis=hyp,
-        graph_path=["getNonexistentRoute"],
+        graph_path=["getProjectMembers"],
         owner_result=owner_res,
         probe_result=probe_res
     )

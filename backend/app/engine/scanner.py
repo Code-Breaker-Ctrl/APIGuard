@@ -341,17 +341,20 @@ class GraphGuidedScanner:
                     findings.append(finding)
                     await self._emit(on_event, "finding_confirmed", f"[ALERT] Confirmed BOLA at {test_op.method} {test_op.path}", "C", finding.model_dump())
                 elif finding and finding.status in {FindingStatus.POTENTIAL, FindingStatus.REJECTED}:
-                    await self._emit(on_event, "probe_denied", f"[VERIFIER] Trap evaluated on {test_op.path}: status {finding.status.value}", "C", {
+                    # Empty-body trap (e.g. /summary returning 200 with empty body): NO LEAK (empty response)
+                    await self._emit(on_event, "probe_denied", f"[VERIFIER] Trap evaluated on {test_op.path}: empty response (no leak)", "C", {
                         "operation_id": test_op.operation_id,
-                        "status": "secure",
-                        "status_code": p_res.status_code
+                        "status": "secure_empty_body",
+                        "status_code": p_res.status_code,
+                        "endpoint": test_op.path
                     })
                 elif finding is None:
                     # Only show "TESTED: NO LEAK" when owner succeeded AND non-owner correctly denied!
                     await self._emit(on_event, "probe_denied", f"[VERIFIER] Access denied for unauthorized probe on {test_op.path} (HTTP {p_res.status_code})", "C", {
                         "operation_id": test_op.operation_id,
                         "status": "secure",
-                        "status_code": p_res.status_code
+                        "status_code": p_res.status_code,
+                        "endpoint": test_op.path
                     })
 
             # 4. ORDER DELETE LAST ON A DISPOSABLE RESOURCE

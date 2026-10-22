@@ -62,6 +62,14 @@ const OperationNode = ({ data, selected }: any) => {
         <ShieldCheck className="w-2.5 h-2.5" /> TESTED: NO LEAK
       </span>
     );
+  } else if (status === 'secure_empty') {
+    borderColor = 'border-emerald-500/80 shadow-[0_0_10px_rgba(16,185,129,0.2)]';
+    bgColor = 'bg-emerald-950/35';
+    statusBadge = (
+      <span className="flex items-center gap-1 text-[8px] text-emerald-300 font-bold px-1 py-0.5 rounded bg-emerald-900/60 border border-emerald-700/60">
+        <ShieldCheck className="w-2.5 h-2.5 text-emerald-400" /> NO LEAK (empty response)
+      </span>
+    );
   } else if (status === 'inconclusive') {
     borderColor = 'border-slate-500/70 shadow-[0_0_12px_rgba(100,116,139,0.3)]';
     bgColor = 'bg-slate-900/90';
@@ -217,9 +225,9 @@ export const GraphView: React.FC<GraphViewProps> = ({
       if (edge.type === 'OPERATES_ON' && edge.from_node !== 'login' && edge.from_node !== 'createProject') {
         return;
       }
-      // 2. For nested operations (export / summary), their structural parent is getProjectById (NESTED_UNDER);
+      // 2. For nested operations (export / summary / members), their structural parent is getProjectById (NESTED_UNDER);
       // skip direct CONSUMES in dagre layout to prevent horizontal ballooning
-      if (edge.type === 'CONSUMES' && (edge.to_node === 'exportProjectBilling' || edge.to_node === 'getProjectSummary')) {
+      if (edge.type === 'CONSUMES' && (edge.to_node === 'exportProjectBilling' || edge.to_node === 'getProjectSummary' || edge.to_node === 'getProjectMembers')) {
         return;
       }
       g.setEdge(edge.from_node, edge.to_node);
@@ -361,7 +369,7 @@ export const GraphView: React.FC<GraphViewProps> = ({
         fitViewOptions={{ padding: 0.15 }}
         className="bg-[#090b10]"
       >
-        <FitViewInternal dep={nodes.length} />
+        <FitViewInternal dep={nodeStates} />
         <Background variant={BackgroundVariant.Dots} gap={18} size={1} color="#1c2433" />
         <Controls
           showFitView={true}
@@ -371,7 +379,7 @@ export const GraphView: React.FC<GraphViewProps> = ({
         <MiniMap
           nodeColor={(n) => {
             if (nodeStates[n.id] === 'vulnerable') return '#f43f5e';
-            if (nodeStates[n.id] === 'secure') return '#10b981';
+            if (nodeStates[n.id] === 'secure' || nodeStates[n.id] === 'secure_empty') return '#10b981';
             if (nodeStates[n.id] === 'setup' || n.id === 'login' || n.id === 'createProject') return '#3b82f6';
             if (nodeStates[n.id] === 'inconclusive') return '#64748b';
             if (nodeStates[n.id] === 'probing') return '#f59e0b';

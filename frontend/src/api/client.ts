@@ -140,6 +140,12 @@ export const apiClient = {
     return res.json();
   },
 
+  async getTargetStatus(): Promise<{ patched_mode: boolean; defect_a: boolean; defect_b: boolean; defect_c: boolean }> {
+    const res = await fetch('/api/target/status');
+    if (!res.ok) throw new Error(`Failed to load target status: HTTP ${res.status}`);
+    return res.json();
+  },
+
   async getLatestBenchmark(): Promise<BenchmarkData> {
     const res = await fetch('/api/benchmark/latest');
     if (!res.ok) throw new Error(`Failed to load benchmark: HTTP ${res.status}`);

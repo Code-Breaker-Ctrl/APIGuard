@@ -1,7 +1,7 @@
 export type NodeType = 'operation' | 'resource_type' | 'identifier' | 'identity' | 'evidence';
 export type EdgeType = 'OPERATES_ON' | 'PRODUCES' | 'CONSUMES' | 'REFERENCES' | 'NESTED_UNDER' | 'OBSERVED_ACCESS' | 'DENIED_ACCESS' | 'SUSPECTS_POLICY' | 'SUPPORTED_BY';
 export type FindingStatus = 'confirmed' | 'likely' | 'potential' | 'inconclusive' | 'not_reproducible' | 'rejected';
-export type NodeState = 'idle' | 'setup' | 'not_tested' | 'probing' | 'vulnerable' | 'secure' | 'candidate' | 'inconclusive';
+export type NodeState = 'idle' | 'setup' | 'not_tested' | 'probing' | 'vulnerable' | 'secure' | 'secure_empty' | 'candidate' | 'inconclusive';
 
 export interface BackendNode {
   id: string;

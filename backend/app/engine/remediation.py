@@ -54,6 +54,7 @@ OFFLINE_UNIT_TEST = """def test_bola_remediation_blocked():
 
 # Track whether any real generation succeeded during this server session
 SESSION_REAL_MODEL_CALL_SUCCEEDED = False
+LAST_WORKING_OPENROUTER_MODEL: Optional[str] = "recursive/flint-v1.0:free"
 
 class RemediationEngine:
     """
@@ -182,6 +183,7 @@ class RemediationEngine:
         Executes prompt via OpenRouter OpenAI-compatible endpoint.
         Tries models in order, advancing on 404, 429, or 5xx.
         """
+        global LAST_WORKING_OPENROUTER_MODEL
         if not self.openrouter_api_key:
             return None, None, "OPENROUTER_API_KEY not configured"
 
@@ -189,7 +191,11 @@ class RemediationEngine:
         if self.openrouter_model:
             models_to_try = [self.openrouter_model]
         else:
-            models_to_try = await self._get_openrouter_free_models()
+            free_catalog = await self._get_openrouter_free_models()
+            if LAST_WORKING_OPENROUTER_MODEL and LAST_WORKING_OPENROUTER_MODEL in free_catalog:
+                models_to_try = [LAST_WORKING_OPENROUTER_MODEL] + [m for m in free_catalog if m != LAST_WORKING_OPENROUTER_MODEL][:4]
+            else:
+                models_to_try = free_catalog[:6]
 
         headers = {
             "Authorization": f"Bearer {self.openrouter_api_key}",
@@ -206,7 +212,7 @@ class RemediationEngine:
                     "messages": [{"role": "user", "content": prompt_text}],
                     "temperature": 0.2
                 }
-                async with httpx.AsyncClient(timeout=14.0) as client:
+                async with httpx.AsyncClient(timeout=10.0) as client:
                     resp = await client.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json=payload)
                     if resp.status_code == 200:
                         data = resp.json()
@@ -214,6 +220,7 @@ class RemediationEngine:
                         if choices and "message" in choices[0]:
                             content = choices[0]["message"].get("content", "")
                             if content:
+                                LAST_WORKING_OPENROUTER_MODEL = model_id
                                 return content, model_id, None
                     else:
                         last_err = f"OpenRouter model {model_id} failed with HTTP {resp.status_code}: {resp.text[:100]}"
@@ -317,24 +324,23 @@ class RemediationEngine:
 
         # --- STEP 1: Attempt OpenRouter ---
         if self.openrouter_api_key:
-            out_v1, model_v1, err_v1 = await self._call_openrouter(v1_prompt)
-            if out_v1:
-                out_v2, model_v2, err_v2 = await self._call_openrouter(v2_prompt)
-                if out_v2:
-                    is_real = True
-                    SESSION_REAL_MODEL_CALL_SUCCEEDED = True
-                    source = "real"
-                    provider = "OpenRouter"
-                    model_used = model_v2 or model_v1 or "openrouter-free"
-                    badge_text = f"OpenRouter: {model_used}"
-                    v1_output = out_v1
-                    v2_output = out_v2
-                    code_patch = out_v2
-                    explanation = f"Generated live using OpenRouter model ({model_used}). Both v1 and v2 outputs are real model completions."
-                else:
-                    self.last_error = f"OpenRouter v2 prompt failed: {err_v2}"
+            (out_v1, model_v1, err_v1), (out_v2, model_v2, err_v2) = await asyncio.gather(
+                self._call_openrouter(v1_prompt),
+                self._call_openrouter(v2_prompt)
+            )
+            if out_v1 and out_v2:
+                is_real = True
+                SESSION_REAL_MODEL_CALL_SUCCEEDED = True
+                source = "real"
+                provider = "OpenRouter"
+                model_used = model_v2 or model_v1 or "openrouter-free"
+                badge_text = f"OpenRouter: {model_used}"
+                v1_output = out_v1
+                v2_output = out_v2
+                code_patch = out_v2
+                explanation = f"Generated live using OpenRouter model ({model_used}). Both v1 and v2 outputs are real model completions."
             else:
-                self.last_error = f"OpenRouter v1 prompt failed: {err_v1}"
+                self.last_error = f"OpenRouter prompt failed: {err_v1 or err_v2}"
 
         # --- STEP 2: Fallback to Gemini if OpenRouter didn't succeed ---
         if not is_real and self.gemini_api_key:

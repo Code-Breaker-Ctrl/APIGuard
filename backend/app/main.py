@@ -22,7 +22,7 @@ from app.engine.auth import AuthRegistry, DEFAULT_CREDENTIALS
 from app.engine.models import IdentityProfile, ScanEvent
 from app.target.app import target_app
 from app.target.data import reset_db
-from app.target.config import update_target_config
+from app.target.config import update_target_config, get_target_config
 from app.db import init_db, save_scan, save_scan_event, save_finding, get_findings, clear_db
 
 current_spec_yaml = DEMO_SPEC_YAML
@@ -274,3 +274,27 @@ async def execute_benchmark_run():
 async def remediate_vulnerability(payload: Dict[str, Any]):
     engine = RemediationEngine()
     return await engine.generate_remediation(payload)
+
+@app.get("/api/remediate/status")
+async def get_remediation_status():
+    engine = RemediationEngine()
+    return await engine.get_status()
+
+class TargetPatchInput(BaseModel):
+    patched: bool = True
+
+@app.post("/api/target/patch")
+def apply_target_reference_patch(payload: Optional[TargetPatchInput] = None):
+    patched = True if payload is None else payload.patched
+    cfg = get_target_config()
+    update_target_config(
+        defect_a=cfg.defect_a,
+        defect_b=cfg.defect_b,
+        defect_c=cfg.defect_c,
+        patched_mode=patched
+    )
+    return {
+        "status": "target_patch_updated",
+        "patched_mode": patched,
+        "note": "Reference fix applied to demo target via patched_mode; model-generated patch is not auto-applied"
+    }

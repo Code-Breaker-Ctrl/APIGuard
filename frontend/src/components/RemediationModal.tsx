@@ -1,18 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { X, Sparkles, Copy, Check, ShieldCheck, AlertTriangle, Code2 } from 'lucide-react';
+import { X, Sparkles, Copy, Check, ShieldCheck, AlertTriangle, Code2, Play } from 'lucide-react';
 import type { Finding, RemediationResponse } from '../types';
 import { apiClient } from '../api/client';
 
 interface RemediationModalProps {
   finding: Finding;
   onClose: () => void;
+  onApplyReferenceFixAndRescan?: () => void;
 }
 
-export const RemediationModal: React.FC<RemediationModalProps> = ({ finding, onClose }) => {
+export const RemediationModal: React.FC<RemediationModalProps> = ({
+  finding,
+  onClose,
+  onApplyReferenceFixAndRescan,
+}) => {
   const [data, setData] = useState<RemediationResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [copiedPatch, setCopiedPatch] = useState(false);
   const [copiedTest, setCopiedTest] = useState(false);
+  const [isApplyingFix, setIsApplyingFix] = useState(false);
 
   useEffect(() => {
     setIsLoading(true);
@@ -33,6 +39,20 @@ export const RemediationModal: React.FC<RemediationModalProps> = ({ finding, onC
     }
   };
 
+  const handleApplyFix = async () => {
+    if (!onApplyReferenceFixAndRescan) return;
+    setIsApplyingFix(true);
+    try {
+      await apiClient.applyTargetPatch(true);
+      onApplyReferenceFixAndRescan();
+    } catch (err) {
+      console.error('Failed to apply reference patch:', err);
+      setIsApplyingFix(false);
+    }
+  };
+
+  const isGemini = data?.mode === 'gemini';
+
   return (
     <div className="flex flex-col h-full bg-[#0b0e14] text-xs font-mono select-none">
       {/* Header */}
@@ -44,11 +64,11 @@ export const RemediationModal: React.FC<RemediationModalProps> = ({ finding, onC
           </span>
           {data && (
             <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${
-              data.mode === 'gemini'
+              isGemini
                 ? 'bg-emerald-950/60 border-emerald-800 text-emerald-300'
                 : 'bg-purple-950/60 border-purple-800 text-purple-300'
             }`}>
-              {data.mode === 'gemini' ? 'LIVE GEMINI 1.5 PROMPT' : 'DETERMINISTIC OFFLINE TEMPLATE'}
+              {isGemini ? `LIVE GEMINI MODEL (${data.model})` : 'DETERMINISTIC OFFLINE TEMPLATE'}
             </span>
           )}
         </div>
@@ -72,7 +92,7 @@ export const RemediationModal: React.FC<RemediationModalProps> = ({ finding, onC
           </div>
         ) : (
           <>
-            {/* Target & Honesty Banner */}
+            {/* Target & Mode Banner */}
             <div className="p-3 rounded-lg bg-[#0e1422] border border-[#1e273b] flex items-center justify-between">
               <div>
                 <span className="text-slate-400">Target Endpoint: </span>
@@ -81,8 +101,17 @@ export const RemediationModal: React.FC<RemediationModalProps> = ({ finding, onC
               </div>
               <div className="text-[10px] text-slate-400">
                 Mode: <strong className="text-purple-300 capitalize">{data.mode.replace('_', ' ')}</strong>
+                {data.model && <span className="text-slate-500 ml-1.5">({data.model})</span>}
               </div>
             </div>
+
+            {/* Offline / Error explanation banner */}
+            {data.error_reason && (
+              <div className="p-2.5 rounded bg-amber-950/30 border border-amber-800/60 text-amber-200 text-[11px] flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
+                <span>{data.error_reason}</span>
+              </div>
+            )}
 
             {/* Prompt Comparison Side-by-Side */}
             <div className="grid grid-cols-2 gap-4">
@@ -93,7 +122,7 @@ export const RemediationModal: React.FC<RemediationModalProps> = ({ finding, onC
                     <AlertTriangle className="w-3.5 h-3.5" /> Naive Prompt (v1)
                   </span>
                   <span className="text-[9px] px-1.5 py-0.2 rounded bg-rose-900/40 text-rose-300">
-                    Unscoped LLM Output
+                    {isGemini ? 'Real Model Output (v1)' : 'Illustrative template, not model output'}
                   </span>
                 </div>
                 <div className="p-3 bg-[#07090e] border-b border-[#181d2a] text-[10px] text-slate-400 italic">
@@ -113,7 +142,7 @@ export const RemediationModal: React.FC<RemediationModalProps> = ({ finding, onC
                     <ShieldCheck className="w-3.5 h-3.5" /> Graph-Guided Prompt (v2)
                   </span>
                   <span className="text-[9px] px-1.5 py-0.2 rounded bg-emerald-900/40 text-emerald-300 font-bold">
-                    Context-Infused Fix
+                    {isGemini ? 'Real Model Output (v2)' : 'Illustrative template, not model output'}
                   </span>
                 </div>
                 <div className="p-3 bg-[#07090e] border-b border-[#181d2a] text-[10px] text-cyan-300/80 italic">
@@ -159,10 +188,25 @@ export const RemediationModal: React.FC<RemediationModalProps> = ({ finding, onC
       </div>
 
       {/* Footer */}
-      <div className="h-12 px-5 bg-[#0e121a] border-t border-[#1f283d] flex items-center justify-between shrink-0">
-        <span className="text-[10px] text-slate-500 font-mono">
-          Hack-O-Relay 6.0 · AI Prompting Bonus Component
-        </span>
+      <div className="h-14 px-5 bg-[#0e121a] border-t border-[#1f283d] flex items-center justify-between shrink-0">
+        <div className="flex items-center gap-2">
+          {onApplyReferenceFixAndRescan && (
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleApplyFix}
+                disabled={isApplyingFix}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-xs transition disabled:opacity-50"
+              >
+                <Play className={`w-3 h-3 fill-black ${isApplyingFix ? 'animate-spin' : ''}`} />
+                {isApplyingFix ? 'Applying Reference Fix...' : 'Apply reference fix & re-scan'}
+              </button>
+              <span className="text-[9px] text-slate-500 font-mono hidden md:inline">
+                *Applies our reference fix to demo target via patched_mode; model patch is not auto-applied.
+              </span>
+            </div>
+          )}
+        </div>
+
         <button
           onClick={() => copyToClipboard(data?.code_patch || '', false)}
           disabled={!data}

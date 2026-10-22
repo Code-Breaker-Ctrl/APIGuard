@@ -1,4 +1,4 @@
-import type { GraphResponse, Finding, ScanEvent, BenchmarkData, IdentityInfo, DryRunResponse, RemediationResponse } from '../types';
+import type { GraphResponse, Finding, ScanEvent, BenchmarkData, IdentityInfo, DryRunResponse, RemediationResponse, RemediationStatus } from '../types';
 
 export const apiClient = {
   async getHealth(): Promise<{ status: string }> {
@@ -109,6 +109,22 @@ export const apiClient = {
       }),
     });
     if (!res.ok) throw new Error(`Failed to trigger remediation: HTTP ${res.status}`);
+    return res.json();
+  },
+
+  async getRemediationStatus(): Promise<RemediationStatus> {
+    const res = await fetch('/api/remediate/status');
+    if (!res.ok) throw new Error(`Failed to fetch remediation status: HTTP ${res.status}`);
+    return res.json();
+  },
+
+  async applyTargetPatch(patched: boolean = true): Promise<{ status: string; patched_mode: boolean; note: string }> {
+    const res = await fetch('/api/target/patch', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ patched }),
+    });
+    if (!res.ok) throw new Error(`Failed to apply target reference patch: HTTP ${res.status}`);
     return res.json();
   },
 

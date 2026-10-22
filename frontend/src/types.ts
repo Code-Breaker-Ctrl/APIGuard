@@ -102,10 +102,19 @@ export interface DryRunResponse {
   budget_remaining: number;
 }
 
+export interface RemediationStatus {
+  key_present: boolean;
+  model: string | null;
+  last_error: string | null;
+  status: 'active' | 'offline_template_only' | 'error';
+}
+
 export interface RemediationResponse {
   finding_id: string;
   endpoint: string;
   mode: 'gemini' | 'offline_template';
+  model?: string;
+  error_reason?: string | null;
   v1_prompt: string;
   v1_output: string;
   v2_prompt: string;

@@ -1,6 +1,7 @@
 import aiosqlite
 import json
 import time
+import uuid
 from typing import Dict, Any, List, Optional
 from app.engine.models import Finding, ScanEvent
 
@@ -45,6 +46,23 @@ async def init_db():
                 data TEXT
             );
         """)
+        await db.execute("""
+            CREATE TABLE IF NOT EXISTS remediations (
+                id TEXT PRIMARY KEY,
+                finding_id TEXT,
+                timestamp REAL,
+                mode TEXT,
+                model TEXT,
+                v1_prompt TEXT,
+                v1_output TEXT,
+                v2_prompt TEXT,
+                v2_output TEXT,
+                code_patch TEXT,
+                explanation TEXT,
+                unit_test TEXT,
+                error_reason TEXT
+            );
+        """)
         await db.commit()
 
 async def save_scan(scan_id: str, target_url: str, status: str = "running"):
@@ -82,6 +100,31 @@ async def clear_db():
         await db.execute("DELETE FROM findings")
         await db.execute("DELETE FROM scan_events")
         await db.execute("DELETE FROM scans")
+        await db.execute("DELETE FROM remediations")
+        await db.commit()
+
+async def save_remediation(data: Dict[str, Any]):
+    async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute(
+            """INSERT OR REPLACE INTO remediations
+               (id, finding_id, timestamp, mode, model, v1_prompt, v1_output, v2_prompt, v2_output, code_patch, explanation, unit_test, error_reason)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+            (
+                data.get("id", str(uuid.uuid4())),
+                data.get("finding_id"),
+                data.get("timestamp", time.time()),
+                data.get("mode"),
+                data.get("model"),
+                data.get("v1_prompt"),
+                data.get("v1_output"),
+                data.get("v2_prompt"),
+                data.get("v2_output"),
+                data.get("code_patch"),
+                data.get("explanation"),
+                data.get("unit_test"),
+                data.get("error_reason")
+            )
+        )
         await db.commit()
 
 async def get_findings(scan_id: Optional[str] = None) -> List[Dict[str, Any]]:

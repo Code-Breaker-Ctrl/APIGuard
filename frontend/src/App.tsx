@@ -53,19 +53,23 @@ export default function App() {
   const [showBenchmarkModal, setShowBenchmarkModal] = useState(false);
   const [showRemediationFinding, setShowRemediationFinding] = useState<Finding | null>(null);
   const [showGuidedDemo, setShowGuidedDemo] = useState(false);
-  const [modelStatusLabel, setModelStatusLabel] = useState<string>('offline template only');
+  const [modelStatusText, setModelStatusText] = useState<string>('model call: offline template only');
 
   const refreshModelStatus = useCallback(() => {
     apiClient.getRemediationStatus()
       .then((st) => {
         if (st.session_real_model_call_succeeded) {
           const provider = st.active_provider && st.active_provider !== 'None' ? st.active_provider : 'OpenRouter';
-          setModelStatusLabel(`tested (${provider})`);
+          setModelStatusText(`model call: tested (${provider})`);
+        } else if (st.openrouter_key_present) {
+          setModelStatusText('OpenRouter configured, not yet tested');
+        } else if (st.gemini_key_present) {
+          setModelStatusText('Gemini configured, not yet tested');
         } else {
-          setModelStatusLabel('offline template only');
+          setModelStatusText('model call: offline template only');
         }
       })
-      .catch(() => setModelStatusLabel('offline template only'));
+      .catch(() => setModelStatusText('model call: offline template only'));
   }, []);
 
   const checkTargetStatus = useCallback(async () => {
@@ -314,7 +318,7 @@ export default function App() {
               PATCH VERIFIED
             </span>
             <span>
-              Reference fix applied to the demo target (patched_mode). Re-scan: {verificationBanner.before} confirmed leak → {findings.length} confirmed leaks.
+              Reference fix applied to the demo target (patched_mode). Re-scan: {verificationBanner.before} confirmed leak → {verificationBanner.after} confirmed leaks.
             </span>
           </div>
           <div className="flex items-center gap-2">
@@ -494,8 +498,27 @@ export default function App() {
           <span className="flex items-center gap-1 text-cyan-400 font-semibold">
             <span className="w-1.5 h-1.5 rounded-full bg-cyan-400"></span> Working: React Flow + Dagre DAG
           </span>
-          <span className="flex items-center gap-1 text-purple-400 font-semibold">
-            <span className={`w-1.5 h-1.5 rounded-full ${modelStatusLabel.startsWith('tested') ? 'bg-emerald-400' : 'bg-purple-400'}`}></span> model call: {modelStatusLabel}
+          <span className="flex items-center gap-1 font-semibold">
+            <span
+              className={`w-1.5 h-1.5 rounded-full ${
+                modelStatusText.startsWith('model call: tested')
+                  ? 'bg-emerald-400'
+                  : modelStatusText.includes('configured')
+                  ? 'bg-amber-400'
+                  : 'bg-purple-400'
+              }`}
+            ></span>
+            <span
+              className={
+                modelStatusText.startsWith('model call: tested')
+                  ? 'text-emerald-400'
+                  : modelStatusText.includes('configured')
+                  ? 'text-amber-400'
+                  : 'text-purple-400'
+              }
+            >
+              {modelStatusText}
+            </span>
           </span>
           <span className="flex items-center gap-1 text-amber-400 font-semibold">
             <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span> Working: Empirical Ground Truth Benchmarks

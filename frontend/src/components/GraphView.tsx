@@ -19,7 +19,7 @@ import type { BackendNode, BackendEdge } from '../types';
 interface GraphViewProps {
   backendNodes: BackendNode[];
   backendEdges: BackendEdge[];
-  nodeStates: Record<string, 'idle' | 'probing' | 'vulnerable' | 'secure' | 'candidate'>;
+  nodeStates: Record<string, 'idle' | 'setup' | 'not_tested' | 'probing' | 'vulnerable' | 'secure' | 'candidate'>;
   selectedNodeId: string | null;
   onSelectNode: (nodeId: string) => void;
 }
@@ -29,6 +29,10 @@ const OperationNode = ({ data, selected }: any) => {
   const method = data.metadata?.method || 'GET';
   const path = data.metadata?.path || data.label;
   const status = data.status || 'idle';
+  const isSetupOp =
+    data.id === 'login' ||
+    data.id === 'createProject' ||
+    (data.metadata?.method === 'POST' && (!data.metadata?.path_params || data.metadata?.path_params.length === 0));
 
   let borderColor = 'border-[#263043]';
   let bgColor = 'bg-[#10141e]';
@@ -58,12 +62,29 @@ const OperationNode = ({ data, selected }: any) => {
         <ShieldCheck className="w-2.5 h-2.5" /> TESTED: NO LEAK
       </span>
     );
+  } else if (status === 'setup' || isSetupOp) {
+    borderColor = 'border-blue-500/40';
+    bgColor = 'bg-blue-950/25';
+    statusBadge = (
+      <span className="flex items-center gap-1 text-[8.5px] text-blue-300 font-bold px-1.5 py-0.5 rounded bg-blue-900/50 border border-blue-700/50">
+        SETUP
+      </span>
+    );
   } else if (status === 'candidate') {
     borderColor = 'border-cyan-400 border-dashed';
     bgColor = 'bg-cyan-950/20';
     statusBadge = (
       <span className="flex items-center gap-1 text-[8.5px] text-cyan-300 font-bold px-1 py-0.5 rounded bg-cyan-900/50">
         <Sparkles className="w-2.5 h-2.5" /> CANDIDATE
+      </span>
+    );
+  } else {
+    // Default for operations never probed (e.g. PATCH/DELETE with mutations off)
+    borderColor = 'border-[#263043]';
+    bgColor = 'bg-[#10141e]';
+    statusBadge = (
+      <span className="flex items-center gap-1 text-[8.5px] text-slate-400 font-medium px-1.5 py-0.5 rounded bg-slate-900/80 border border-slate-700/60">
+        NOT TESTED
       </span>
     );
   }
@@ -343,6 +364,7 @@ export const GraphView: React.FC<GraphViewProps> = ({
           nodeColor={(n) => {
             if (nodeStates[n.id] === 'vulnerable') return '#f43f5e';
             if (nodeStates[n.id] === 'secure') return '#10b981';
+            if (nodeStates[n.id] === 'setup' || n.id === 'login' || n.id === 'createProject') return '#3b82f6';
             if (nodeStates[n.id] === 'probing') return '#f59e0b';
             return '#1e293b';
           }}

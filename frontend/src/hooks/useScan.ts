@@ -8,7 +8,7 @@ export function useScan() {
   const [events, setEvents] = useState<ScanEvent[]>([]);
   const [findings, setFindings] = useState<Finding[]>([]);
   const [showAllHistory, setShowAllHistory] = useState(false);
-  const [nodeStates, setNodeStates] = useState<Record<string, 'idle' | 'probing' | 'vulnerable' | 'secure' | 'candidate'>>({});
+  const [nodeStates, setNodeStates] = useState<Record<string, 'idle' | 'setup' | 'not_tested' | 'probing' | 'vulnerable' | 'secure' | 'candidate'>>({});
   const [error, setError] = useState<string | null>(null);
 
   const dedupeFindings = (items: Finding[]): Finding[] => {
@@ -57,56 +57,82 @@ export function useScan() {
       const { scan_id } = await apiClient.triggerScan(options);
       setCurrentScanId(scan_id);
 
+      const setupOps = new Set<string>(['login', 'createProject']);
+      const probedOps = new Set<string>();
+
       const unsubscribe = apiClient.subscribeScanEvents(
         scan_id,
         (event) => {
           setEvents((prev) => [...prev, event]);
 
           const opId = event.data?.operation_id || event.data?.candidate_id;
+          const purpose = event.data?.purpose || (event.message?.includes('[SETUP]') ? 'setup' : '');
+
+          if (purpose === 'setup' || opId === 'login' || opId === 'createProject') {
+            if (opId) setupOps.add(opId);
+          }
 
           if (event.event_type === 'request_sent' && opId) {
-            setNodeStates((prev) => ({ ...prev, [opId]: 'probing' }));
+            if (setupOps.has(opId) || purpose === 'setup') {
+              setNodeStates((prev) => ({ ...prev, [opId]: 'setup' }));
+            } else {
+              probedOps.add(opId);
+              setNodeStates((prev) => ({ ...prev, [opId]: 'probing' }));
+            }
           } else if (event.event_type === 'finding_confirmed') {
             const confirmedOp = event.data?.hypothesis?.operation_id || opId;
             if (confirmedOp) {
+              probedOps.add(confirmedOp);
               setNodeStates((prev) => ({ ...prev, [confirmedOp]: 'vulnerable' }));
             }
             if (event.data && event.data.id) {
               setFindings((prev) => dedupeFindings([...prev, event.data as Finding]));
             }
           } else if (event.event_type === 'hypothesis_propagated' && opId) {
-            setNodeStates((prev) => ({ ...prev, [opId]: 'candidate' }));
+            if (!setupOps.has(opId)) {
+              setNodeStates((prev) => (prev[opId] === 'vulnerable' || prev[opId] === 'secure' ? prev : { ...prev, [opId]: 'candidate' }));
+            }
           } else if (event.event_type === 'response_received' && opId) {
-            const statusCode = event.data?.status_code;
-            if (statusCode === 403 || statusCode === 404) {
-              setNodeStates((prev) => (prev[opId] === 'vulnerable' ? prev : { ...prev, [opId]: 'secure' }));
+            if (setupOps.has(opId) || purpose === 'setup') {
+              setNodeStates((prev) => ({ ...prev, [opId]: 'setup' }));
+            } else {
+              probedOps.add(opId);
+              const statusCode = event.data?.status_code;
+              if (statusCode === 403 || statusCode === 404) {
+                setNodeStates((prev) => (prev[opId] === 'vulnerable' ? prev : { ...prev, [opId]: 'secure' }));
+              }
             }
           } else if (event.event_type === 'scan_completed') {
-            // Settle all tested/probed nodes that did not leak into 'secure' ("tested: no leak")
             setNodeStates((prev) => {
-              const next = { ...prev };
-              Object.keys(next).forEach((k) => {
-                if (next[k] !== 'vulnerable') {
-                  next[k] = 'secure';
+              const next: Record<string, 'idle' | 'setup' | 'not_tested' | 'probing' | 'vulnerable' | 'secure' | 'candidate'> = { ...prev };
+              // 1. Setup operations always show 'setup' (neutral / blue)
+              setupOps.forEach((id) => { next[id] = 'setup'; });
+              next['login'] = 'setup';
+              next['createProject'] = 'setup';
+
+              // 2. Only operations that actually had a probe step and did not leak show 'secure' ("TESTED: NO LEAK")
+              probedOps.forEach((id) => {
+                if (next[id] !== 'vulnerable') {
+                  next[id] = 'secure';
                 }
               });
-              // Ensure login and other tested operations are marked secure
-              next['login'] = next['login'] === 'vulnerable' ? 'vulnerable' : 'secure';
+
               return next;
             });
           }
         },
         () => {
           setIsScanning(false);
-          // Settle all tested/probed nodes into 'secure' unless vulnerable
           setNodeStates((prev) => {
-            const next = { ...prev };
-            Object.keys(next).forEach((k) => {
-              if (next[k] !== 'vulnerable') {
-                next[k] = 'secure';
+            const next: Record<string, 'idle' | 'setup' | 'not_tested' | 'probing' | 'vulnerable' | 'secure' | 'candidate'> = { ...prev };
+            setupOps.forEach((id) => { next[id] = 'setup'; });
+            next['login'] = 'setup';
+            next['createProject'] = 'setup';
+            probedOps.forEach((id) => {
+              if (next[id] !== 'vulnerable') {
+                next[id] = 'secure';
               }
             });
-            next['login'] = next['login'] === 'vulnerable' ? 'vulnerable' : 'secure';
             return next;
           });
           loadFindings(scan_id);
@@ -115,10 +141,13 @@ export function useScan() {
           console.error('SSE Error:', err);
           setIsScanning(false);
           setNodeStates((prev) => {
-            const next = { ...prev };
-            Object.keys(next).forEach((k) => {
-              if (next[k] !== 'vulnerable') {
-                next[k] = 'secure';
+            const next: Record<string, 'idle' | 'setup' | 'not_tested' | 'probing' | 'vulnerable' | 'secure' | 'candidate'> = { ...prev };
+            setupOps.forEach((id) => { next[id] = 'setup'; });
+            next['login'] = 'setup';
+            next['createProject'] = 'setup';
+            probedOps.forEach((id) => {
+              if (next[id] !== 'vulnerable') {
+                next[id] = 'secure';
               }
             });
             return next;

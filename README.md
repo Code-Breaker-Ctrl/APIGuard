@@ -31,6 +31,7 @@ Most DAST scanners test endpoints in isolation: they fuzz parameters, receive `4
 | ![Differential Finding Detail](docs/screenshots/06_finding_detail.png) | **Differential Inspector:** Alice vs Bob response diff, leaked fields in red, and repro cURL. |
 | ![Empirical Benchmarks](docs/screenshots/03_benchmark_panel.png) | **Benchmark & Ablations:** 100% recall vs 0% baseline on Defect B, with ablation proofs. |
 | ![AI Remediation](docs/screenshots/07_ai_remediation.png) | **AI Prompting Bonus:** Side-by-side $v_1$ vs $v_2$ prompt iteration and pytest test suite. |
+| ![Target Patched & Re-scanned](docs/screenshots/09_after_fix_secure.png) | **Automated Fix Verification:** After reference patch is applied, re-scan proves 0 confirmed leaks and green nodes. |
 
 ---
 

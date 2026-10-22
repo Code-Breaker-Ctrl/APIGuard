@@ -231,7 +231,7 @@ export const GraphView: React.FC<GraphViewProps> = ({
     }
 
     const g = new dagre.graphlib.Graph();
-    g.setGraph({ rankdir: 'TB', nodesep: 18, ranksep: 36, marginx: 15, marginy: 15 });
+    g.setGraph({ rankdir: 'TB', nodesep: 36, ranksep: 50, marginx: 20, marginy: 20 });
     g.setDefaultEdgeLabel(() => ({}));
 
     backendNodes.forEach((node) => {
@@ -292,6 +292,9 @@ export const GraphView: React.FC<GraphViewProps> = ({
       let strokeColor = isPropagated ? '#38bdf8' : '#64748b';
       if (isVulnerableEdge) strokeColor = '#f43f5e';
 
+      const isOperatesOn = edge.type === 'OPERATES_ON';
+      const edgeLabel = isOperatesOn ? undefined : edge.type.replace('_', ' ').toLowerCase();
+
       return {
         id: `e_${edge.from_node}_${edge.to_node}_${idx}`,
         source: edge.from_node,
@@ -308,11 +311,11 @@ export const GraphView: React.FC<GraphViewProps> = ({
           width: 14,
           height: 14,
         },
-        label: edge.type.replace('_', ' ').toLowerCase(),
-        labelStyle: { fill: '#f1f5f9', fontSize: 10, fontFamily: 'monospace', fontWeight: 700 },
-        labelBgStyle: { fill: '#0d131f', fillOpacity: 0.98 },
-        labelBgPadding: [6, 3] as [number, number],
-        labelBgBorderRadius: 4,
+        label: edgeLabel,
+        labelStyle: edgeLabel ? { fill: '#f1f5f9', fontSize: 10, fontFamily: 'monospace', fontWeight: 700 } : undefined,
+        labelBgStyle: edgeLabel ? { fill: '#0d131f', fillOpacity: 0.98 } : undefined,
+        labelBgPadding: edgeLabel ? [6, 3] as [number, number] : undefined,
+        labelBgBorderRadius: edgeLabel ? 4 : undefined,
       };
     });
 

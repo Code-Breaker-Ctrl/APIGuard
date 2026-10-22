@@ -88,7 +88,7 @@ Every metric below was empirically measured against live target sockets (`http:/
 ### Technologies Used
 - **Backend:** Python 3.12, FastAPI, Pydantic v2, `aiosqlite` (WAL-mode SQLite), `openapi-spec-validator`, `httpx` (async ASGI/HTTP client), `pytest`, `pytest-asyncio`.
 - **Frontend:** React 19, Vite, TypeScript, Tailwind CSS, `@xyflow/react` (React Flow), `dagre` (graph layout), `lucide-react`.
-- **AI Remediation:** Google Gemini API 1.5 Flash (prompting-bonus) with automatic deterministic offline template fallback.
+- **AI Remediation:** LLM via OpenRouter or Gemini (whichever is configured), with SQLite caching and automatic deterministic offline template fallback.
 
 ### Reused Open-Source Components & Attributions
 - `@xyflow/react` & `dagre`: Interactive node-edge visualization and hierarchical DAG layout.
@@ -103,7 +103,7 @@ Every metric below was empirically measured against live target sockets (`http:/
 |---|:---:|---|
 | **Real Engine Execution** | **100% Real** | All HTTP requests are executed against real network sockets (`127.0.0.1:8000`). Zero `setTimeout` mocks or hardcoded node arrays. |
 | **Deterministic Scanner** | **100% Real** | The scanner engine makes **no LLM calls**. Graph traversal, policy evaluation, and differential verification are completely deterministic. |
-| **AI Prompting Bonus** | **Tested / Offline Template** | Gemini API is used strictly for post-scan surgical remediation ($v_1 \to v_2$). If no API key is provided, a deterministic offline template is badged. |
+| **AI Prompting Bonus** | **Tested / Offline Template** | LLM via OpenRouter or Gemini (whichever is configured) is used strictly for post-scan surgical remediation ($v_1 \to v_2$). If no API key is provided, a deterministic offline template is badged. |
 | **Safe by Default** | **Working** | Requests are strictly restricted to allowlisted loopback hosts (`127.0.0.1`). Mutating requests (`PATCH`/`DELETE`) are blocked unless explicitly toggled. |
 | **Git Commit History** | **Verified** | Clean, incremental commit history with tests passing at every stage. |
 

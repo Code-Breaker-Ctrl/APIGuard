@@ -103,17 +103,22 @@ export interface DryRunResponse {
 }
 
 export interface RemediationStatus {
-  key_present: boolean;
-  model: string | null;
+  openrouter_key_present: boolean;
+  gemini_key_present: boolean;
+  active_provider: 'OpenRouter' | 'Gemini' | 'None';
+  configured_model: string | null;
   last_error: string | null;
   status: 'active' | 'offline_template_only' | 'error';
+  session_real_model_call_succeeded: boolean;
 }
 
 export interface RemediationResponse {
   finding_id: string;
   endpoint: string;
-  mode: 'gemini' | 'offline_template';
-  model?: string;
+  source: 'real' | 'cached_real' | 'offline_template';
+  provider: string;
+  model: string;
+  badge_text: string;
   error_reason?: string | null;
   v1_prompt: string;
   v1_output: string;
@@ -122,6 +127,7 @@ export interface RemediationResponse {
   code_patch: string;
   explanation: string;
   unit_test: string;
+  is_real: number;
 }
 
 export interface BenchmarkData {

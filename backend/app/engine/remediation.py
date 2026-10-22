@@ -3,8 +3,13 @@ import json
 import time
 import uuid
 import httpx
-from typing import Dict, Any, Optional, Tuple
-from app.db import save_remediation
+from typing import Dict, Any, Optional, Tuple, List
+from dotenv import load_dotenv
+
+# Load .env variables from current working dir or backend dir
+load_dotenv()
+
+from app.db import save_remediation, get_last_real_remediation
 
 OFFLINE_V1_TEMPLATE = """# [Illustrative template, not model output]
 # Common pitfall: Authentication-only check (fails to verify tenant resource ownership)
@@ -47,133 +52,247 @@ OFFLINE_UNIT_TEST = """def test_bola_remediation_blocked():
     assert "forbidden" in response.json().get("detail", "").lower()
 """
 
+# Track whether any real generation succeeded during this server session
+SESSION_REAL_MODEL_CALL_SUCCEEDED = False
+
 class RemediationEngine:
     """
-    Handles BOLA remediation generation.
-    When GEMINI_API_KEY is available:
-      - Validates and discovers available Gemini model via ListModels with header x-goog-api-key
-      - Executes model calls for BOTH v1 and v2 prompts
-      - Persists real prompts, model name, real outputs, and timestamp in SQLite
-    When offline or if Gemini is unreachable:
-      - Returns deterministic templates clearly labeled as illustrative templates (not model outputs)
-      - Records the exact failure status / error reason
+    Provider-agnostic BOLA remediation engine.
+    Provider Order:
+      1. OpenRouter (if OPENROUTER_API_KEY is configured)
+         - Model from OPENROUTER_MODEL or auto-discovering :free models via GET /api/v1/models
+      2. Google Gemini (if GEMINI_API_KEY is configured)
+         - Tries gemini-3.8-flash, gemini-3.6-flash, gemini-3.5-flash-lite, etc. in order
+      3. SQLite Cached Real Remediation (labeled 'recorded <timestamp>' for offline resilience)
+      4. Deterministic Offline Template (labeled 'Offline template (illustrative, not model output)')
     """
-    def __init__(self, api_key: Optional[str] = None):
-        self.api_key = api_key or os.environ.get("GEMINI_API_KEY")
-        self.configured_model = os.environ.get("GEMINI_MODEL")
+    def __init__(self):
+        # Reload env in case .env was modified at runtime
+        load_dotenv()
+        self.openrouter_api_key = os.environ.get("OPENROUTER_API_KEY")
+        self.openrouter_model = os.environ.get("OPENROUTER_MODEL")
+        self.gemini_api_key = os.environ.get("GEMINI_API_KEY")
+        self.gemini_model = os.environ.get("GEMINI_MODEL")
         self.last_error: Optional[str] = None
-        self.last_tested_model: Optional[str] = None
+        self.last_provider_used: Optional[str] = None
+        self.last_model_used: Optional[str] = None
 
     async def get_status(self) -> Dict[str, Any]:
         """
-        Returns status of Gemini integration (key present/absent, discovered model, last error).
+        Returns telemetry on configured providers, active keys, and session test status.
         """
-        if not self.api_key:
-            return {
-                "key_present": False,
-                "model": None,
-                "last_error": "GEMINI_API_KEY environment variable is not configured",
-                "status": "offline_template_only"
-            }
+        load_dotenv()
+        self.openrouter_api_key = os.environ.get("OPENROUTER_API_KEY")
+        self.gemini_api_key = os.environ.get("GEMINI_API_KEY")
 
-        # Validate by discovering available models
-        model_name, err = await self._discover_model()
-        if err:
-            return {
-                "key_present": True,
-                "model": None,
-                "last_error": err,
-                "status": "error"
-            }
+        active_provider = "None"
+        if self.openrouter_api_key:
+            active_provider = "OpenRouter"
+        elif self.gemini_api_key:
+            active_provider = "Gemini"
 
         return {
-            "key_present": True,
-            "model": model_name,
-            "last_error": None,
-            "status": "active"
+            "openrouter_key_present": bool(self.openrouter_api_key),
+            "gemini_key_present": bool(self.gemini_api_key),
+            "active_provider": active_provider,
+            "configured_model": self.openrouter_model if active_provider == "OpenRouter" else self.gemini_model,
+            "last_error": self.last_error,
+            "status": "active" if active_provider != "None" else "offline_template_only",
+            "session_real_model_call_succeeded": SESSION_REAL_MODEL_CALL_SUCCEEDED
         }
 
-    async def _discover_model(self) -> Tuple[Optional[str], Optional[str]]:
-        if not self.api_key:
-            return None, "GEMINI_API_KEY not configured"
+    async def test_connection(self) -> Dict[str, Any]:
+        """
+        Executes a minimal test prompt to verify LLM connectivity.
+        """
+        global SESSION_REAL_MODEL_CALL_SUCCEEDED
+        load_dotenv()
+        self.openrouter_api_key = os.environ.get("OPENROUTER_API_KEY")
+        self.gemini_api_key = os.environ.get("GEMINI_API_KEY")
 
-        if self.configured_model:
-            model_id = self.configured_model.replace("models/", "")
-            return f"models/{model_id}", None
+        test_prompt = "Say OK in one word."
+        start_t = time.time()
 
-        # Dynamically query ListModels endpoint to avoid assuming model existence
+        # 1. Try OpenRouter
+        if self.openrouter_api_key:
+            out, model, err = await self._call_openrouter(test_prompt)
+            if out:
+                SESSION_REAL_MODEL_CALL_SUCCEEDED = True
+                dur = int((time.time() - start_t) * 1000)
+                return {
+                    "success": True,
+                    "provider": "OpenRouter",
+                    "model": model,
+                    "output": out.strip()[:60],
+                    "duration_ms": dur
+                }
+            self.last_error = f"OpenRouter test failed: {err}"
+
+        # 2. Try Gemini
+        if self.gemini_api_key:
+            out, model, err = await self._call_gemini(test_prompt)
+            if out:
+                SESSION_REAL_MODEL_CALL_SUCCEEDED = True
+                dur = int((time.time() - start_t) * 1000)
+                return {
+                    "success": True,
+                    "provider": "Gemini",
+                    "model": model,
+                    "output": out.strip()[:60],
+                    "duration_ms": dur
+                }
+            self.last_error = f"Gemini test failed: {err}"
+
+        reason = self.last_error or "Neither OPENROUTER_API_KEY nor GEMINI_API_KEY is configured in backend/.env"
+        return {
+            "success": False,
+            "error": reason
+        }
+
+    async def _get_openrouter_free_models(self) -> List[str]:
+        """
+        Queries OpenRouter models catalog and returns IDs where prompt/completion pricing is "0".
+        """
+        fallback_free = [
+            "recursive/flint-v1.0:free",
+            "nvidia/nemotron-3.5-super-vl:free",
+            "liquid/lfm-2.5-2.6b:free",
+            "google/gemma-2-9b-it:free",
+            "meta-llama/llama-3.2-3b-instruct:free",
+            "mistralai/mistral-7b-instruct:free"
+        ]
         try:
-            url = "https://generativelanguage.googleapis.com/v1beta/models"
-            headers = {"x-goog-api-key": self.api_key}
-            async with httpx.AsyncClient(timeout=8.0) as client:
-                res = await client.get(url, headers=headers)
-                if res.status_code != 200:
-                    err_msg = f"Gemini unavailable: HTTP {res.status_code} ({res.text[:120]})"
-                    self.last_error = err_msg
-                    return None, err_msg
-
-                data = res.json()
-                models = data.get("models", [])
-                
-                # Prioritize available flash models
-                flash_models = [
-                    m["name"] for m in models 
-                    if "generateContent" in m.get("supportedGenerationMethods", []) and "flash" in m.get("name", "").lower()
-                ]
-                if flash_models:
-                    chosen = flash_models[0]
-                    self.last_tested_model = chosen
-                    return chosen, None
-
-                # Otherwise any model supporting generateContent
-                gen_models = [
-                    m["name"] for m in models 
-                    if "generateContent" in m.get("supportedGenerationMethods", [])
-                ]
-                if gen_models:
-                    chosen = gen_models[0]
-                    self.last_tested_model = chosen
-                    return chosen, None
-
-                return None, "No models with generateContent capability found"
+            url = "https://openrouter.ai/api/v1/models"
+            async with httpx.AsyncClient(timeout=6.0) as client:
+                res = await client.get(url)
+                if res.status_code == 200:
+                    data = res.json().get("data", [])
+                    free_models = [
+                        m["id"] for m in data
+                        if m.get("pricing", {}).get("prompt") == "0" and m.get("pricing", {}).get("completion") == "0"
+                    ]
+                    if free_models:
+                        return free_models
         except Exception as e:
-            err_msg = f"Gemini unavailable: {str(e)}"
-            self.last_error = err_msg
-            return None, err_msg
+            self.last_error = f"Failed to fetch OpenRouter free models catalog: {str(e)}"
+        return fallback_free
 
-    async def _call_gemini_prompt(self, model_name: str, prompt_text: str) -> Tuple[Optional[str], Optional[str]]:
-        try:
-            model_clean = model_name.replace("models/", "")
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_clean}:generateContent"
-            headers = {
-                "x-goog-api-key": self.api_key,
-                "Content-Type": "application/json"
-            }
-            payload = {
-                "contents": [{
-                    "parts": [{"text": prompt_text}]
-                }]
-            }
-            async with httpx.AsyncClient(timeout=12.0) as client:
-                res = await client.post(url, headers=headers, json=payload)
-                if res.status_code != 200:
-                    return None, f"HTTP {res.status_code}: {res.text[:120]}"
-                data = res.json()
-                candidates = data.get("candidates", [])
-                if candidates and "content" in candidates[0]:
-                    parts = candidates[0]["content"].get("parts", [])
-                    if parts and "text" in parts[0]:
-                        return parts[0]["text"], None
-                return None, "Empty response from Gemini model"
-        except Exception as e:
-            return None, str(e)
+    async def _call_openrouter(self, prompt_text: str) -> Tuple[Optional[str], Optional[str], Optional[str]]:
+        """
+        Executes prompt via OpenRouter OpenAI-compatible endpoint.
+        Tries models in order, advancing on 404, 429, or 5xx.
+        """
+        if not self.openrouter_api_key:
+            return None, None, "OPENROUTER_API_KEY not configured"
+
+        models_to_try: List[str] = []
+        if self.openrouter_model:
+            models_to_try = [self.openrouter_model]
+        else:
+            models_to_try = await self._get_openrouter_free_models()
+
+        headers = {
+            "Authorization": f"Bearer {self.openrouter_api_key}",
+            "Content-Type": "application/json",
+            "HTTP-Referer": "http://127.0.0.1:8000",
+            "X-Title": "APIGuard BOLA Engine"
+        }
+
+        last_err = None
+        for model_id in models_to_try:
+            try:
+                payload = {
+                    "model": model_id,
+                    "messages": [{"role": "user", "content": prompt_text}],
+                    "temperature": 0.2
+                }
+                async with httpx.AsyncClient(timeout=14.0) as client:
+                    resp = await client.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json=payload)
+                    if resp.status_code == 200:
+                        data = resp.json()
+                        choices = data.get("choices", [])
+                        if choices and "message" in choices[0]:
+                            content = choices[0]["message"].get("content", "")
+                            if content:
+                                return content, model_id, None
+                    else:
+                        last_err = f"OpenRouter model {model_id} failed with HTTP {resp.status_code}: {resp.text[:100]}"
+                        # Continue to next model on 404, 429, 5xx
+                        continue
+            except Exception as e:
+                last_err = f"OpenRouter request error on {model_id}: {str(e)}"
+                continue
+
+        return None, None, last_err or "All OpenRouter models failed"
+
+    async def _call_gemini(self, prompt_text: str) -> Tuple[Optional[str], Optional[str], Optional[str]]:
+        """
+        Executes prompt via Google Gemini API.
+        Tries gemini-3.8-flash, gemini-3.6-flash, gemini-3.5-flash-lite, etc. in order.
+        """
+        if not self.gemini_api_key:
+            return None, None, "GEMINI_API_KEY not configured"
+
+        gemini_models = [
+            "gemini-3.8-flash",
+            "gemini-3.6-flash",
+            "gemini-3.5-flash-lite",
+            "gemini-2.5-flash",
+            "gemini-2.0-flash",
+            "gemini-1.5-flash"
+        ]
+        if self.gemini_model:
+            gemini_models = [self.gemini_model] + [m for m in gemini_models if m != self.gemini_model]
+
+        headers = {
+            "x-goog-api-key": self.gemini_api_key,
+            "Content-Type": "application/json"
+        }
+        payload = {
+            "contents": [{"parts": [{"text": prompt_text}]}]
+        }
+
+        last_err = None
+        for m_name in gemini_models:
+            clean_name = m_name.replace("models/", "")
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/{clean_name}:generateContent"
+            try:
+                async with httpx.AsyncClient(timeout=12.0) as client:
+                    res = await client.post(url, headers=headers, json=payload)
+                    if res.status_code == 200:
+                        data = res.json()
+                        candidates = data.get("candidates", [])
+                        if candidates and "content" in candidates[0]:
+                            parts = candidates[0]["content"].get("parts", [])
+                            if parts and "text" in parts[0]:
+                                return parts[0]["text"], clean_name, None
+                    else:
+                        last_err = f"Gemini model {clean_name} failed: HTTP {res.status_code} ({res.text[:100]})"
+                        continue
+            except Exception as e:
+                last_err = f"Gemini error on {clean_name}: {str(e)}"
+                continue
+
+        return None, None, last_err or "All Gemini models failed"
 
     async def generate_remediation(self, finding_data: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Generates BOLA remediation comparing v1 (naive) vs v2 (graph-guided).
+        Attempts real model calls first (OpenRouter -> Gemini).
+        If offline or failed, falls back to SQLite cached real execution, or offline template.
+        """
+        global SESSION_REAL_MODEL_CALL_SUCCEEDED
+        load_dotenv()
+        self.openrouter_api_key = os.environ.get("OPENROUTER_API_KEY")
+        self.openrouter_model = os.environ.get("OPENROUTER_MODEL")
+        self.gemini_api_key = os.environ.get("GEMINI_API_KEY")
+        self.gemini_model = os.environ.get("GEMINI_MODEL")
+
         endpoint = finding_data.get("endpoint", "/projects/{project_id}/export")
         method = finding_data.get("method", "GET")
         diff_fields = finding_data.get("diff_fields", ["owner_email", "financial_payload"])
         resource = finding_data.get("resource_type", "Project")
-        finding_id = finding_data.get("finding_id", "fnd_remed")
+        finding_id = finding_data.get("id") or finding_data.get("finding_id", "fnd_remed")
 
         v1_prompt = f"Fix this BOLA security bug in our API: endpoint {method} {endpoint} allows unauthorized users to read data."
         v2_prompt = (
@@ -185,41 +304,87 @@ class RemediationEngine:
 
         unit_test = OFFLINE_UNIT_TEST.format(endpoint_url=f"/projects/proj_42/export")
 
-        mode = "offline_template"
-        model_used = "None (offline template)"
+        source = "offline_template"
+        provider = "offline"
+        model_used = "None"
+        badge_text = "Offline template (illustrative, not model output)"
         error_reason: Optional[str] = None
         v1_output = ""
         v2_output = ""
         code_patch = ""
         explanation = ""
+        is_real = False
 
-        # Attempt real Gemini call if key is provided
-        if self.api_key:
-            model_name, disc_err = await self._discover_model()
-            if disc_err:
-                error_reason = f"Gemini unavailable: {disc_err}, using offline template"
-                self.last_error = error_reason
-            else:
-                model_used = model_name
-                # Call BOTH v1 and v2 prompts for genuine comparison
-                out_v1, err_v1 = await self._call_gemini_prompt(model_name, v1_prompt)
-                out_v2, err_v2 = await self._call_gemini_prompt(model_name, v2_prompt)
-
-                if out_v1 and out_v2:
-                    mode = "gemini"
+        # --- STEP 1: Attempt OpenRouter ---
+        if self.openrouter_api_key:
+            out_v1, model_v1, err_v1 = await self._call_openrouter(v1_prompt)
+            if out_v1:
+                out_v2, model_v2, err_v2 = await self._call_openrouter(v2_prompt)
+                if out_v2:
+                    is_real = True
+                    SESSION_REAL_MODEL_CALL_SUCCEEDED = True
+                    source = "real"
+                    provider = "OpenRouter"
+                    model_used = model_v2 or model_v1 or "openrouter-free"
+                    badge_text = f"OpenRouter: {model_used}"
                     v1_output = out_v1
                     v2_output = out_v2
                     code_patch = out_v2
-                    explanation = f"Generated live using Google Gemini model ({model_name}). Both v1 and v2 outputs are real model completions."
+                    explanation = f"Generated live using OpenRouter model ({model_used}). Both v1 and v2 outputs are real model completions."
                 else:
-                    failed_call = "v1" if not out_v1 else "v2"
-                    err_detail = err_v1 if not out_v1 else err_v2
-                    error_reason = f"Gemini unavailable: {err_detail} during {failed_call} prompt, using offline template"
-                    self.last_error = error_reason
+                    self.last_error = f"OpenRouter v2 prompt failed: {err_v2}"
+            else:
+                self.last_error = f"OpenRouter v1 prompt failed: {err_v1}"
 
-        # Fallback to illustrative templates if offline or call failed
+        # --- STEP 2: Fallback to Gemini if OpenRouter didn't succeed ---
+        if not is_real and self.gemini_api_key:
+            out_v1, model_v1, err_v1 = await self._call_gemini(v1_prompt)
+            if out_v1:
+                out_v2, model_v2, err_v2 = await self._call_gemini(v2_prompt)
+                if out_v2:
+                    is_real = True
+                    SESSION_REAL_MODEL_CALL_SUCCEEDED = True
+                    source = "real"
+                    provider = "Gemini"
+                    model_used = model_v2 or model_v1 or "gemini-flash"
+                    badge_text = f"Gemini: {model_used}"
+                    v1_output = out_v1
+                    v2_output = out_v2
+                    code_patch = out_v2
+                    explanation = f"Generated live using Google Gemini model ({model_used}). Both v1 and v2 outputs are real model completions."
+                else:
+                    self.last_error = f"Gemini v2 prompt failed: {err_v2}"
+            else:
+                self.last_error = f"Gemini v1 prompt failed: {err_v1}"
+
+        # --- STEP 3: If live call failed, check for cached real remediation in SQLite ---
+        if not is_real:
+            cached = await get_last_real_remediation(finding_id)
+            if cached and cached.get("is_real"):
+                source = "cached_real"
+                provider = cached.get("provider", "LLM")
+                model_used = cached.get("model", "recorded")
+                rec_time = time.strftime("%Y-%m-%d %H:%M", time.localtime(cached.get("timestamp", time.time())))
+                badge_text = f"{provider}: {model_used} (recorded {rec_time})"
+                v1_output = cached.get("v1_output", "")
+                v2_output = cached.get("v2_output", "")
+                code_patch = cached.get("code_patch", "")
+                explanation = cached.get("explanation", "")
+                unit_test = cached.get("unit_test", unit_test)
+                error_reason = self.last_error or "Network call unavailable; displaying cached real execution telemetry"
+                is_real = True
+
+        # --- STEP 4: Fallback to illustrative offline template ---
         if not v1_output or not v2_output:
-            mode = "offline_template"
+            source = "offline_template"
+            provider = "offline"
+            model_used = "Offline template"
+            badge_text = "Offline template (illustrative, not model output)"
+            if not self.openrouter_api_key and not self.gemini_api_key:
+                error_reason = "Neither OPENROUTER_API_KEY nor GEMINI_API_KEY configured in backend/.env"
+            else:
+                error_reason = self.last_error or "Live model generation failed; fell back to offline template"
+
             v1_output = OFFLINE_V1_TEMPLATE.format(
                 endpoint=endpoint,
                 method_lower=method.lower(),
@@ -248,8 +413,10 @@ class RemediationEngine:
             "finding_id": finding_id,
             "timestamp": time.time(),
             "endpoint": endpoint,
-            "mode": mode,
+            "source": source,
+            "provider": provider,
             "model": model_used,
+            "badge_text": badge_text,
             "v1_prompt": v1_prompt,
             "v1_output": v1_output,
             "v2_prompt": v2_prompt,
@@ -257,10 +424,10 @@ class RemediationEngine:
             "code_patch": code_patch,
             "explanation": explanation,
             "unit_test": unit_test,
-            "error_reason": error_reason
+            "error_reason": error_reason,
+            "is_real": 1 if is_real else 0
         }
 
-        # Store prompt, model, outputs, timestamp in SQLite
+        # Store in SQLite telemetry
         await save_remediation(record)
-
         return record

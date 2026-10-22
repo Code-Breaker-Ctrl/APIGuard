@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Sparkles, Copy, Check, ShieldCheck, AlertTriangle, Code2, Play } from 'lucide-react';
+import { X, Sparkles, Copy, Check, ShieldCheck, AlertTriangle, Code2, Play, Terminal, CheckCircle2 } from 'lucide-react';
 import type { Finding, RemediationResponse } from '../types';
 import { apiClient } from '../api/client';
 
@@ -7,12 +7,14 @@ interface RemediationModalProps {
   finding: Finding;
   onClose: () => void;
   onApplyReferenceFixAndRescan?: () => void;
+  onModelTested?: () => void;
 }
 
 export const RemediationModal: React.FC<RemediationModalProps> = ({
   finding,
   onClose,
   onApplyReferenceFixAndRescan,
+  onModelTested,
 }) => {
   const [data, setData] = useState<RemediationResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -20,12 +22,25 @@ export const RemediationModal: React.FC<RemediationModalProps> = ({
   const [copiedTest, setCopiedTest] = useState(false);
   const [isApplyingFix, setIsApplyingFix] = useState(false);
 
-  useEffect(() => {
+  // Test model button state
+  const [isTestingModel, setIsTestingModel] = useState(false);
+  const [testResult, setTestResult] = useState<{ success: boolean; message: string } | null>(null);
+
+  const fetchRemediation = () => {
     setIsLoading(true);
     apiClient.remediate(finding)
-      .then(setData)
+      .then((res) => {
+        setData(res);
+        if (res.is_real && onModelTested) {
+          onModelTested();
+        }
+      })
       .catch((err) => console.error('Remediation error:', err))
       .finally(() => setIsLoading(false));
+  };
+
+  useEffect(() => {
+    fetchRemediation();
   }, [finding]);
 
   const copyToClipboard = (text: string, isTest: boolean) => {
@@ -51,7 +66,37 @@ export const RemediationModal: React.FC<RemediationModalProps> = ({
     }
   };
 
-  const isGemini = data?.mode === 'gemini';
+  const handleTestModel = async () => {
+    setIsTestingModel(true);
+    setTestResult(null);
+    try {
+      const res = await apiClient.testModel();
+      if (res.success) {
+        setTestResult({
+          success: true,
+          message: `${res.provider}: ${res.model} connection OK (${res.duration_ms}ms)`,
+        });
+        if (onModelTested) onModelTested();
+        // Re-fetch remediation since live model is confirmed working
+        fetchRemediation();
+      } else {
+        setTestResult({
+          success: false,
+          message: res.error || 'Connection failed',
+        });
+      }
+    } catch (err: any) {
+      setTestResult({
+        success: false,
+        message: err.message || 'Model test request failed',
+      });
+    } finally {
+      setIsTestingModel(false);
+    }
+  };
+
+  const isRealModel = data?.source === 'real';
+  const isCachedReal = data?.source === 'cached_real';
 
   return (
     <div className="flex flex-col h-full bg-[#0b0e14] text-xs font-mono select-none">
@@ -63,28 +108,73 @@ export const RemediationModal: React.FC<RemediationModalProps> = ({
             AI Remediation Engine · Prompting Bonus Evaluation
           </span>
           {data && (
-            <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${
-              isGemini
-                ? 'bg-emerald-950/60 border-emerald-800 text-emerald-300'
-                : 'bg-purple-950/60 border-purple-800 text-purple-300'
-            }`}>
-              {isGemini ? `LIVE GEMINI MODEL (${data.model})` : 'DETERMINISTIC OFFLINE TEMPLATE'}
+            <span
+              className={`px-2 py-0.5 rounded text-[10px] font-bold border ${
+                isRealModel
+                  ? 'bg-emerald-950/70 border-emerald-700 text-emerald-300'
+                  : isCachedReal
+                  ? 'bg-blue-950/70 border-blue-700 text-blue-300'
+                  : 'bg-amber-950/70 border-amber-800 text-amber-300 font-medium'
+              }`}
+            >
+              {data.badge_text.toUpperCase()}
             </span>
           )}
         </div>
-        <button
-          onClick={onClose}
-          className="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition"
-        >
-          <X className="w-4 h-4" />
-        </button>
+
+        <div className="flex items-center gap-2">
+          {/* Test model button */}
+          <button
+            type="button"
+            onClick={handleTestModel}
+            disabled={isTestingModel}
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#162033] hover:bg-[#1e2c45] border border-[#2b3c5e] text-cyan-300 hover:text-white transition disabled:opacity-50 cursor-pointer text-[10px]"
+            title="Perform a minimal test call to verify LLM connection"
+          >
+            <Terminal className="w-3 h-3 text-cyan-400" />
+            <span>{isTestingModel ? 'Testing model...' : 'Test model'}</span>
+          </button>
+
+          <button
+            onClick={onClose}
+            className="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition cursor-pointer"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
       </div>
+
+      {/* Test Result Toast Banner if available */}
+      {testResult && (
+        <div
+          className={`px-5 py-2 flex items-center justify-between text-[11px] border-b ${
+            testResult.success
+              ? 'bg-emerald-950/60 border-emerald-800 text-emerald-300'
+              : 'bg-rose-950/60 border-rose-800 text-rose-300'
+          }`}
+        >
+          <div className="flex items-center gap-2">
+            {testResult.success ? (
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+            ) : (
+              <AlertTriangle className="w-3.5 h-3.5 text-rose-400" />
+            )}
+            <span>{testResult.message}</span>
+          </div>
+          <button
+            onClick={() => setTestResult(null)}
+            className="text-slate-400 hover:text-white text-xs cursor-pointer"
+          >
+            ✕
+          </button>
+        </div>
+      )}
 
       {/* Body */}
       <div className="flex-1 p-5 overflow-y-auto space-y-4">
         {isLoading ? (
           <div className="py-20 text-center text-slate-400 animate-pulse">
-            Synthesizing graph-guided patch and test cases...
+            Synthesizing graph-guided patch and test cases via LLM provider...
           </div>
         ) : !data ? (
           <div className="py-20 text-center text-slate-500">
@@ -100,12 +190,12 @@ export const RemediationModal: React.FC<RemediationModalProps> = ({
                 <span className="text-slate-500 ml-2">({finding.method})</span>
               </div>
               <div className="text-[10px] text-slate-400">
-                Mode: <strong className="text-purple-300 capitalize">{data.mode.replace('_', ' ')}</strong>
+                Source: <strong className="text-purple-300 capitalize">{data.provider}</strong>
                 {data.model && <span className="text-slate-500 ml-1.5">({data.model})</span>}
               </div>
             </div>
 
-            {/* Offline / Error explanation banner */}
+            {/* Error / Fallback explanation banner */}
             {data.error_reason && (
               <div className="p-2.5 rounded bg-amber-950/30 border border-amber-800/60 text-amber-200 text-[11px] flex items-center gap-2">
                 <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
@@ -122,7 +212,7 @@ export const RemediationModal: React.FC<RemediationModalProps> = ({
                     <AlertTriangle className="w-3.5 h-3.5" /> Naive Prompt (v1)
                   </span>
                   <span className="text-[9px] px-1.5 py-0.2 rounded bg-rose-900/40 text-rose-300">
-                    {isGemini ? 'Real Model Output (v1)' : 'Illustrative template, not model output'}
+                    {data.is_real ? 'Real Model Output (v1)' : 'Illustrative template, not model output'}
                   </span>
                 </div>
                 <div className="p-3 bg-[#07090e] border-b border-[#181d2a] text-[10px] text-slate-400 italic">
@@ -142,7 +232,7 @@ export const RemediationModal: React.FC<RemediationModalProps> = ({
                     <ShieldCheck className="w-3.5 h-3.5" /> Graph-Guided Prompt (v2)
                   </span>
                   <span className="text-[9px] px-1.5 py-0.2 rounded bg-emerald-900/40 text-emerald-300 font-bold">
-                    {isGemini ? 'Real Model Output (v2)' : 'Illustrative template, not model output'}
+                    {data.is_real ? 'Real Model Output (v2)' : 'Illustrative template, not model output'}
                   </span>
                 </div>
                 <div className="p-3 bg-[#07090e] border-b border-[#181d2a] text-[10px] text-cyan-300/80 italic">
@@ -173,7 +263,7 @@ export const RemediationModal: React.FC<RemediationModalProps> = ({
                 </span>
                 <button
                   onClick={() => copyToClipboard(data.unit_test, true)}
-                  className="flex items-center gap-1 text-[10px] text-cyan-400 hover:text-cyan-300 bg-cyan-950/40 px-2 py-0.5 rounded border border-cyan-800/40 transition"
+                  className="flex items-center gap-1 text-[10px] text-cyan-400 hover:text-cyan-300 bg-cyan-950/40 px-2 py-0.5 rounded border border-cyan-800/40 transition cursor-pointer"
                 >
                   {copiedTest ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
                   {copiedTest ? 'Copied Test' : 'Copy Test'}
@@ -195,7 +285,7 @@ export const RemediationModal: React.FC<RemediationModalProps> = ({
               <button
                 onClick={handleApplyFix}
                 disabled={isApplyingFix}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-xs transition disabled:opacity-50"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-xs transition disabled:opacity-50 cursor-pointer"
               >
                 <Play className={`w-3 h-3 fill-black ${isApplyingFix ? 'animate-spin' : ''}`} />
                 {isApplyingFix ? 'Applying Reference Fix...' : 'Apply reference fix & re-scan'}
@@ -210,7 +300,7 @@ export const RemediationModal: React.FC<RemediationModalProps> = ({
         <button
           onClick={() => copyToClipboard(data?.code_patch || '', false)}
           disabled={!data}
-          className="flex items-center gap-2 px-4 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-bold transition disabled:opacity-50"
+          className="flex items-center gap-2 px-4 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-bold transition disabled:opacity-50 cursor-pointer"
         >
           {copiedPatch ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
           {copiedPatch ? 'Patch Copied!' : 'Copy Code Patch'}

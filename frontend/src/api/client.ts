@@ -118,6 +118,12 @@ export const apiClient = {
     return res.json();
   },
 
+  async testModel(): Promise<{ success: boolean; provider?: string; model?: string; output?: string; duration_ms?: number; error?: string }> {
+    const res = await fetch('/api/remediate/test', { method: 'POST' });
+    if (!res.ok) throw new Error(`Model test request failed: HTTP ${res.status}`);
+    return res.json();
+  },
+
   async applyTargetPatch(patched: boolean = true): Promise<{ status: string; patched_mode: boolean; note: string }> {
     const res = await fetch('/api/target/patch', {
       method: 'POST',

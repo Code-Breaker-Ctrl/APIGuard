@@ -12,7 +12,7 @@
    - Point to the **Honesty Strip** at the bottom:
      - `Working: Real REST + SSE Engine`
      - `Working: React Flow + Dagre DAG`
-     - `Gemini: tested (or offline template only)`
+     - `model call: tested (or offline template only)`
      - `Working: Empirical Ground Truth Benchmarks`
    - *"Most security scanners test endpoints in silos. When an endpoint returns HTTP 200, uptime monitors and CI pipelines assume everything is fine. This is BOLA (OWASP API #1) — it doesn't crash the server, it quietly leaks private tenant data."*
 2. **Examine the React Flow DAG (Center Panel)**:
@@ -76,7 +76,7 @@
 
 ### Q3: "Why is the scanner engine deterministic instead of using an LLM to find the bugs?"
 > **Answer:**  
-> *"For vulnerability detection, predictability and auditability are non-negotiable. An LLM in the core scanning loop introduces hallucinated findings, non-deterministic flakiness, token latency, and high cost per scan. APIGuard uses a 100% deterministic graph engine for detection. We utilize the LLM (Gemini 1.5) strictly in the remediation phase, where graph context transforms vague prompt suggestions into surgical, test-verified code patches."*
+> *"For vulnerability detection, predictability and auditability are non-negotiable. An LLM in the core scanning loop introduces hallucinated findings, non-deterministic flakiness, token latency, and high cost per scan. APIGuard uses a 100% deterministic graph engine for detection. We utilize the LLM via OpenRouter or Gemini (whichever is configured) strictly in the remediation phase, where graph context transforms vague prompt suggestions into surgical, test-verified code patches."*
 
 ---
 

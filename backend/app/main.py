@@ -5,6 +5,10 @@ import uuid
 import os
 from typing import Optional, Dict, Any, List
 from contextlib import asynccontextmanager
+from dotenv import load_dotenv
+
+# Load environment variables at startup
+load_dotenv()
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException, status
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -279,6 +283,11 @@ async def remediate_vulnerability(payload: Dict[str, Any]):
 async def get_remediation_status():
     engine = RemediationEngine()
     return await engine.get_status()
+
+@app.post("/api/remediate/test")
+async def test_remediation_model():
+    engine = RemediationEngine()
+    return await engine.test_connection()
 
 class TargetPatchInput(BaseModel):
     patched: bool = True

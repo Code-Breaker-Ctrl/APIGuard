@@ -52,19 +52,23 @@ export default function App() {
   const [showBenchmarkModal, setShowBenchmarkModal] = useState(false);
   const [showRemediationFinding, setShowRemediationFinding] = useState<Finding | null>(null);
   const [showGuidedDemo, setShowGuidedDemo] = useState(false);
-  const [geminiStatusLabel, setGeminiStatusLabel] = useState<string>('offline template only');
+  const [modelStatusLabel, setModelStatusLabel] = useState<string>('offline template only');
 
-  useEffect(() => {
+  const refreshModelStatus = useCallback(() => {
     apiClient.getRemediationStatus()
       .then((st) => {
-        if (st.key_present && st.status === 'active') {
-          setGeminiStatusLabel('tested');
+        if (st.session_real_model_call_succeeded) {
+          setModelStatusLabel(`tested (${st.active_provider})`);
         } else {
-          setGeminiStatusLabel('offline template only');
+          setModelStatusLabel('offline template only');
         }
       })
-      .catch(() => setGeminiStatusLabel('offline template only'));
+      .catch(() => setModelStatusLabel('offline template only'));
   }, []);
+
+  useEffect(() => {
+    refreshModelStatus();
+  }, [refreshModelStatus]);
 
   // Health check on mount
   const checkBackendHealth = useCallback(async () => {
@@ -416,6 +420,7 @@ export default function App() {
               finding={showRemediationFinding}
               onClose={() => setShowRemediationFinding(null)}
               onApplyReferenceFixAndRescan={handleApplyReferenceFixAndRescan}
+              onModelTested={refreshModelStatus}
             />
           </div>
         </div>
@@ -449,7 +454,7 @@ export default function App() {
             <span className="w-1.5 h-1.5 rounded-full bg-cyan-400"></span> Working: React Flow + Dagre DAG
           </span>
           <span className="flex items-center gap-1 text-purple-400 font-semibold">
-            <span className="w-1.5 h-1.5 rounded-full bg-purple-400"></span> Gemini: {geminiStatusLabel}
+            <span className={`w-1.5 h-1.5 rounded-full ${modelStatusLabel.startsWith('tested') ? 'bg-emerald-400' : 'bg-purple-400'}`}></span> model call: {modelStatusLabel}
           </span>
           <span className="flex items-center gap-1 text-amber-400 font-semibold">
             <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span> Working: Empirical Ground Truth Benchmarks

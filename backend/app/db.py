@@ -52,6 +52,7 @@ async def init_db():
                 finding_id TEXT,
                 timestamp REAL,
                 mode TEXT,
+                provider TEXT,
                 model TEXT,
                 v1_prompt TEXT,
                 v1_output TEXT,
@@ -60,9 +61,18 @@ async def init_db():
                 code_patch TEXT,
                 explanation TEXT,
                 unit_test TEXT,
-                error_reason TEXT
+                error_reason TEXT,
+                is_real INTEGER DEFAULT 0
             );
         """)
+        try:
+            await db.execute("ALTER TABLE remediations ADD COLUMN provider TEXT")
+        except Exception:
+            pass
+        try:
+            await db.execute("ALTER TABLE remediations ADD COLUMN is_real INTEGER DEFAULT 0")
+        except Exception:
+            pass
         await db.commit()
 
 async def save_scan(scan_id: str, target_url: str, status: str = "running"):
@@ -107,13 +117,14 @@ async def save_remediation(data: Dict[str, Any]):
     async with aiosqlite.connect(DB_PATH) as db:
         await db.execute(
             """INSERT OR REPLACE INTO remediations
-               (id, finding_id, timestamp, mode, model, v1_prompt, v1_output, v2_prompt, v2_output, code_patch, explanation, unit_test, error_reason)
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+               (id, finding_id, timestamp, mode, provider, model, v1_prompt, v1_output, v2_prompt, v2_output, code_patch, explanation, unit_test, error_reason, is_real)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
             (
                 data.get("id", str(uuid.uuid4())),
                 data.get("finding_id"),
                 data.get("timestamp", time.time()),
                 data.get("mode"),
+                data.get("provider", "offline_template"),
                 data.get("model"),
                 data.get("v1_prompt"),
                 data.get("v1_output"),
@@ -122,10 +133,32 @@ async def save_remediation(data: Dict[str, Any]):
                 data.get("code_patch"),
                 data.get("explanation"),
                 data.get("unit_test"),
-                data.get("error_reason")
+                data.get("error_reason"),
+                1 if data.get("is_real") else 0
             )
         )
         await db.commit()
+
+async def get_last_real_remediation(finding_id: Optional[str] = None) -> Optional[Dict[str, Any]]:
+    async with aiosqlite.connect(DB_PATH) as db:
+        db.row_factory = aiosqlite.Row
+        query = "SELECT * FROM remediations WHERE is_real = 1"
+        params: list = []
+        if finding_id:
+            query += " AND finding_id = ?"
+            params.append(finding_id)
+        query += " ORDER BY timestamp DESC LIMIT 1"
+        async with db.execute(query, params) as cursor:
+            row = await cursor.fetchone()
+            if row:
+                return dict(row)
+            # If finding-specific not found, return any real recorded remediation
+            if finding_id:
+                async with db.execute("SELECT * FROM remediations WHERE is_real = 1 ORDER BY timestamp DESC LIMIT 1") as fallback_cur:
+                    fallback_row = await fallback_cur.fetchone()
+                    if fallback_row:
+                        return dict(fallback_row)
+    return None
 
 async def get_findings(scan_id: Optional[str] = None) -> List[Dict[str, Any]]:
     async with aiosqlite.connect(DB_PATH) as db:

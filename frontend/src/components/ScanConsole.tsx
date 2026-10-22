@@ -99,7 +99,7 @@ export const ScanConsole: React.FC<ScanConsoleProps> = ({ events, isScanning }) 
                 {/* Identity Chip */}
                 {ev.data?.identity && (
                   <span className="text-[9px] px-1 py-0.2 rounded bg-slate-800 text-slate-300 font-mono shrink-0">
-                    {ev.data.identity.includes('alice') ? 'Alice' : 'Bob'}
+                    {ev.data.identity.includes('aman') || ev.data.identity.includes('alice') ? 'Aman' : 'Taaran'}
                   </span>
                 )}
 

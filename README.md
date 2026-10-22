@@ -14,9 +14,9 @@ Most DAST scanners test endpoints in isolation: they fuzz parameters, receive `4
 
 **APIGuard** replaces isolated fuzzing with a **Resource Dependency Directed Acyclic Graph (DAG)**:
 1. **Schema & DAG Ingestion:** Ingests standard OpenAPI 3.x specifications without custom invented keys, mapping relationships between producer and consumer operations (`POST /projects` creates `{project_id}` $\to$ consumed by `GET /projects/{project_id}`).
-2. **Dynamic Multi-Identity State Harvest:** Automatically authenticates as **User A (Alice)** to create genuine state and harvest live resource IDs.
+2. **Dynamic Multi-Identity State Harvest:** Automatically authenticates as **User A (Aman)** to create genuine state and harvest live resource IDs.
 3. **Graph-Guided Policy Inference & Propagation:** Observes authorization enforcement on parent endpoints and propagates candidate ownership policies along DAG edges to adjacent/nested endpoints (e.g., `GET /projects/{project_id}/export`).
-4. **Differential Payload Verification:** Probes the endpoint using **User B's (Bob's)** credentials. Rather than blindly trusting status codes, it performs differential analysis on response bodies, confirming BOLA only when private owner-linked fields are leaked.
+4. **Differential Payload Verification:** Probes the endpoint using **User B's (Taaran's)** credentials. Rather than blindly trusting status codes, it performs differential analysis on response bodies, confirming BOLA only when private owner-linked fields are leaked.
 5. **AI-Driven Surgical Remediation (Prompting Bonus):** Bridges detection to remediation with context-infused prompting. Shows side-by-side comparisons of naive prompts ($v_1$) vs graph-guided prompts ($v_2$), generating production-ready FastAPI patches and Pytest unit tests.
 
 ---
@@ -28,7 +28,7 @@ Most DAST scanners test endpoints in isolation: they fuzz parameters, receive `4
 | ![Graph Idle](docs/screenshots/01_graph_idle.png) | **React Flow DAG:** Operation, Resource, and Identifier nodes with Dagre auto-layout. |
 | ![Dry Run Preview](docs/screenshots/02_dry_run_table.png) | **Dry-Run Mode:** Planned multi-identity sequence table without sending socket traffic. |
 | ![Live SSE Scan](docs/screenshots/05_graph_after_scan.png) | **Real-Time Audit:** Streaming console, live SSE event propagation, and red BOLA badge. |
-| ![Differential Finding Detail](docs/screenshots/06_finding_detail.png) | **Differential Inspector:** Alice vs Bob response diff, leaked fields in red, and repro cURL. |
+| ![Differential Finding Detail](docs/screenshots/06_finding_detail.png) | **Differential Inspector:** Aman vs Taaran response diff, leaked fields in red, and repro cURL. |
 | ![Empirical Benchmarks](docs/screenshots/03_benchmark_panel.png) | **Benchmark & Ablations:** 100% recall vs 0% baseline on Defect B, with ablation proofs. |
 | ![AI Remediation](docs/screenshots/07_ai_remediation.png) | **AI Prompting Bonus:** Side-by-side $v_1$ vs $v_2$ prompt iteration and pytest test suite. |
 | ![Target Patched & Re-scanned](docs/screenshots/09_after_fix_secure.png) | **Automated Fix Verification:** After reference patch is applied, re-scan proves 0 confirmed leaks and green nodes. |

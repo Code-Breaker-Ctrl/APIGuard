@@ -123,8 +123,8 @@ async def preview_dry_run(opts: ScanTriggerInput):
     operations = parser.extract_operations()
     planner = TestPlanner(current_graph, base_url="http://127.0.0.1:8000/target")
 
-    user_a = IdentityProfile(identity_id="usr_alice_101", username="alice@acme.corp", password="mock_alice_password", role="customer", token="[DRY_RUN_ALICE_TOKEN]")
-    user_b = IdentityProfile(identity_id="usr_bob_202", username="bob@adversary.io", password="mock_bob_password", role="customer", token="[DRY_RUN_BOB_TOKEN]")
+    user_a = IdentityProfile(identity_id="usr_aman_101", username="aman@acme.corp", password="mock_aman_password", role="customer", token="[DRY_RUN_AMAN_TOKEN]")
+    user_b = IdentityProfile(identity_id="usr_taaran_202", username="taaran@adversary.io", password="mock_taaran_password", role="customer", token="[DRY_RUN_TAARAN_TOKEN]")
 
     all_steps = []
     budget_allocated = opts.budget

@@ -2,19 +2,19 @@ import copy
 from typing import Dict, Any
 
 SEEDED_USERS = {
-    "alice@acme.corp": {
-        "id": "usr_alice_101",
-        "username": "alice@acme.corp",
-        "password": "password_alice_123",
+    "aman@acme.corp": {
+        "id": "usr_aman_101",
+        "username": "aman@acme.corp",
+        "password": "password_aman_123",
         "role": "customer",
-        "token": "tok_live_alice_8921"
+        "token": "tok_live_aman_8921"
     },
-    "bob@adversary.io": {
-        "id": "usr_bob_202",
-        "username": "bob@adversary.io",
-        "password": "password_bob_456",
+    "taaran@adversary.io": {
+        "id": "usr_taaran_202",
+        "username": "taaran@adversary.io",
+        "password": "password_taaran_456",
         "role": "customer",
-        "token": "tok_live_bob_9934"
+        "token": "tok_live_taaran_9934"
     },
     "admin@corp.internal": {
         "id": "usr_admin_001",
@@ -35,8 +35,8 @@ SEEDED_USERS = {
 SEEDED_PROJECTS = {
     "proj_42": {
         "id": "proj_42",
-        "owner_id": "usr_alice_101",
-        "owner_email": "alice@acme.corp",
+        "owner_id": "usr_aman_101",
+        "owner_email": "aman@acme.corp",
         "name": "Project Aegis Quantum",
         "confidential_data": "QNTM-SECRET-PROD-KEY-9981",
         "budget": "$240,000",

@@ -45,7 +45,7 @@ export const GuidedDemoModal: React.FC<GuidedDemoModalProps> = ({
       icon: <Play className="w-5 h-5 text-emerald-400 fill-emerald-400" />,
       tagline: 'Real HTTP requests against 127.0.0.1 with live SSE telemetry',
       description:
-        'Watch the terminal stream live HTTP requests. User A (Alice) establishes resource state; the engine observes authorization on GET /projects/{id} and propagates candidate ownership rules along DAG edges to adjacent endpoints. When Alice’s export endpoint is probed with Bob’s token, HTTP 200 OK leaks confidential billing data, triggering a CONFIRMED finding.',
+        'Watch the terminal stream live HTTP requests. User A (Aman) establishes resource state; the engine observes authorization on GET /projects/{id} and propagates candidate ownership rules along DAG edges to adjacent endpoints. When Aman’s export endpoint is probed with Taaran’s token, HTTP 200 OK leaks confidential billing data, triggering a CONFIRMED finding.',
       actionLabel: 'Trigger Live Audit',
       action: () => {
         onClose();

@@ -31,10 +31,10 @@
 2. **Trigger the Live Audit**:
    - Click **"RUN EXECUTION AUDIT"**:
    - Watch the **Scan Console** stream real-time HTTP requests:
-     - **Phase A (State Harvest)**: Authenticates Alice (`usr_alice_101`), creates a project via `POST /projects` (HTTP 201), extracts dynamic `project_id`.
-     - **Phase A (Policy Inference)**: Executes control read as Alice (HTTP 200) and baseline probe as Bob (`usr_bob_202`, HTTP 403 Forbidden). Engine validates `owner_only` rule.
+     - **Phase A (State Harvest)**: Authenticates Aman (`usr_aman_101`), creates a project via `POST /projects` (HTTP 201), extracts dynamic `project_id`.
+     - **Phase A (Policy Inference)**: Executes control read as Aman (HTTP 200) and baseline probe as Taaran (`usr_taaran_202`, HTTP 403 Forbidden). Engine validates `owner_only` rule.
      - **Phase B (Graph Propagation)**: Propagates ownership rule to adjacent child routes (`/export` and `/summary`).
-     - **Phase C (Differential Probe)**: Probes `/export` using Bob's credentials. The endpoint returns HTTP 200 OK — differential verifier extracts leaked owner fields (`owner_email`, `financial_payload.budget`, `financial_payload.billing`).
+     - **Phase C (Differential Probe)**: Probes `/export` using Taaran's credentials. The endpoint returns HTTP 200 OK — differential verifier extracts leaked owner fields (`owner_email`, `financial_payload.budget`, `financial_payload.billing`).
    - The React Flow node `GET /projects/{project_id}/export` pulses in real-time and turns **red** with a **BOLA LEAK** badge.
    - The Confirmed Findings badge updates to **1**.
 
@@ -43,8 +43,8 @@
 ### Act 3: Proof, AI Remediation & Benchmark (1:45 – 3:00)
 1. **Click the Confirmed Finding (`GET /projects/{project_id}/export`)**:
    - Show the **Side-by-Side Differential Inspector**:
-     - Left: Alice's Control response.
-     - Right: Bob's Probe response with leaked fields highlighted in red.
+     - Left: Aman's Control response.
+     - Right: Taaran's Probe response with leaked fields highlighted in red.
    - Show the **Graph Propagation Path**: `getProjectById -> (NESTED_UNDER) -> exportProjectBilling`.
    - Show the **Sanitized cURL Command** and copy button.
 2. **Open AI Remediation (Click "AI Remediation")**:

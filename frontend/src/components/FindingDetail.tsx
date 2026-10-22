@@ -93,10 +93,10 @@ export const FindingDetail: React.FC<FindingDetailProps> = ({
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-[#1f2738]">
-            {/* Control (Owner Alice) */}
+            {/* Control (Owner Aman) */}
             <div className="p-3 bg-[#06080d]">
               <div className="flex items-center justify-between mb-1.5 text-[10px] text-slate-400">
-                <span className="font-semibold text-emerald-400">CONTROL: Owner Request ({finding.identities?.owner || 'Alice'})</span>
+                <span className="font-semibold text-emerald-400">CONTROL: Owner Request ({finding.identities?.owner || 'Aman'})</span>
                 <span className="px-1.5 py-0.2 rounded bg-emerald-950 text-emerald-300">HTTP 200 OK</span>
               </div>
               <pre className="p-2.5 rounded bg-[#0b0e14] border border-slate-800/80 text-[10px] text-slate-300 leading-relaxed overflow-x-auto max-h-52 scrollbar-thin">
@@ -104,10 +104,10 @@ export const FindingDetail: React.FC<FindingDetailProps> = ({
               </pre>
             </div>
 
-            {/* Probe (Adversary Bob) */}
+            {/* Probe (Adversary Taaran) */}
             <div className="p-3 bg-[#11080b]">
               <div className="flex items-center justify-between mb-1.5 text-[10px] text-slate-400">
-                <span className="font-semibold text-rose-400">PROBE: Adversary Request ({finding.identities?.probe || 'Bob'})</span>
+                <span className="font-semibold text-rose-400">PROBE: Adversary Request ({finding.identities?.probe || 'Taaran'})</span>
                 <span className="px-1.5 py-0.2 rounded bg-rose-950 text-rose-300 font-bold">HTTP 200 OK (LEAK)</span>
               </div>
               <pre className="p-2.5 rounded bg-[#180a0f] border border-rose-900/40 text-[10px] text-rose-200 leading-relaxed overflow-x-auto max-h-52 scrollbar-thin">

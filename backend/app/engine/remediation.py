@@ -46,7 +46,7 @@ OFFLINE_UNIT_TEST = """def test_bola_remediation_blocked():
     client = TestClient(app)
     response = client.get(
         "{endpoint_url}",
-        headers={{"Authorization": "Bearer " + bob_token}}
+        headers={{"Authorization": "Bearer " + taaran_token}}
     )
     assert response.status_code == 403
     assert "forbidden" in response.json().get("detail", "").lower()

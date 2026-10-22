@@ -83,7 +83,7 @@ def get_project(project_id: str, authorization: Optional[str] = Header(None)):
 def export_project(project_id: str, authorization: Optional[str] = Header(None)):
     """
     KEY DEMO MOMENT:
-    Primary GET /projects/{id} is secure, but this graph-adjacent export leaks Alice's billing data!
+    Primary GET /projects/{id} is secure, but this graph-adjacent export leaks Aman's billing data!
     """
     user = get_current_user(authorization)
     cfg = get_target_config()

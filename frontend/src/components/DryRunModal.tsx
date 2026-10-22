@@ -116,7 +116,7 @@ export const DryRunModal: React.FC<DryRunModalProps> = ({
                         <td className="py-2.5 px-3 text-cyan-300 font-mono">{s.url}</td>
                         <td className="py-2.5 px-3">
                           <span className={`text-[10px] px-1.5 py-0.5 rounded font-mono ${
-                            s.identity.includes('alice') ? 'bg-emerald-950/60 text-emerald-300' : 'bg-rose-950/60 text-rose-300'
+                            s.identity.includes('aman') || s.identity.includes('alice') ? 'bg-emerald-950/60 text-emerald-300' : 'bg-rose-950/60 text-rose-300'
                           }`}>
                             {s.identity}
                           </span>

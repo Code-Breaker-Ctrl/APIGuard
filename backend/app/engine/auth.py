@@ -4,15 +4,15 @@ from app.engine.models import IdentityProfile
 
 DEFAULT_CREDENTIALS = {
     "user_a": {
-        "identity_id": "usr_alice_101",
-        "username": "alice@acme.corp",
-        "password": "password_alice_123",
+        "identity_id": "usr_aman_101",
+        "username": "aman@acme.corp",
+        "password": "password_aman_123",
         "role": "customer"
     },
     "user_b": {
-        "identity_id": "usr_bob_202",
-        "username": "bob@adversary.io",
-        "password": "password_bob_456",
+        "identity_id": "usr_taaran_202",
+        "username": "taaran@adversary.io",
+        "password": "password_taaran_456",
         "role": "customer"
     },
     "admin": {

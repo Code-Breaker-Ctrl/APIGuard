@@ -47,12 +47,8 @@ class DifferentialVerifier:
         owner_identity_id: str = "user_a",
         probe_identity_id: str = "user_b"
     ) -> Optional[Finding]:
-        # 1. Check if probe was rejected (401, 403, 404 are legitimate access controls)
-        if probe_result.status_code in {401, 403, 404}:
-            return None
-
-        # 2. Check for inconclusive execution
-        if owner_result.status_code != 200 or probe_result.status_code == 0:
+        # 1. Check for inconclusive execution (owner control did not succeed)
+        if owner_result.status_code < 200 or owner_result.status_code >= 300 or probe_result.status_code == 0:
             return Finding(
                 id=f"fnd_inconclusive_{uuid.uuid4().hex[:6]}",
                 endpoint=endpoint,
@@ -69,6 +65,10 @@ class DifferentialVerifier:
                 diff_fields=[],
                 repro_curl=""
             )
+
+        # 2. Check if probe was legitimately rejected (401, 403, 404 access controls when owner succeeded)
+        if probe_result.status_code in {401, 403, 404}:
+            return None
 
         # 3. VERIFIER TRAP: Empty or filtered 200 body
         probe_body = probe_result.body

@@ -157,3 +157,65 @@ async def test_zero_false_positives_when_secure_and_patched(real_uvicorn_server)
     update_target_config(defect_a=True, defect_b=True, defect_c=True, patched_mode=True)
     findings_patched = await graph_scanner.run_scan(operations, user_a, user_b, enable_mutations=True)
     assert len(findings_patched) == 0
+
+@pytest.mark.asyncio
+async def test_owner_control_failed_404_emits_inconclusive(real_uvicorn_server):
+    """
+    If the owner's CONTROL request does not return success (e.g. 404 because the route
+    doesn't exist on the target), the engine must emit 'test_inconclusive' with
+    'control failed (404), test inconclusive' and NEVER flag the operation as secure or confirmed.
+    """
+    from app.engine.models import Operation
+
+    auth_reg = AuthRegistry(real_uvicorn_server)
+    identities = await auth_reg.authenticate_all()
+    user_a = identities["user_a"]
+    user_b = identities["user_b"]
+
+    parser = OpenAPIParser(DEMO_SPEC_YAML)
+    operations = parser.extract_operations()
+
+    # Append an operation for a non-existent route on the target
+    nonexistent_op = Operation(
+        id="getNonexistentRoute",
+        operation_id="getNonexistentRoute",
+        method="GET",
+        path="/projects/{project_id}/does_not_exist",
+        path_params=["project_id"],
+        query_params=[]
+    )
+
+    events = []
+    async def capture_event(ev):
+        events.append(ev)
+
+    executor = SafeExecutor(allowed_hosts={"127.0.0.1", "localhost"}, total_budget=30, enable_mutations=False)
+    graph_scanner = GraphGuidedScanner(executor, real_uvicorn_server)
+    findings = await graph_scanner.run_scan(
+        operations + [nonexistent_op],
+        user_a,
+        user_b,
+        enable_mutations=False,
+        on_event=capture_event
+    )
+
+    # 1. Non-existent route is NOT in confirmed findings
+    assert not any(f.endpoint == "/projects/{project_id}/does_not_exist" for f in findings)
+
+    # 2. Scanner emitted test_inconclusive event
+    inconclusive_events = [
+        ev for ev in events
+        if ev.event_type == "test_inconclusive" and ev.data.get("operation_id") == "getNonexistentRoute"
+    ]
+    assert len(inconclusive_events) >= 1
+    inc_ev = inconclusive_events[0]
+    assert "control failed (404), test inconclusive" in inc_ev.message
+    assert inc_ev.data.get("status") == "inconclusive"
+    assert inc_ev.data.get("status_code") == 404
+
+    # 3. Non-existent route was NEVER falsely marked as secure ("TESTED: NO LEAK")
+    secure_events = [
+        ev for ev in events
+        if ev.event_type == "probe_denied" and ev.data and ev.data.get("operation_id") == "getNonexistentRoute"
+    ]
+    assert len(secure_events) == 0

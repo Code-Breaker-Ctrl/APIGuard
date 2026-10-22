@@ -150,6 +150,22 @@ paths:
         '200':
           description: Public summary stats
 
+  /projects/{project_id}/analytics:
+    get:
+      summary: Get project analytics (unimplemented route returning 404)
+      operationId: getProjectAnalytics
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: project_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Analytics payload
+
 components:
   securitySchemes:
     bearerAuth:

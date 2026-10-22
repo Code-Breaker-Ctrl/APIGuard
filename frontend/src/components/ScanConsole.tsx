@@ -63,6 +63,7 @@ export const ScanConsole: React.FC<ScanConsoleProps> = ({ events, isScanning }) 
         ) : (
           events.map((ev, index) => {
             const isAlert = ev.event_type === 'finding_confirmed';
+            const isInconclusive = ev.event_type === 'test_inconclusive' || ev.message?.includes('test inconclusive');
             const isReq = ev.event_type === 'request_sent';
             const isRes = ev.event_type === 'response_received';
 
@@ -72,6 +73,9 @@ export const ScanConsole: React.FC<ScanConsoleProps> = ({ events, isScanning }) 
             if (isAlert) {
               lineBg = 'bg-rose-950/40 border-l-2 border-rose-500 p-1.5 rounded';
               textColor = 'text-rose-300 font-semibold';
+            } else if (isInconclusive) {
+              lineBg = 'bg-slate-900/60 border-l-2 border-slate-500 p-1.5 rounded';
+              textColor = 'text-slate-400 font-mono';
             } else if (isReq) {
               textColor = 'text-slate-400';
             } else if (isRes) {

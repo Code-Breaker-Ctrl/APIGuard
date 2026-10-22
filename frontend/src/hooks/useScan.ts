@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { apiClient } from '../api/client';
-import type { ScanEvent, Finding } from '../types';
+import type { ScanEvent, Finding, NodeState } from '../types';
 
 export function useScan() {
   const [isScanning, setIsScanning] = useState(false);
@@ -8,7 +8,7 @@ export function useScan() {
   const [events, setEvents] = useState<ScanEvent[]>([]);
   const [findings, setFindings] = useState<Finding[]>([]);
   const [showAllHistory, setShowAllHistory] = useState(false);
-  const [nodeStates, setNodeStates] = useState<Record<string, 'idle' | 'setup' | 'not_tested' | 'probing' | 'vulnerable' | 'secure' | 'candidate'>>({});
+  const [nodeStates, setNodeStates] = useState<Record<string, NodeState>>({});
   const [error, setError] = useState<string | null>(null);
 
   const dedupeFindings = (items: Finding[]): Finding[] => {
@@ -58,7 +58,40 @@ export function useScan() {
       setCurrentScanId(scan_id);
 
       const setupOps = new Set<string>(['login', 'createProject']);
-      const probedOps = new Set<string>();
+      const testedNoLeakOps = new Set<string>();
+      const inconclusiveOps = new Set<string>();
+      const vulnerableOps = new Set<string>();
+
+      const applyFinalStates = () => {
+        setNodeStates((prev) => {
+          const next: Record<string, NodeState> = { ...prev };
+          // 1. Setup operations
+          setupOps.forEach((id) => { next[id] = 'setup'; });
+          next['login'] = 'setup';
+          next['createProject'] = 'setup';
+
+          // 2. Inconclusive operations (owner control failed)
+          inconclusiveOps.forEach((id) => {
+            if (!vulnerableOps.has(id)) {
+              next[id] = 'inconclusive';
+            }
+          });
+
+          // 3. Only show "TESTED: NO LEAK" when owner succeeded AND non-owner denied
+          testedNoLeakOps.forEach((id) => {
+            if (!vulnerableOps.has(id) && !inconclusiveOps.has(id)) {
+              next[id] = 'secure';
+            }
+          });
+
+          // 4. Vulnerable operations
+          vulnerableOps.forEach((id) => {
+            next[id] = 'vulnerable';
+          });
+
+          return next;
+        });
+      };
 
       const unsubscribe = apiClient.subscribeScanEvents(
         scan_id,
@@ -72,86 +105,55 @@ export function useScan() {
             if (opId) setupOps.add(opId);
           }
 
-          if (event.event_type === 'request_sent' && opId) {
+          if (event.event_type === 'test_inconclusive' || event.message?.includes('test inconclusive') || event.message?.includes('control failed')) {
+            if (opId) {
+              inconclusiveOps.add(opId);
+              testedNoLeakOps.delete(opId);
+              setNodeStates((prev) => ({ ...prev, [opId]: 'inconclusive' }));
+            }
+          } else if (event.event_type === 'request_sent' && opId) {
             if (setupOps.has(opId) || purpose === 'setup') {
               setNodeStates((prev) => ({ ...prev, [opId]: 'setup' }));
-            } else {
-              probedOps.add(opId);
+            } else if (!vulnerableOps.has(opId) && !inconclusiveOps.has(opId) && !testedNoLeakOps.has(opId)) {
               setNodeStates((prev) => ({ ...prev, [opId]: 'probing' }));
             }
           } else if (event.event_type === 'finding_confirmed') {
             const confirmedOp = event.data?.hypothesis?.operation_id || opId;
             if (confirmedOp) {
-              probedOps.add(confirmedOp);
+              vulnerableOps.add(confirmedOp);
+              testedNoLeakOps.delete(confirmedOp);
+              inconclusiveOps.delete(confirmedOp);
               setNodeStates((prev) => ({ ...prev, [confirmedOp]: 'vulnerable' }));
             }
             if (event.data && event.data.id) {
               setFindings((prev) => dedupeFindings([...prev, event.data as Finding]));
             }
+          } else if (event.event_type === 'probe_denied') {
+            if (opId && !inconclusiveOps.has(opId) && !vulnerableOps.has(opId)) {
+              testedNoLeakOps.add(opId);
+              setNodeStates((prev) => ({ ...prev, [opId]: 'secure' }));
+            }
           } else if (event.event_type === 'hypothesis_propagated' && opId) {
-            if (!setupOps.has(opId)) {
-              setNodeStates((prev) => (prev[opId] === 'vulnerable' || prev[opId] === 'secure' ? prev : { ...prev, [opId]: 'candidate' }));
+            if (!setupOps.has(opId) && !vulnerableOps.has(opId) && !testedNoLeakOps.has(opId) && !inconclusiveOps.has(opId)) {
+              setNodeStates((prev) => ({ ...prev, [opId]: 'candidate' }));
             }
           } else if (event.event_type === 'response_received' && opId) {
             if (setupOps.has(opId) || purpose === 'setup') {
               setNodeStates((prev) => ({ ...prev, [opId]: 'setup' }));
-            } else {
-              probedOps.add(opId);
-              const statusCode = event.data?.status_code;
-              if (statusCode === 403 || statusCode === 404) {
-                setNodeStates((prev) => (prev[opId] === 'vulnerable' ? prev : { ...prev, [opId]: 'secure' }));
-              }
             }
           } else if (event.event_type === 'scan_completed') {
-            setNodeStates((prev) => {
-              const next: Record<string, 'idle' | 'setup' | 'not_tested' | 'probing' | 'vulnerable' | 'secure' | 'candidate'> = { ...prev };
-              // 1. Setup operations always show 'setup' (neutral / blue)
-              setupOps.forEach((id) => { next[id] = 'setup'; });
-              next['login'] = 'setup';
-              next['createProject'] = 'setup';
-
-              // 2. Only operations that actually had a probe step and did not leak show 'secure' ("TESTED: NO LEAK")
-              probedOps.forEach((id) => {
-                if (next[id] !== 'vulnerable') {
-                  next[id] = 'secure';
-                }
-              });
-
-              return next;
-            });
+            applyFinalStates();
           }
         },
         () => {
           setIsScanning(false);
-          setNodeStates((prev) => {
-            const next: Record<string, 'idle' | 'setup' | 'not_tested' | 'probing' | 'vulnerable' | 'secure' | 'candidate'> = { ...prev };
-            setupOps.forEach((id) => { next[id] = 'setup'; });
-            next['login'] = 'setup';
-            next['createProject'] = 'setup';
-            probedOps.forEach((id) => {
-              if (next[id] !== 'vulnerable') {
-                next[id] = 'secure';
-              }
-            });
-            return next;
-          });
+          applyFinalStates();
           loadFindings(scan_id);
         },
         (err) => {
           console.error('SSE Error:', err);
           setIsScanning(false);
-          setNodeStates((prev) => {
-            const next: Record<string, 'idle' | 'setup' | 'not_tested' | 'probing' | 'vulnerable' | 'secure' | 'candidate'> = { ...prev };
-            setupOps.forEach((id) => { next[id] = 'setup'; });
-            next['login'] = 'setup';
-            next['createProject'] = 'setup';
-            probedOps.forEach((id) => {
-              if (next[id] !== 'vulnerable') {
-                next[id] = 'secure';
-              }
-            });
-            return next;
-          });
+          applyFinalStates();
           loadFindings(scan_id);
         }
       );

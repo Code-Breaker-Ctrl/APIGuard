@@ -1,6 +1,7 @@
 export type NodeType = 'operation' | 'resource_type' | 'identifier' | 'identity' | 'evidence';
 export type EdgeType = 'OPERATES_ON' | 'PRODUCES' | 'CONSUMES' | 'REFERENCES' | 'NESTED_UNDER' | 'OBSERVED_ACCESS' | 'DENIED_ACCESS' | 'SUSPECTS_POLICY' | 'SUPPORTED_BY';
 export type FindingStatus = 'confirmed' | 'likely' | 'potential' | 'inconclusive' | 'not_reproducible' | 'rejected';
+export type NodeState = 'idle' | 'setup' | 'not_tested' | 'probing' | 'vulnerable' | 'secure' | 'candidate' | 'inconclusive';
 
 export interface BackendNode {
   id: string;
@@ -27,7 +28,7 @@ export interface ScanEvent {
   event_id: string;
   scan_id: string;
   timestamp: number;
-  event_type: 'request_sent' | 'response_received' | 'hypothesis_validated' | 'hypothesis_propagated' | 'finding_confirmed' | 'control_secure' | 'probe_denied' | 'scan_completed' | 'log' | 'error';
+  event_type: 'request_sent' | 'response_received' | 'hypothesis_validated' | 'hypothesis_propagated' | 'finding_confirmed' | 'control_secure' | 'probe_denied' | 'scan_completed' | 'log' | 'error' | 'test_inconclusive';
   phase?: 'A' | 'B' | 'C';
   message: string;
   data?: Record<string, any>;

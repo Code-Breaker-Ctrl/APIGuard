@@ -13,13 +13,13 @@ import {
 import type { Node, Edge, ReactFlowInstance } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import dagre from 'dagre';
-import { ShieldAlert, ShieldCheck, Activity, Sparkles, Database, Key, Maximize2 } from 'lucide-react';
-import type { BackendNode, BackendEdge } from '../types';
+import { ShieldAlert, ShieldCheck, Activity, Sparkles, Database, Key, Maximize2, HelpCircle } from 'lucide-react';
+import type { BackendNode, BackendEdge, NodeState } from '../types';
 
 interface GraphViewProps {
   backendNodes: BackendNode[];
   backendEdges: BackendEdge[];
-  nodeStates: Record<string, 'idle' | 'setup' | 'not_tested' | 'probing' | 'vulnerable' | 'secure' | 'candidate'>;
+  nodeStates: Record<string, NodeState>;
   selectedNodeId: string | null;
   onSelectNode: (nodeId: string) => void;
 }
@@ -60,6 +60,14 @@ const OperationNode = ({ data, selected }: any) => {
     statusBadge = (
       <span className="flex items-center gap-1 text-[8.5px] text-emerald-300 font-bold px-1 py-0.5 rounded bg-emerald-900/50">
         <ShieldCheck className="w-2.5 h-2.5" /> TESTED: NO LEAK
+      </span>
+    );
+  } else if (status === 'inconclusive') {
+    borderColor = 'border-slate-500/70 shadow-[0_0_12px_rgba(100,116,139,0.3)]';
+    bgColor = 'bg-slate-900/90';
+    statusBadge = (
+      <span className="flex items-center gap-1 text-[8.5px] text-slate-300 font-bold px-1.5 py-0.5 rounded bg-slate-800 border border-slate-600/70">
+        <HelpCircle className="w-2.5 h-2.5 text-slate-400" /> INCONCLUSIVE
       </span>
     );
   } else if (status === 'setup' || isSetupOp) {
@@ -365,6 +373,7 @@ export const GraphView: React.FC<GraphViewProps> = ({
             if (nodeStates[n.id] === 'vulnerable') return '#f43f5e';
             if (nodeStates[n.id] === 'secure') return '#10b981';
             if (nodeStates[n.id] === 'setup' || n.id === 'login' || n.id === 'createProject') return '#3b82f6';
+            if (nodeStates[n.id] === 'inconclusive') return '#64748b';
             if (nodeStates[n.id] === 'probing') return '#f59e0b';
             return '#1e293b';
           }}
@@ -386,6 +395,9 @@ export const GraphView: React.FC<GraphViewProps> = ({
         </span>
         <span className="flex items-center gap-1.5 text-slate-300">
           <span className="w-2.5 h-2.5 rounded-full bg-rose-500"></span> BOLA Leak
+        </span>
+        <span className="flex items-center gap-1.5 text-slate-300">
+          <span className="w-2.5 h-2.5 rounded-full bg-slate-500"></span> Inconclusive
         </span>
       </div>
     </div>

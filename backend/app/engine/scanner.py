@@ -173,6 +173,21 @@ class GraphGuidedScanner:
             )
             ctrl_res = await self._execute_and_emit(ctrl_step, on_event, client=client)
 
+            if ctrl_res.status_code < 200 or ctrl_res.status_code >= 300:
+                await self._emit(
+                    on_event,
+                    event_type="test_inconclusive",
+                    message=f"control failed ({ctrl_res.status_code}), test inconclusive",
+                    phase="A",
+                    data={
+                        "operation_id": primary_read_op.operation_id,
+                        "status": "inconclusive",
+                        "status_code": ctrl_res.status_code,
+                        "endpoint": primary_read_op.path
+                    }
+                )
+                continue
+
             # Execute Probe on primary read
             probe_step = PlanStep(
                 step_id=f"probe_{primary_read_op.operation_id}",
@@ -189,6 +204,17 @@ class GraphGuidedScanner:
             # Record control observation
             hyp = self.inference.record_control_observation(primary_read_op.operation_id, ctrl_res, probe_res)
             if hyp:
+                await self._emit(
+                    on_event,
+                    event_type="probe_denied",
+                    phase="A",
+                    message=f"[VERIFIER] Access denied for unauthorized probe on {primary_read_op.path} (HTTP {probe_res.status_code})",
+                    data={
+                        "operation_id": primary_read_op.operation_id,
+                        "status": "secure",
+                        "status_code": probe_res.status_code
+                    }
+                )
                 await self._emit(
                     on_event,
                     event_type="hypothesis_validated",
@@ -267,6 +293,22 @@ class GraphGuidedScanner:
                 )
                 c_res = await self._execute_and_emit(c_step, on_event, client=client)
 
+                # Check if owner's CONTROL request did not return success
+                if c_res.status_code < 200 or c_res.status_code >= 300:
+                    await self._emit(
+                        on_event,
+                        event_type="test_inconclusive",
+                        message=f"control failed ({c_res.status_code}), test inconclusive",
+                        phase="B",
+                        data={
+                            "operation_id": test_op.operation_id,
+                            "status": "inconclusive",
+                            "status_code": c_res.status_code,
+                            "endpoint": test_op.path
+                        }
+                    )
+                    continue
+
                 # Execute adversary probe
                 p_step = PlanStep(
                     step_id=f"probe_{test_op.operation_id}",
@@ -299,7 +341,18 @@ class GraphGuidedScanner:
                     findings.append(finding)
                     await self._emit(on_event, "finding_confirmed", f"[ALERT] Confirmed BOLA at {test_op.method} {test_op.path}", "C", finding.model_dump())
                 elif finding and finding.status in {FindingStatus.POTENTIAL, FindingStatus.REJECTED}:
-                    await self._emit(on_event, "probe_denied", f"[VERIFIER] Trap evaluated on {test_op.path}: status {finding.status.value}", "C")
+                    await self._emit(on_event, "probe_denied", f"[VERIFIER] Trap evaluated on {test_op.path}: status {finding.status.value}", "C", {
+                        "operation_id": test_op.operation_id,
+                        "status": "secure",
+                        "status_code": p_res.status_code
+                    })
+                elif finding is None:
+                    # Only show "TESTED: NO LEAK" when owner succeeded AND non-owner correctly denied!
+                    await self._emit(on_event, "probe_denied", f"[VERIFIER] Access denied for unauthorized probe on {test_op.path} (HTTP {p_res.status_code})", "C", {
+                        "operation_id": test_op.operation_id,
+                        "status": "secure",
+                        "status_code": p_res.status_code
+                    })
 
             # 4. ORDER DELETE LAST ON A DISPOSABLE RESOURCE
             if enable_mutations and delete_ops:
@@ -351,6 +404,44 @@ class GraphGuidedScanner:
                             repro_curl=f"curl -X DELETE '{del_probe.url}' -H 'Authorization: Bearer <TOKEN>'"
                         )
                         findings.append(f_del)
+                        await self._emit(on_event, "finding_confirmed", f"[ALERT] Confirmed BOLA on DELETE at {del_op.path}", "C", f_del.model_dump())
+                    else:
+                        # Non-owner was denied; now test owner control can delete (cleanup):
+                        del_ctrl = PlanStep(
+                            step_id=f"ctrl_del_{disp_id}",
+                            identity_id=user_a.identity_id,
+                            operation_id=del_op.operation_id,
+                            method="DELETE",
+                            path_template=del_op.path,
+                            url=f"{self.base_url}{del_op.path}".replace(f"{{{del_op.path_params[0]}}}", str(disp_id)),
+                            headers={"Authorization": f"Bearer {user_a.token}"} if user_a.token else {},
+                            purpose="control_owner"
+                        )
+                        del_ctrl_res = await self._execute_and_emit(del_ctrl, on_event, client=client)
+                        if del_ctrl_res.status_code == 200:
+                            await self._emit(
+                                on_event,
+                                "probe_denied",
+                                f"[VERIFIER] Access denied for unauthorized DELETE on {del_op.path} (HTTP {del_res.status_code}); cleanup succeeded",
+                                "C",
+                                {
+                                    "operation_id": del_op.operation_id,
+                                    "status": "secure",
+                                    "status_code": del_res.status_code
+                                }
+                            )
+                        else:
+                            await self._emit(
+                                on_event,
+                                event_type="test_inconclusive",
+                                message=f"control failed ({del_ctrl_res.status_code}), test inconclusive",
+                                phase="C",
+                                data={
+                                    "operation_id": del_op.operation_id,
+                                    "status": "inconclusive",
+                                    "status_code": del_ctrl_res.status_code
+                                }
+                            )
 
         # Deduplicate findings so each endpoint/method only appears once per scan
         unique_findings = []

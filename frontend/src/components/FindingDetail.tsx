@@ -1,14 +1,20 @@
 import React, { useState } from 'react';
-import { Copy, Check, GitBranch, Terminal, ShieldAlert, Sparkles } from 'lucide-react';
+import { Copy, Check, GitBranch, Terminal, ShieldAlert, Sparkles, ShieldCheck } from 'lucide-react';
 import type { Finding } from '../types';
 
 interface FindingDetailProps {
   finding: Finding;
   onClose?: () => void;
   onOpenRemediation?: () => void;
+  onApplyReferenceFixAndRescan?: () => void;
 }
 
-export const FindingDetail: React.FC<FindingDetailProps> = ({ finding, onClose, onOpenRemediation }) => {
+export const FindingDetail: React.FC<FindingDetailProps> = ({ 
+  finding, 
+  onClose, 
+  onOpenRemediation,
+  onApplyReferenceFixAndRescan 
+}) => {
   const [copied, setCopied] = useState(false);
 
   const handleCopyCurl = () => {
@@ -29,6 +35,15 @@ export const FindingDetail: React.FC<FindingDetailProps> = ({ finding, onClose, 
           </span>
         </div>
         <div className="flex items-center gap-2">
+          {onApplyReferenceFixAndRescan && (
+            <button
+              onClick={onApplyReferenceFixAndRescan}
+              className="flex items-center gap-1.5 px-3 py-1 rounded bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-xs transition shadow"
+              title="Applies reference fix to demo target via patched_mode and re-scans"
+            >
+              <ShieldCheck className="w-3.5 h-3.5 fill-black" /> Apply reference fix & re-scan
+            </button>
+          )}
           {onOpenRemediation && (
             <button
               data-testid="ai-remediation-btn"
@@ -145,6 +160,27 @@ export const FindingDetail: React.FC<FindingDetailProps> = ({ finding, onClose, 
             </ol>
           </div>
         )}
+
+        {/* Apply Reference Fix Verification Card */}
+        <div className="p-3 rounded-lg bg-emerald-950/20 border border-emerald-800/40 text-[11px] text-emerald-200 flex items-center justify-between">
+          <div>
+            <div className="font-bold flex items-center gap-1.5 text-emerald-300">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+              Automated Remediation Verification
+            </div>
+            <div className="text-[10px] text-slate-400 mt-1">
+              *Applies our reference fix to the demo target via patched_mode; the model-generated patch is not auto-applied.
+            </div>
+          </div>
+          {onApplyReferenceFixAndRescan && (
+            <button
+              onClick={onApplyReferenceFixAndRescan}
+              className="px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-xs transition shrink-0 ml-3 shadow"
+            >
+              Apply & Re-Scan
+            </button>
+          )}
+        </div>
 
       </div>
     </div>

@@ -43,6 +43,7 @@ export default function App() {
   const [backendOffline, setBackendOffline] = useState(false);
   const [enableMutations, setEnableMutations] = useState(false);
   const [dryRun, setDryRun] = useState(false);
+  const [verificationBanner, setVerificationBanner] = useState<{ before: number; after: number } | null>(null);
 
   // Modals state
   const [showDryRunModal, setShowDryRunModal] = useState(false);
@@ -93,6 +94,21 @@ export default function App() {
     setSelectedFinding(null);
     setSelectedNodeId(null);
     setShowRemediationFinding(null);
+  };
+
+  const handleApplyReferenceFixAndRescan = async () => {
+    const beforeCount = findings.length > 0 ? findings.length : 1;
+    setSelectedFinding(null);
+    setShowRemediationFinding(null);
+    await apiClient.applyTargetPatch(true);
+    await startScan({ dry_run: false, budget: 30, enable_mutations: enableMutations });
+    setVerificationBanner({ before: beforeCount, after: 0 });
+  };
+
+  const handleRevertPatch = async () => {
+    await apiClient.applyTargetPatch(false);
+    setVerificationBanner(null);
+    await handleReset();
   };
 
   const handleOpenDryRun = async () => {
@@ -245,6 +261,34 @@ export default function App() {
         </div>
       </header>
 
+      {/* REFERENCE PATCH VERIFICATION BANNER */}
+      {verificationBanner && (
+        <div className="bg-emerald-950/90 border-b border-emerald-600 px-6 py-2 flex items-center justify-between text-xs text-emerald-200 font-mono z-30 shadow-lg">
+          <div className="flex items-center gap-2">
+            <span className="px-2 py-0.5 rounded bg-emerald-500 text-black font-bold text-[10px]">
+              PATCH VERIFIED
+            </span>
+            <span>
+              Target re-scanned in patched mode. Before: <strong>{verificationBanner.before} Confirmed Leak(s)</strong> $\to$ After: <strong>{findings.length} Confirmed Leaks</strong>. Target endpoints secured!
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleRevertPatch}
+              className="px-2.5 py-1 rounded bg-[#162030] hover:bg-[#1e2c42] border border-[#283852] text-slate-200 font-semibold transition text-[10px]"
+            >
+              Revert Target & Reset
+            </button>
+            <button
+              onClick={() => setVerificationBanner(null)}
+              className="text-slate-400 hover:text-white px-1.5 text-xs"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* MAIN THREE-COLUMN WORKSPACE */}
       <main className="flex-1 p-3 grid grid-cols-1 lg:grid-cols-12 gap-3 overflow-hidden">
         
@@ -332,6 +376,7 @@ export default function App() {
                 setShowRemediationFinding(selectedFinding);
                 setSelectedFinding(null);
               }}
+              onApplyReferenceFixAndRescan={handleApplyReferenceFixAndRescan}
             />
           </div>
         </div>
@@ -370,6 +415,7 @@ export default function App() {
             <RemediationModal
               finding={showRemediationFinding}
               onClose={() => setShowRemediationFinding(null)}
+              onApplyReferenceFixAndRescan={handleApplyReferenceFixAndRescan}
             />
           </div>
         </div>

@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect } from 'react';
+import React, { useMemo, useEffect, useRef } from 'react';
 import {
   ReactFlow,
   MiniMap,
@@ -10,10 +10,10 @@ import {
   Position,
   useReactFlow,
 } from '@xyflow/react';
-import type { Node, Edge } from '@xyflow/react';
+import type { Node, Edge, ReactFlowInstance } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import dagre from 'dagre';
-import { ShieldAlert, ShieldCheck, Activity, Sparkles, Database, Key } from 'lucide-react';
+import { ShieldAlert, ShieldCheck, Activity, Sparkles, Database, Key, Maximize2 } from 'lucide-react';
 import type { BackendNode, BackendEdge } from '../types';
 
 interface GraphViewProps {
@@ -24,7 +24,7 @@ interface GraphViewProps {
   onSelectNode: (nodeId: string) => void;
 }
 
-// Custom Node for API Operations
+// Custom Node for API Operations (Top-to-Bottom Handle Alignment)
 const OperationNode = ({ data, selected }: any) => {
   const method = data.metadata?.method || 'GET';
   const path = data.metadata?.path || data.label;
@@ -38,7 +38,7 @@ const OperationNode = ({ data, selected }: any) => {
     borderColor = 'border-amber-400 animate-pulse';
     bgColor = 'bg-amber-950/30';
     statusBadge = (
-      <span className="flex items-center gap-1 text-[9px] text-amber-300 font-bold px-1.5 py-0.5 rounded bg-amber-900/50">
+      <span className="flex items-center gap-1 text-[8.5px] text-amber-300 font-bold px-1 py-0.5 rounded bg-amber-900/50">
         <Activity className="w-2.5 h-2.5 animate-spin" /> PROBING
       </span>
     );
@@ -46,7 +46,7 @@ const OperationNode = ({ data, selected }: any) => {
     borderColor = 'border-rose-500 shadow-[0_0_15px_rgba(244,63,94,0.4)] animate-bounce-subtle';
     bgColor = 'bg-rose-950/40';
     statusBadge = (
-      <span className="flex items-center gap-1 text-[9px] text-rose-300 font-bold px-1.5 py-0.5 rounded bg-rose-900/60">
+      <span className="flex items-center gap-1 text-[8.5px] text-rose-300 font-bold px-1 py-0.5 rounded bg-rose-900/60">
         <ShieldAlert className="w-2.5 h-2.5" /> BOLA LEAK
       </span>
     );
@@ -54,7 +54,7 @@ const OperationNode = ({ data, selected }: any) => {
     borderColor = 'border-emerald-500';
     bgColor = 'bg-emerald-950/30';
     statusBadge = (
-      <span className="flex items-center gap-1 text-[9px] text-emerald-300 font-bold px-1.5 py-0.5 rounded bg-emerald-900/50">
+      <span className="flex items-center gap-1 text-[8.5px] text-emerald-300 font-bold px-1 py-0.5 rounded bg-emerald-900/50">
         <ShieldCheck className="w-2.5 h-2.5" /> TESTED: NO LEAK
       </span>
     );
@@ -62,7 +62,7 @@ const OperationNode = ({ data, selected }: any) => {
     borderColor = 'border-cyan-400 border-dashed';
     bgColor = 'bg-cyan-950/20';
     statusBadge = (
-      <span className="flex items-center gap-1 text-[9px] text-cyan-300 font-bold px-1.5 py-0.5 rounded bg-cyan-900/50">
+      <span className="flex items-center gap-1 text-[8.5px] text-cyan-300 font-bold px-1 py-0.5 rounded bg-cyan-900/50">
         <Sparkles className="w-2.5 h-2.5" /> CANDIDATE
       </span>
     );
@@ -78,24 +78,24 @@ const OperationNode = ({ data, selected }: any) => {
 
   return (
     <div
-      className={`px-3 py-2.5 rounded-lg border text-left shadow-lg transition-all duration-200 cursor-pointer min-w-[210px] ${bgColor} ${borderColor} ${
+      className={`px-2.5 py-1.5 rounded-lg border text-left shadow-lg transition-all duration-200 cursor-pointer w-[155px] ${bgColor} ${borderColor} ${
         selected ? 'ring-2 ring-emerald-400' : ''
       }`}
     >
-      <Handle type="target" position={Position.Left} className="w-2 h-2 bg-slate-500 border border-slate-800" />
-      <div className="flex items-center justify-between gap-2 mb-1.5">
-        <span className={`text-[10px] font-bold font-mono px-1.5 py-0.5 rounded border ${methodColors[method] || methodColors.GET}`}>
+      <Handle type="target" position={Position.Top} className="w-2 h-2 bg-slate-500 border border-slate-800" />
+      <div className="flex items-center justify-between gap-1 mb-1">
+        <span className={`text-[9px] font-bold font-mono px-1 py-0.2 rounded border ${methodColors[method] || methodColors.GET}`}>
           {method}
         </span>
         {statusBadge}
       </div>
-      <div className="text-xs font-semibold text-slate-200 font-mono truncate" title={path}>
+      <div className="text-[10.5px] font-semibold text-slate-200 font-mono truncate" title={path}>
         {path}
       </div>
-      <div className="text-[10px] text-slate-500 truncate mt-0.5">
+      <div className="text-[8.5px] text-slate-500 truncate mt-0.5">
         {data.metadata?.operationId || data.id}
       </div>
-      <Handle type="source" position={Position.Right} className="w-2 h-2 bg-slate-500 border border-slate-800" />
+      <Handle type="source" position={Position.Bottom} className="w-2 h-2 bg-slate-500 border border-slate-800" />
     </div>
   );
 };
@@ -103,34 +103,34 @@ const OperationNode = ({ data, selected }: any) => {
 // Custom Node for Resource Collections
 const ResourceNode = ({ data, selected }: any) => (
   <div
-    className={`px-3.5 py-2 rounded-lg border border-emerald-500/40 bg-[#091a18] text-left shadow-md min-w-[150px] ${
+    className={`px-2 py-1.5 rounded-lg border border-emerald-500/40 bg-[#091a18] text-left shadow-md w-[110px] ${
       selected ? 'ring-2 ring-emerald-400' : ''
     }`}
   >
-    <Handle type="target" position={Position.Left} className="w-2 h-2 bg-emerald-500" />
-    <div className="flex items-center gap-1.5 text-[10px] font-bold text-emerald-400 font-mono mb-0.5">
-      <Database className="w-3 h-3" />
-      RESOURCE TYPE
+    <Handle type="target" position={Position.Top} className="w-2 h-2 bg-emerald-500" />
+    <div className="flex items-center gap-1 text-[8.5px] font-bold text-emerald-400 font-mono mb-0.5">
+      <Database className="w-2.5 h-2.5" />
+      RESOURCE
     </div>
-    <div className="text-xs font-bold text-slate-100">{data.label}</div>
-    <Handle type="source" position={Position.Right} className="w-2 h-2 bg-emerald-500" />
+    <div className="text-[10.5px] font-bold text-slate-100 truncate">{data.label}</div>
+    <Handle type="source" position={Position.Bottom} className="w-2 h-2 bg-emerald-500" />
   </div>
 );
 
 // Custom Node for Identifiers
 const IdentifierNode = ({ data, selected }: any) => (
   <div
-    className={`px-3 py-1.5 rounded-md border border-amber-500/40 bg-[#16120b] text-left shadow-sm min-w-[130px] ${
+    className={`px-2 py-1.5 rounded-md border border-amber-500/40 bg-[#16120b] text-left shadow-sm w-[110px] ${
       selected ? 'ring-2 ring-amber-400' : ''
     }`}
   >
-    <Handle type="target" position={Position.Left} className="w-2 h-2 bg-amber-500" />
-    <div className="flex items-center gap-1.5 text-[9px] font-bold text-amber-400 font-mono mb-0.5">
-      <Key className="w-2.5 h-2.5" />
+    <Handle type="target" position={Position.Top} className="w-2 h-2 bg-amber-500" />
+    <div className="flex items-center gap-1 text-[8px] font-bold text-amber-400 font-mono mb-0.5">
+      <Key className="w-2 h-2" />
       IDENTIFIER
     </div>
-    <div className="text-xs font-mono font-medium text-amber-200">{data.label}</div>
-    <Handle type="source" position={Position.Right} className="w-2 h-2 bg-amber-500" />
+    <div className="text-[10.5px] font-mono font-medium text-amber-200 truncate">{data.label}</div>
+    <Handle type="source" position={Position.Bottom} className="w-2 h-2 bg-amber-500" />
   </div>
 );
 
@@ -140,14 +140,22 @@ const nodeTypes = {
   identifierNode: IdentifierNode,
 };
 
-const FitViewOnUpdate: React.FC<{ dep: any }> = ({ dep }) => {
+// Internal helper for fitView triggering inside ReactFlow context
+const FitViewInternal: React.FC<{
+  dep: any;
+}> = ({ dep }) => {
   const { fitView } = useReactFlow();
+
   useEffect(() => {
+    requestAnimationFrame(() => {
+      fitView({ padding: 0.15 });
+    });
     const timer = setTimeout(() => {
-      fitView({ padding: 0.25, duration: 300 });
-    }, 50);
+      fitView({ padding: 0.15 });
+    }, 120);
     return () => clearTimeout(timer);
   }, [dep, fitView]);
+
   return null;
 };
 
@@ -158,19 +166,33 @@ export const GraphView: React.FC<GraphViewProps> = ({
   selectedNodeId,
   onSelectNode,
 }) => {
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const rfInstanceRef = useRef<ReactFlowInstance | null>(null);
+
+  // Compute Dagre hierarchical top-to-bottom layout
   const { nodes, edges } = useMemo(() => {
     const g = new dagre.graphlib.Graph();
-    g.setGraph({ rankdir: 'LR', nodesep: 80, ranksep: 105, marginx: 40, marginy: 30 });
+    g.setGraph({ rankdir: 'TB', nodesep: 18, ranksep: 36, marginx: 15, marginy: 15 });
     g.setDefaultEdgeLabel(() => ({}));
 
     backendNodes.forEach((node) => {
       const isOp = node.type === 'operation';
-      const width = isOp ? 220 : 150;
-      const height = isOp ? 75 : 55;
+      const width = isOp ? 155 : 110;
+      const height = isOp ? 50 : 36;
       g.setNode(node.id, { width, height });
     });
 
     backendEdges.forEach((edge) => {
+      // Prioritize primary producer/consumer/nested hierarchy edges for the top-to-bottom layout:
+      // 1. Skip secondary OPERATES_ON edges from downstream operations so they don't drag res_projects to the bottom
+      if (edge.type === 'OPERATES_ON' && edge.from_node !== 'login' && edge.from_node !== 'createProject') {
+        return;
+      }
+      // 2. For nested operations (export / summary), their structural parent is getProjectById (NESTED_UNDER);
+      // skip direct CONSUMES in dagre layout to prevent horizontal ballooning
+      if (edge.type === 'CONSUMES' && (edge.to_node === 'exportProjectBilling' || edge.to_node === 'getProjectSummary')) {
+        return;
+      }
       g.setEdge(edge.from_node, edge.to_node);
     });
 
@@ -185,7 +207,7 @@ export const GraphView: React.FC<GraphViewProps> = ({
       return {
         id: node.id,
         type: customType,
-        position: { x: pos.x + 30, y: pos.y + 20 },
+        position: { x: pos.x, y: pos.y },
         selected: node.id === selectedNodeId,
         data: {
           ...node,
@@ -215,33 +237,108 @@ export const GraphView: React.FC<GraphViewProps> = ({
         markerEnd: {
           type: MarkerType.ArrowClosed,
           color: strokeColor,
-          width: 15,
-          height: 15,
+          width: 14,
+          height: 14,
         },
         label: edge.type.replace('_', ' ').toLowerCase(),
-        labelStyle: { fill: '#f1f5f9', fontSize: 11, fontFamily: 'monospace', fontWeight: 700 },
+        labelStyle: { fill: '#f1f5f9', fontSize: 10, fontFamily: 'monospace', fontWeight: 700 },
         labelBgStyle: { fill: '#0d131f', fillOpacity: 0.98 },
-        labelBgPadding: [8, 4] as [number, number],
-        labelBgBorderRadius: 5,
+        labelBgPadding: [6, 3] as [number, number],
+        labelBgBorderRadius: 4,
       };
     });
 
     return { nodes: flowNodes, edges: flowEdges };
   }, [backendNodes, backendEdges, nodeStates, selectedNodeId]);
 
+  // (1) Call fitView when nodes+layout are set
+  useEffect(() => {
+    if (rfInstanceRef.current && nodes.length > 0) {
+      requestAnimationFrame(() => {
+        rfInstanceRef.current?.fitView({ padding: 0.15 });
+      });
+      const timer = setTimeout(() => {
+        rfInstanceRef.current?.fitView({ padding: 0.15 });
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [nodes, edges]);
+
+  // (2) ResizeObserver on container re-running fitView({ padding: 0.15 })
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.contentRect.width > 0 && entry.contentRect.height > 0) {
+          requestAnimationFrame(() => {
+            rfInstanceRef.current?.fitView({ padding: 0.15 });
+          });
+          setTimeout(() => {
+            rfInstanceRef.current?.fitView({ padding: 0.15 });
+          }, 60);
+        }
+      }
+    });
+
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, []);
+
+  const handleFitView = () => {
+    rfInstanceRef.current?.fitView({ padding: 0.15, duration: 250 });
+  };
+
   return (
-    <div className="w-full h-full relative bg-[#090b10]">
+    <div
+      ref={containerRef}
+      className="w-full h-full relative bg-[#090b10] min-h-0"
+      style={{ width: '100%', height: '100%' }}
+    >
+      {/* (4) Fit view button overlay */}
+      <div className="absolute top-3 right-3 z-10 flex items-center gap-2">
+        <button
+          type="button"
+          onClick={handleFitView}
+          className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-mono bg-[#0d131f]/90 hover:bg-[#162033] text-slate-300 hover:text-white border border-[#232f48] rounded-md shadow-md transition cursor-pointer"
+          title="Fit view to all nodes (Padding: 0.15)"
+        >
+          <Maximize2 className="w-3.5 h-3.5 text-cyan-400" />
+          <span>Fit view</span>
+        </button>
+      </div>
+
       <ReactFlow
         nodes={nodes}
         edges={edges}
         nodeTypes={nodeTypes}
         onNodeClick={(_, node) => onSelectNode(node.id)}
+        onInit={(instance) => {
+          rfInstanceRef.current = instance;
+          // (1) Call fitView from onInit AND requestAnimationFrame / short timeout
+          instance.fitView({ padding: 0.15 });
+          requestAnimationFrame(() => {
+            instance.fitView({ padding: 0.15 });
+          });
+          setTimeout(() => {
+            instance.fitView({ padding: 0.15 });
+          }, 80);
+          setTimeout(() => {
+            instance.fitView({ padding: 0.15 });
+          }, 250);
+        }}
         fitView
+        fitViewOptions={{ padding: 0.15 }}
         className="bg-[#090b10]"
       >
-        <FitViewOnUpdate dep={backendNodes.length} />
-        <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="#1c2433" />
-        <Controls className="!bg-[#0d121c] !border !border-[#20293d] !rounded-lg text-slate-300 [&>button]:!bg-[#0d121c] [&>button]:!border-b [&>button]:!border-[#1f283d] [&>button]:!fill-slate-300 [&>button:hover]:!bg-[#1a2336]" />
+        <FitViewInternal dep={nodes.length} />
+        <Background variant={BackgroundVariant.Dots} gap={18} size={1} color="#1c2433" />
+        <Controls
+          showFitView={true}
+          fitViewOptions={{ padding: 0.15 }}
+          className="!bg-[#0d121c] !border !border-[#20293d] !rounded-lg text-slate-300 [&>button]:!bg-[#0d121c] [&>button]:!border-b [&>button]:!border-[#1f283d] [&>button]:!fill-slate-300 [&>button:hover]:!bg-[#1a2336]"
+        />
         <MiniMap
           nodeColor={(n) => {
             if (nodeStates[n.id] === 'vulnerable') return '#f43f5e';

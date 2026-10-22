@@ -23,9 +23,20 @@ export function useScan() {
 
   const loadFindings = useCallback(async (targetScanId?: string | null) => {
     try {
-      const activeId = showAllHistory ? undefined : (targetScanId ?? currentScanId ?? undefined);
-      const data = await apiClient.getFindings(activeId);
-      setFindings(dedupeFindings(data || []));
+      if (showAllHistory) {
+        // User toggled History -> fetch all past findings from database
+        const data = await apiClient.getFindings();
+        setFindings(dedupeFindings(data || []));
+      } else {
+        const activeId = targetScanId ?? currentScanId;
+        if (!activeId) {
+          // No scan has run yet in this session -> Current Run shows 0 / empty
+          setFindings([]);
+          return;
+        }
+        const data = await apiClient.getFindings(activeId);
+        setFindings(dedupeFindings(data || []));
+      }
     } catch (err: any) {
       console.error('Failed to load findings:', err);
     }

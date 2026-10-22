@@ -28,16 +28,23 @@ export const FindingsList: React.FC<FindingsListProps> = ({
           {onToggleHistory && (
             <button
               onClick={onToggleHistory}
-              className={`text-[9px] px-1.5 py-0.5 rounded border transition font-mono ${
+              className={`text-[9px] px-2 py-0.5 rounded border transition font-mono cursor-pointer ${
                 showAllHistory
                   ? 'bg-purple-950/60 border-purple-800 text-purple-300'
                   : 'bg-slate-900 border-slate-700 text-slate-400 hover:text-slate-200'
               }`}
+              title={showAllHistory ? 'Show findings from Current Run' : 'Show full historical findings (History)'}
             >
-              {showAllHistory ? 'All History' : 'Current Run'}
+              {showAllHistory ? 'History' : 'Current Run'}
             </button>
           )}
-          <span className="text-[10px] px-2 py-0.5 rounded bg-rose-950/60 text-rose-300 border border-rose-800/40 font-bold">
+          <span
+            className={`text-[10px] px-2 py-0.5 rounded border font-bold ${
+              findings.length > 0
+                ? 'bg-rose-950/60 text-rose-300 border-rose-800/40'
+                : 'bg-slate-900 text-slate-500 border-slate-800'
+            }`}
+          >
             {findings.length}
           </span>
         </div>
@@ -46,7 +53,9 @@ export const FindingsList: React.FC<FindingsListProps> = ({
       <div className="flex-1 p-3 overflow-y-auto space-y-2.5">
         {findings.length === 0 ? (
           <div className="p-6 text-center text-xs text-slate-500 font-mono">
-            Zero confirmed vulnerabilities detected yet.
+            {showAllHistory
+              ? 'Zero confirmed vulnerabilities recorded in history.'
+              : 'Zero confirmed vulnerabilities in current run. Click "RUN EXECUTION AUDIT" to scan.'}
           </div>
         ) : (
           findings.map((f) => {

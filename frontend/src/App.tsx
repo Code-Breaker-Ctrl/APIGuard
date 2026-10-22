@@ -313,7 +313,7 @@ export default function App() {
             </span>
           </div>
 
-          <div className="flex-1 relative">
+          <div className="flex-1 min-h-0 relative h-full w-full">
             <GraphView
               backendNodes={nodes}
               backendEdges={edges}

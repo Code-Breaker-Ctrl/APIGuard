@@ -51,6 +51,19 @@ export default function App() {
   const [showBenchmarkModal, setShowBenchmarkModal] = useState(false);
   const [showRemediationFinding, setShowRemediationFinding] = useState<Finding | null>(null);
   const [showGuidedDemo, setShowGuidedDemo] = useState(false);
+  const [geminiStatusLabel, setGeminiStatusLabel] = useState<string>('offline template only');
+
+  useEffect(() => {
+    apiClient.getRemediationStatus()
+      .then((st) => {
+        if (st.key_present && st.status === 'active') {
+          setGeminiStatusLabel('tested');
+        } else {
+          setGeminiStatusLabel('offline template only');
+        }
+      })
+      .catch(() => setGeminiStatusLabel('offline template only'));
+  }, []);
 
   // Health check on mount
   const checkBackendHealth = useCallback(async () => {
@@ -390,7 +403,7 @@ export default function App() {
             <span className="w-1.5 h-1.5 rounded-full bg-cyan-400"></span> Working: React Flow + Dagre DAG
           </span>
           <span className="flex items-center gap-1 text-purple-400 font-semibold">
-            <span className="w-1.5 h-1.5 rounded-full bg-purple-400"></span> Working: Gemini / Offline AST Remediation
+            <span className="w-1.5 h-1.5 rounded-full bg-purple-400"></span> Gemini: {geminiStatusLabel}
           </span>
           <span className="flex items-center gap-1 text-amber-400 font-semibold">
             <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span> Working: Empirical Ground Truth Benchmarks

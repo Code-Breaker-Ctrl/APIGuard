@@ -74,7 +74,7 @@ export const FindingDetail: React.FC<FindingDetailProps> = ({ finding, onClose, 
         <div className="rounded-lg border border-[#1f2738] bg-[#080b10] overflow-hidden">
           <div className="px-4 py-2.5 bg-[#0f1420] border-b border-[#1f2738] flex items-center justify-between text-[11px]">
             <span className="font-bold text-slate-200">Differential Payload Comparison</span>
-            <span className="text-rose-400 font-bold">Latency Proof: Status 200 OK + Owner Data Leaked</span>
+            <span className="text-rose-400 font-bold">Latent leak proof: Status 200 OK + Owner Data Leaked</span>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-[#1f2738]">

@@ -137,7 +137,7 @@
       "precision": 0.0,
       "requests": 5,
       "duration_ms": 4.0,
-      "note": "Proves rule propagation across DAG edges is what catches the export leak."
+      "note": "In our ablation, disabling propagation missed the indirect defect (1 defect, 1 target API)."
     },
     "oracle_baseline_on_variant_b": {
       "name": "Oracle Baseline (Manual Rules Hand-Tagged for Every Route)",

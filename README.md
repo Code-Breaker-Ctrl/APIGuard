@@ -48,7 +48,7 @@ Every metric below was empirically measured against live target sockets (`http:/
 
 ### 🔬 Controlled Ablation Study
 
-- **Graph Scanner with Propagation OFF:** Recall on Defect B drops to **0.0%** (0/1 confirmed). Proves DAG edge propagation is the mathematically critical mechanism.
+- **Graph Scanner with Propagation OFF:** In our ablation, disabling propagation missed the indirect defect (1 defect, 1 target API).
 - **Oracle Baseline (Hand-Tagged Rules on Every Route):** Matches APIGuard at 100% recall, but requires humans to manually author security rules for every route in advance.
 
 ---
@@ -102,7 +102,7 @@ Every metric below was empirically measured against live target sockets (`http:/
 |---|:---:|---|
 | **Real Engine Execution** | **100% Real** | All HTTP requests are executed against real network sockets (`127.0.0.1:8000`). Zero `setTimeout` mocks or hardcoded node arrays. |
 | **Deterministic Scanner** | **100% Real** | The scanner engine makes **no LLM calls**. Graph traversal, policy evaluation, and differential verification are completely deterministic. |
-| **AI Prompting Bonus** | **Working** | Gemini API is used strictly for post-scan surgical remediation ($v_1 \to v_2$). If no API key is provided, a deterministic offline template is badged. |
+| **AI Prompting Bonus** | **Tested / Offline Template** | Gemini API is used strictly for post-scan surgical remediation ($v_1 \to v_2$). If no API key is provided, a deterministic offline template is badged. |
 | **Safe by Default** | **Working** | Requests are strictly restricted to allowlisted loopback hosts (`127.0.0.1`). Mutating requests (`PATCH`/`DELETE`) are blocked unless explicitly toggled. |
 | **Git Commit History** | **Verified** | Clean, incremental commit history with tests passing at every stage. |
 

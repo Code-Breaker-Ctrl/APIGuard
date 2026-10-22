@@ -157,7 +157,7 @@ async def run_benchmark(
                 "precision": 0.0,
                 "requests": no_prop_exec.requests_sent,
                 "duration_ms": t_no_prop,
-                "note": "Proves rule propagation across DAG edges is what catches the export leak."
+                "note": "In our ablation, disabling propagation missed the indirect defect (1 defect, 1 target API)."
             },
             "oracle_baseline_on_variant_b": {
                 "name": "Oracle Baseline (Manual Rules Hand-Tagged for Every Route)",
@@ -236,7 +236,7 @@ async def run_benchmark(
             "## Key Takeaways",
             "- **Defect B (Variant `variant_b`):** APIGuard achieves **100% recall** by propagating ownership rules to graph-adjacent operations. Baseline achieves **0% recall** because it evaluates `/export` without DAG context.",
             "- **Zero False Positives:** In `variant_secure`, APIGuard maintains **100% precision** with 0 false positives.",
-            "- **Ablation Proof:** Turning propagation off drops recall on Variant B to 0%, proving the graph traversal is the active mechanism."
+            "- **Ablation:** In our ablation, disabling propagation missed the indirect defect (1 defect, 1 target API)."
         ])
 
         with open(os.path.join(BENCHMARKS_DIR, "results.md"), "w", encoding="utf-8") as f:

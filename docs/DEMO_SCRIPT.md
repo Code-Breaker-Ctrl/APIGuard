@@ -12,7 +12,7 @@
    - Point to the **Honesty Strip** at the bottom:
      - `Working: Real REST + SSE Engine`
      - `Working: React Flow + Dagre DAG`
-     - `Working: Gemini / Offline AST Remediation`
+     - `Gemini: tested (or offline template only)`
      - `Working: Empirical Ground Truth Benchmarks`
    - *"Most security scanners test endpoints in silos. When an endpoint returns HTTP 200, uptime monitors and CI pipelines assume everything is fine. This is BOLA (OWASP API #1) — it doesn't crash the server, it quietly leaks private tenant data."*
 2. **Examine the React Flow DAG (Center Panel)**:
@@ -49,14 +49,14 @@
    - Show the **Sanitized cURL Command** and copy button.
 2. **Open AI Remediation (Click "AI Remediation")**:
    - *"Prompting Bonus demonstration:"*
-   - Show **Naive Prompt (v1)**: Generic prompt causes LLM to check `if not user:` (only checks authentication, misses tenant ownership).
-   - Show **Graph-Guided Prompt (v2)**: Context-infused prompt includes DAG relations, AST parameter binding, and leaked field context. Generates the exact tenant check: `if project.owner_id != current_user.id:` plus an automated Pytest test case.
+   - Show **Naive Prompt (v1)**: Generic prompt causes model to check `if not user:` (only checks authentication, misses tenant ownership).
+   - Show **Graph-Guided Prompt (v2)**: Context-infused prompt includes DAG relations, resource ownership context, and leaked field context. Generates the exact tenant check: `if project.owner_id != current_user.id:` plus an automated Pytest test case.
 3. **Open Benchmarks Panel (Click "Benchmarks" or press 'D')**:
    - Show empirical comparison across 5 target variants:
      - **Defect B (Indirect BOLA)**: Baseline Recall = 0% vs APIGuard Recall = 100%.
      - **Secure Variant**: 0 false positives (100% precision).
    - Point to the **Controlled Ablation Study**:
-     - *Rule Propagation OFF*: Recall drops from 100% to **0%**, scientifically proving DAG propagation is the essential mechanism.
+     - *Rule Propagation OFF*: In our ablation, disabling propagation missed the indirect defect (1 defect, 1 target API).
 
 ---
 

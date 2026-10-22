@@ -20,4 +20,4 @@
 ## Key Takeaways
 - **Defect B (Variant `variant_b`):** APIGuard achieves **100% recall** by propagating ownership rules to graph-adjacent operations. Baseline achieves **0% recall** because it evaluates `/export` without DAG context.
 - **Zero False Positives:** In `variant_secure`, APIGuard maintains **100% precision** with 0 false positives.
-- **Ablation Proof:** Turning propagation off drops recall on Variant B to 0%, proving the graph traversal is the active mechanism.
+- **Ablation:** In our ablation, disabling propagation missed the indirect defect (1 defect, 1 target API).

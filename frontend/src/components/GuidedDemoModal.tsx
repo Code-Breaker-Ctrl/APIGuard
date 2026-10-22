@@ -57,7 +57,7 @@ export const GuidedDemoModal: React.FC<GuidedDemoModalProps> = ({
       icon: <ShieldCheck className="w-5 h-5 text-purple-400" />,
       tagline: 'Measurable empirical claims vs Option A Baseline & Ablations',
       description:
-        'Review the empirical benchmark across 5 target variants. Notice how the baseline achieves 0% recall on Defect B (indirect BOLA on export) while APIGuard reaches 100% recall. The controlled ablation proves that turning graph propagation OFF drops recall to 0%, proving the graph is the critical mechanism.',
+        'Review the empirical benchmark across 5 target variants. Notice how the baseline achieves 0% recall on Defect B (indirect BOLA on export) while APIGuard reaches 100% recall. In our ablation, disabling propagation missed the indirect defect (1 defect, 1 target API).',
       actionLabel: 'Open Benchmark Panel',
       action: () => {
         onClose();

@@ -5,9 +5,16 @@ import uuid
 import os
 from typing import Optional, Dict, Any, List
 from contextlib import asynccontextmanager
+from pathlib import Path
 from dotenv import load_dotenv
 
-# Load environment variables at startup
+# Load environment variables at startup from backend/.env or root .env
+_env_backend = Path(__file__).resolve().parent.parent / ".env"
+_env_root = Path(__file__).resolve().parent.parent.parent / ".env"
+if _env_backend.exists():
+    load_dotenv(_env_backend)
+if _env_root.exists():
+    load_dotenv(_env_root)
 load_dotenv()
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException, status
 from fastapi.responses import StreamingResponse

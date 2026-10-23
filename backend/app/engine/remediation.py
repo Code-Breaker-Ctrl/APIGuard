@@ -5,10 +5,20 @@ import uuid
 import asyncio
 import httpx
 from typing import Dict, Any, Optional, Tuple, List
+from pathlib import Path
 from dotenv import load_dotenv
 
-# Load .env variables from current working dir or backend dir
-load_dotenv()
+def _ensure_env_loaded():
+    backend_env = Path(__file__).resolve().parent.parent.parent / ".env"
+    root_env = Path(__file__).resolve().parent.parent.parent.parent / ".env"
+    if backend_env.exists():
+        load_dotenv(backend_env, override=False)
+    if root_env.exists():
+        load_dotenv(root_env, override=False)
+    load_dotenv(override=False)
+
+# Load .env variables from backend dir or current working dir
+_ensure_env_loaded()
 
 from app.db import save_remediation, get_last_real_remediation
 
@@ -70,7 +80,7 @@ class RemediationEngine:
     """
     def __init__(self):
         # Reload env in case .env was modified at runtime
-        load_dotenv()
+        _ensure_env_loaded()
         self.openrouter_api_key = os.environ.get("OPENROUTER_API_KEY")
         self.openrouter_model = os.environ.get("OPENROUTER_MODEL")
         self.gemini_api_key = os.environ.get("GEMINI_API_KEY")
@@ -83,7 +93,7 @@ class RemediationEngine:
         """
         Returns telemetry on configured providers, active keys, and session test status.
         """
-        load_dotenv()
+        _ensure_env_loaded()
         self.openrouter_api_key = os.environ.get("OPENROUTER_API_KEY")
         self.gemini_api_key = os.environ.get("GEMINI_API_KEY")
 
@@ -108,7 +118,7 @@ class RemediationEngine:
         Executes a minimal test prompt to verify LLM connectivity.
         """
         global SESSION_REAL_MODEL_CALL_SUCCEEDED
-        load_dotenv()
+        _ensure_env_loaded()
         self.openrouter_api_key = os.environ.get("OPENROUTER_API_KEY")
         self.gemini_api_key = os.environ.get("GEMINI_API_KEY")
 
@@ -289,7 +299,7 @@ class RemediationEngine:
         If offline or failed, falls back to SQLite cached real execution, or offline template.
         """
         global SESSION_REAL_MODEL_CALL_SUCCEEDED
-        load_dotenv()
+        _ensure_env_loaded()
         self.openrouter_api_key = os.environ.get("OPENROUTER_API_KEY")
         self.openrouter_model = os.environ.get("OPENROUTER_MODEL")
         self.gemini_api_key = os.environ.get("GEMINI_API_KEY")

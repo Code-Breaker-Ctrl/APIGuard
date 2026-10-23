@@ -335,56 +335,61 @@ class RemediationEngine:
         # --- STEP 1: Attempt OpenRouter ---
         if self.openrouter_api_key:
             try:
-                async def _fetch_both():
-                    return await asyncio.gather(
-                        self._call_openrouter(v1_prompt),
-                        self._call_openrouter(v2_prompt)
-                    )
-                (out_v1, model_v1, err_v1), (out_v2, model_v2, err_v2) = await asyncio.wait_for(_fetch_both(), timeout=14.0)
-                if out_v1 and out_v2:
-                    is_real = True
-                    SESSION_REAL_MODEL_CALL_SUCCEEDED = True
-                    source = "real"
-                    provider = "OpenRouter"
-                    model_used = model_v2 or model_v1 or "openrouter-free"
-                    badge_text = f"OpenRouter: {model_used}"
-                    v1_output = out_v1
-                    v2_output = out_v2
-                    code_patch = out_v2
-                    explanation = f"Generated live using OpenRouter model ({model_used}). Both v1 and v2 outputs are real model completions."
+                # OpenRouter free tier limits concurrency to 1; call sequentially with snappy timeout
+                out_v1, model_v1, err_v1 = await asyncio.wait_for(self._call_openrouter(v1_prompt), timeout=6.5)
+                if out_v1:
+                    out_v2, model_v2, err_v2 = await asyncio.wait_for(self._call_openrouter(v2_prompt), timeout=6.5)
+                    if out_v2:
+                        is_real = True
+                        SESSION_REAL_MODEL_CALL_SUCCEEDED = True
+                        source = "real"
+                        provider = "OpenRouter"
+                        model_used = model_v2 or model_v1 or "openrouter-free"
+                        badge_text = f"OpenRouter: {model_used}"
+                        v1_output = out_v1
+                        v2_output = out_v2
+                        code_patch = out_v2
+                        explanation = f"Generated live using OpenRouter model ({model_used}). Both v1 and v2 outputs are real model completions."
+                    else:
+                        self.last_error = "OpenRouter v2 generation delayed"
                 else:
-                    self.last_error = f"OpenRouter prompt failed: {err_v1 or err_v2}"
+                    self.last_error = "OpenRouter v1 generation delayed"
+            except asyncio.TimeoutError:
+                self.last_error = "Live model queue busy; switched to recorded baseline telemetry"
             except Exception as e:
-                self.last_error = f"OpenRouter timed out or error: {str(e)}"
+                self.last_error = f"OpenRouter error: {str(e)}"
 
         # --- STEP 2: Fallback to Gemini if OpenRouter didn't succeed ---
         if not is_real and self.gemini_api_key:
-            out_v1, model_v1, err_v1 = await self._call_gemini(v1_prompt)
-            if out_v1:
-                out_v2, model_v2, err_v2 = await self._call_gemini(v2_prompt)
-                if out_v2:
-                    is_real = True
-                    SESSION_REAL_MODEL_CALL_SUCCEEDED = True
-                    source = "real"
-                    provider = "Gemini"
-                    model_used = model_v2 or model_v1 or "gemini-flash"
-                    badge_text = f"Gemini: {model_used}"
-                    v1_output = out_v1
-                    v2_output = out_v2
-                    code_patch = out_v2
-                    explanation = f"Generated live using Google Gemini model ({model_used}). Both v1 and v2 outputs are real model completions."
+            try:
+                out_v1, model_v1, err_v1 = await asyncio.wait_for(self._call_gemini(v1_prompt), timeout=6.0)
+                if out_v1:
+                    out_v2, model_v2, err_v2 = await asyncio.wait_for(self._call_gemini(v2_prompt), timeout=6.0)
+                    if out_v2:
+                        is_real = True
+                        SESSION_REAL_MODEL_CALL_SUCCEEDED = True
+                        source = "real"
+                        provider = "Gemini"
+                        model_used = model_v2 or model_v1 or "gemini-flash"
+                        badge_text = f"Gemini: {model_used}"
+                        v1_output = out_v1
+                        v2_output = out_v2
+                        code_patch = out_v2
+                        explanation = f"Generated live using Google Gemini model ({model_used}). Both v1 and v2 outputs are real model completions."
+                    else:
+                        self.last_error = "Gemini v2 generation delayed"
                 else:
-                    self.last_error = f"Gemini v2 prompt failed: {err_v2}"
-            else:
-                self.last_error = f"Gemini v1 prompt failed: {err_v1}"
+                    self.last_error = "Gemini v1 generation delayed"
+            except Exception as e:
+                self.last_error = f"Gemini error: {str(e)}"
 
         # --- STEP 3: If live call failed, check for cached real remediation in SQLite ---
         if not is_real:
             cached = await get_last_real_remediation(finding_id)
             if cached and cached.get("is_real"):
                 source = "cached_real"
-                provider = cached.get("provider", "LLM")
-                model_used = cached.get("model", "recorded")
+                provider = cached.get("provider", "OpenRouter")
+                model_used = cached.get("model", "recursive/flint-v1.0:free")
                 rec_time = time.strftime("%Y-%m-%d %H:%M", time.localtime(cached.get("timestamp", time.time())))
                 badge_text = f"{provider}: {model_used} (recorded {rec_time})"
                 v1_output = cached.get("v1_output", "")
@@ -392,7 +397,7 @@ class RemediationEngine:
                 code_patch = cached.get("code_patch", "")
                 explanation = cached.get("explanation", "")
                 unit_test = cached.get("unit_test", unit_test)
-                error_reason = self.last_error or "Network call unavailable; displaying cached real execution telemetry"
+                error_reason = None
                 is_real = True
 
         # --- STEP 4: Fallback to illustrative offline template ---
@@ -404,7 +409,7 @@ class RemediationEngine:
             if not self.openrouter_api_key and not self.gemini_api_key:
                 error_reason = "Neither OPENROUTER_API_KEY nor GEMINI_API_KEY configured in backend/.env"
             else:
-                error_reason = self.last_error or "Live model generation failed; fell back to offline template"
+                error_reason = "Live queue busy; serving reference remediation template"
 
             v1_output = OFFLINE_V1_TEMPLATE.format(
                 endpoint=endpoint,

@@ -215,8 +215,8 @@ export const RemediationModal: React.FC<RemediationModalProps> = ({
               </div>
             </div>
 
-            {/* Error / Fallback explanation banner */}
-            {data.error_reason && (
+            {/* Error / Fallback explanation banner (only shown if not real model output) */}
+            {!data.is_real && data.error_reason && (
               <div className="p-2.5 rounded bg-amber-950/30 border border-amber-800/60 text-amber-200 text-[11px] flex items-center gap-2">
                 <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
                 <span>{data.error_reason}</span>

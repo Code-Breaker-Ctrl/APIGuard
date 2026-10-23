@@ -35,7 +35,27 @@ export const RemediationModal: React.FC<RemediationModalProps> = ({
           onModelTested();
         }
       })
-      .catch((err) => console.error('Remediation error:', err))
+      .catch((err) => {
+        console.error('Remediation error:', err);
+        // Resilient fallback: render offline template so screen is never blank if Wi-Fi drops
+        setData({
+          finding_id: finding.id,
+          endpoint: finding.endpoint,
+          source: 'offline_template',
+          provider: 'offline',
+          model: 'Offline template',
+          badge_text: 'Offline template (illustrative, not model output)',
+          v1_prompt: `Fix this BOLA security bug in our API: endpoint ${finding.method} ${finding.endpoint} allows unauthorized users to read data.`,
+          v1_output: `# [Illustrative template, not model output]\n# Common pitfall: Authentication-only check (fails to verify tenant resource ownership)\n\n@app.${finding.method.toLowerCase()}("${finding.endpoint}")\ndef export_project_billing(project_id: str, current_user: User = Depends(get_current_user)):\n    # Vulnerable: Only verifies caller is authenticated, not tenant ownership\n    if not current_user:\n        raise HTTPException(status_code=401, detail="Unauthorized")\n    return execute_export(project_id)`,
+          v2_prompt: `Context: Graph-Guided BOLA Engine detected authorization defect on ${finding.method} ${finding.endpoint}.\nResource: ${finding.resource_type || 'Project'}. Leaked owner-specific fields: ${finding.diff_fields.join(', ')}.\nGenerate a secure FastAPI route fix verifying tenant ownership, and provide a pytest unit test.`,
+          v2_output: `# [Illustrative template, not model output]\n# Reference fix: Resource-level owner verification\n\n@app.${finding.method.toLowerCase()}("${finding.endpoint}")\ndef export_project_billing(project_id: str, current_user: User = Depends(get_current_user)):\n    project = get_project_by_id(project_id)\n    if not project:\n        raise HTTPException(status_code=404, detail="Not Found")\n    # 2. Enforce Graph-Inferred Owner-Only Authorization Policy\n    if project.owner_id != current_user.id and current_user.role != "admin":\n        raise HTTPException(status_code=403, detail="Forbidden: You do not own this project export")\n    return execute_authorized_export(project)\n\n# Verification Test:\ndef test_bola_remediation_blocked():\n    client = TestClient(app)\n    response = client.get("${finding.endpoint.replace('{project_id}', 'proj_42')}", headers={"Authorization": "Bearer " + taaran_token})\n    assert response.status_code == 403`,
+          code_patch: `@app.${finding.method.toLowerCase()}("${finding.endpoint}")\ndef export_project_billing(project_id: str, current_user: User = Depends(get_current_user)):\n    project = get_project_by_id(project_id)\n    if not project:\n        raise HTTPException(status_code=404, detail="Not Found")\n    if project.owner_id != current_user.id and current_user.role != "admin":\n        raise HTTPException(status_code=403, detail="Forbidden: You do not own this project export")\n    return execute_authorized_export(project)`,
+          explanation: `The target endpoint ${finding.endpoint} failed to check ownership. In the parent endpoint, GET /projects/{project_id} checked owner_id. The fix propagates this check.`,
+          unit_test: `def test_bola_remediation_blocked():\n    client = TestClient(app)\n    response = client.get("${finding.endpoint.replace('{project_id}', 'proj_42')}", headers={"Authorization": "Bearer " + taaran_token})\n    assert response.status_code == 403`,
+          error_reason: 'Network call delayed; displaying reference remediation template',
+          is_real: 0
+        });
+      })
       .finally(() => setIsLoading(false));
   };
 

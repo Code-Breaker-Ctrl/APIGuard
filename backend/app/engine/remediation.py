@@ -2,6 +2,7 @@ import os
 import json
 import time
 import uuid
+import asyncio
 import httpx
 from typing import Dict, Any, Optional, Tuple, List
 from dotenv import load_dotenv
@@ -193,9 +194,9 @@ class RemediationEngine:
         else:
             free_catalog = await self._get_openrouter_free_models()
             if LAST_WORKING_OPENROUTER_MODEL and LAST_WORKING_OPENROUTER_MODEL in free_catalog:
-                models_to_try = [LAST_WORKING_OPENROUTER_MODEL] + [m for m in free_catalog if m != LAST_WORKING_OPENROUTER_MODEL][:4]
+                models_to_try = [LAST_WORKING_OPENROUTER_MODEL] + [m for m in free_catalog if m != LAST_WORKING_OPENROUTER_MODEL][:1]
             else:
-                models_to_try = free_catalog[:6]
+                models_to_try = free_catalog[:2]
 
         headers = {
             "Authorization": f"Bearer {self.openrouter_api_key}",
@@ -212,7 +213,7 @@ class RemediationEngine:
                     "messages": [{"role": "user", "content": prompt_text}],
                     "temperature": 0.2
                 }
-                async with httpx.AsyncClient(timeout=10.0) as client:
+                async with httpx.AsyncClient(timeout=8.0) as client:
                     resp = await client.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json=payload)
                     if resp.status_code == 200:
                         data = resp.json()
@@ -224,7 +225,6 @@ class RemediationEngine:
                                 return content, model_id, None
                     else:
                         last_err = f"OpenRouter model {model_id} failed with HTTP {resp.status_code}: {resp.text[:100]}"
-                        # Continue to next model on 404, 429, 5xx
                         continue
             except Exception as e:
                 last_err = f"OpenRouter request error on {model_id}: {str(e)}"
@@ -324,23 +324,28 @@ class RemediationEngine:
 
         # --- STEP 1: Attempt OpenRouter ---
         if self.openrouter_api_key:
-            (out_v1, model_v1, err_v1), (out_v2, model_v2, err_v2) = await asyncio.gather(
-                self._call_openrouter(v1_prompt),
-                self._call_openrouter(v2_prompt)
-            )
-            if out_v1 and out_v2:
-                is_real = True
-                SESSION_REAL_MODEL_CALL_SUCCEEDED = True
-                source = "real"
-                provider = "OpenRouter"
-                model_used = model_v2 or model_v1 or "openrouter-free"
-                badge_text = f"OpenRouter: {model_used}"
-                v1_output = out_v1
-                v2_output = out_v2
-                code_patch = out_v2
-                explanation = f"Generated live using OpenRouter model ({model_used}). Both v1 and v2 outputs are real model completions."
-            else:
-                self.last_error = f"OpenRouter prompt failed: {err_v1 or err_v2}"
+            try:
+                async def _fetch_both():
+                    return await asyncio.gather(
+                        self._call_openrouter(v1_prompt),
+                        self._call_openrouter(v2_prompt)
+                    )
+                (out_v1, model_v1, err_v1), (out_v2, model_v2, err_v2) = await asyncio.wait_for(_fetch_both(), timeout=14.0)
+                if out_v1 and out_v2:
+                    is_real = True
+                    SESSION_REAL_MODEL_CALL_SUCCEEDED = True
+                    source = "real"
+                    provider = "OpenRouter"
+                    model_used = model_v2 or model_v1 or "openrouter-free"
+                    badge_text = f"OpenRouter: {model_used}"
+                    v1_output = out_v1
+                    v2_output = out_v2
+                    code_patch = out_v2
+                    explanation = f"Generated live using OpenRouter model ({model_used}). Both v1 and v2 outputs are real model completions."
+                else:
+                    self.last_error = f"OpenRouter prompt failed: {err_v1 or err_v2}"
+            except Exception as e:
+                self.last_error = f"OpenRouter timed out or error: {str(e)}"
 
         # --- STEP 2: Fallback to Gemini if OpenRouter didn't succeed ---
         if not is_real and self.gemini_api_key:

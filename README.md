@@ -20,10 +20,11 @@ Most DAST scanners test endpoints in isolation: they fuzz parameters, receive `4
 
 **APIGuard** replaces isolated fuzzing with a **Resource Dependency Directed Acyclic Graph (DAG)**:
 1. **Schema & DAG Ingestion:** Ingests standard OpenAPI 3.x specifications without custom invented keys, mapping relationships between producer and consumer operations (`POST /projects` creates `{project_id}` $\to$ consumed by `GET /projects/{project_id}`).
-2. **Dynamic Multi-Identity State Harvest:** Automatically authenticates as **User A (Aman)** to create genuine state and harvest live resource IDs.
+2. **Dynamic Multi-Identity State Harvest:** Automatically authenticates as **User A (Owner)** to create genuine state and harvest live resource IDs.
 3. **Graph-Guided Policy Inference & Propagation:** Observes authorization enforcement on parent endpoints and propagates candidate ownership policies along DAG edges to adjacent/nested endpoints (e.g., `GET /projects/{project_id}/export`).
-4. **Differential Payload Verification:** Probes the endpoint using **User B's (Taaran's)** credentials. Rather than blindly trusting status codes, it performs differential analysis on response bodies, confirming BOLA only when private owner-linked fields are leaked.
-5. **AI-Driven Surgical Remediation (Prompting Bonus):** Bridges detection to remediation with context-infused prompting. Shows side-by-side comparisons of naive prompts ($v_1$) vs graph-guided prompts ($v_2$), generating production-ready FastAPI patches and Pytest unit tests.
+4. **Differential Payload Verification:** Probes the endpoint using **User B's (Attacker's)** credentials. Rather than blindly trusting status codes, it performs differential analysis on response bodies, confirming BOLA only when private owner-linked fields are leaked.
+5. **AI-Driven Surgical Remediation:** Bridges detection to remediation with context-infused prompting. Shows side-by-side comparisons of naive prompts ($v_1$) vs graph-guided prompts ($v_2$), generating production-ready FastAPI patches and Pytest unit tests.
+6. **Executive Audit Report Export:** Instantly exports comprehensive security assessment reports in GitHub-Flavored Markdown (`.md`) or printable executive HTML/PDF with one-click print styling, detailing affected routes, leaked tenant attributes, and cURL repro commands.
 
 ---
 
@@ -36,7 +37,7 @@ Most DAST scanners test endpoints in isolation: they fuzz parameters, receive `4
 | ![Live SSE Scan](docs/screenshots/05_graph_after_scan.png) | **Real-Time Audit:** Streaming console, live SSE event propagation, and red BOLA badge. |
 | ![Differential Finding Detail](docs/screenshots/06_finding_detail.png) | **Differential Inspector:** Aman vs Taaran response diff, leaked fields in red, and repro cURL. |
 | ![Empirical Benchmarks](docs/screenshots/03_benchmark_panel.png) | **Benchmark & Ablations:** 100% recall vs 0% baseline on Defect B, with ablation proofs. |
-| ![AI Remediation](docs/screenshots/07_ai_remediation.png) | **AI Prompting Bonus:** Side-by-side $v_1$ vs $v_2$ prompt iteration and pytest test suite. |
+| ![AI Remediation](docs/screenshots/07_ai_remediation.png) | **AI Remediation Engine:** Side-by-side $v_1$ vs $v_2$ prompt iteration and pytest test suite. |
 | ![Target Patched & Re-scanned](docs/screenshots/09_after_fix_secure.png) | **Automated Fix Verification:** After reference patch is applied, re-scan proves 0 confirmed leaks and green nodes. |
 
 ---
@@ -138,7 +139,7 @@ APIGuard/
 │   └── requirements.txt           # Backend dependencies
 ├── frontend/                      # React 19 + TypeScript + Vite + Tailwind CSS v4
 │   ├── src/
-│   │   ├── components/            # GraphView (@xyflow/react), FindingDetail, Modals
+│   │   ├── components/            # GraphView, AuditReportModal, FindingDetail, Modals
 │   │   ├── hooks/                 # useGraph, useScan (real-time SSE streaming)
 │   │   └── App.tsx                # Main security dashboard
 │   ├── package.json

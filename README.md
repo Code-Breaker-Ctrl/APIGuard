@@ -12,7 +12,6 @@
 </p>
 
 > **"The Vulnerability That Hides in Plain Sight — Made Visible."**  
-> **Repository:** [https://github.com/Code-Breaker-Ctrl/APIGuard](https://github.com/Code-Breaker-Ctrl/APIGuard)
 
 ---
 

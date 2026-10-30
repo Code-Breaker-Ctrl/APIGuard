@@ -12,9 +12,7 @@
 </p>
 
 > **"The Vulnerability That Hides in Plain Sight — Made Visible."**  
-> **Repository:** [https://github.com/Code-Breaker-Ctrl/APIGuard](https://github.com/Code-Breaker-Ctrl/APIGuard)  
-> **Event:** Hack-O-Relay 6.0 (GDG DCE) | **Track:** Open Innovation | **Team:** Wasabi  
-> **Final Commit Hash:** Review `git log -1` for final commit ID.
+> **Repository:** [https://github.com/Code-Breaker-Ctrl/APIGuard](https://github.com/Code-Breaker-Ctrl/APIGuard)
 
 ---
 
@@ -109,13 +107,13 @@ Every metric below was empirically measured against live target sockets (`http:/
 
 ---
 
-## ⚖️ Hackathon Rulebook Compliance: Honesty Statement
+## ⚖️ Safety & Architectural Guarantees
 
 | Category | Status | Details |
 |---|:---:|---|
 | **Real Engine Execution** | **100% Real** | All HTTP requests are executed against real network sockets (`127.0.0.1:8000`). Zero `setTimeout` mocks or hardcoded node arrays. |
 | **Deterministic Scanner** | **100% Real** | The scanner engine makes **no LLM calls**. Graph traversal, policy evaluation, and differential verification are completely deterministic. |
-| **AI Prompting Bonus** | **Tested / Offline Template** | LLM via OpenRouter or Gemini (whichever is configured) is used strictly for post-scan surgical remediation ($v_1 \to v_2$). If no API key is provided, a deterministic offline template is badged. |
+| **AI Remediation Engine** | **Supported / Offline Fallback** | LLM via OpenRouter or Gemini (whichever is configured) is used strictly for post-scan surgical remediation ($v_1 \to v_2$). If no API key is provided, a deterministic offline template is badged. |
 | **Safe by Default** | **Working** | Requests are strictly restricted to allowlisted loopback hosts (`127.0.0.1`). Mutating requests (`PATCH`/`DELETE`) are blocked unless explicitly toggled. |
 | **Git Commit History** | **Verified** | Clean, incremental commit history with tests passing at every stage. |
 
@@ -197,7 +195,7 @@ Open `http://127.0.0.1:5173` in your browser.
 
 ---
 
-## 👥 Team Wasabi Contributions
+## 👥 Core Contributors
 - **Raveena Rajput:** Product design, UI/UX architecture, React Flow graph styling, and interactive demo flows.
 - **Aman Joshi:** FastAPI core engine, safe HTTP executor, differential payload verifier, and aiosqlite telemetry.
 - **Taaran:** OpenAPI 3.x schema DAG builder, policy inference engine, empirical benchmark runner, and security research.
@@ -218,5 +216,5 @@ Feel free to fork the repository, open issues, and submit PRs!
 
 ## ⚠️ Known Limitations
 1. **Mock Seed Target:** The bundled vulnerable target uses SQLite for local demonstration simplicity. In enterprise deployment, the scanner attaches via network proxies to staging clusters.
-2. **Identifier Scope:** The prototype extracts runtime resource identifiers primarily from path parameters (`{project_id}`); nested body-based compound keys are planned for post-hackathon release.
+2. **Identifier Scope:** The prototype extracts runtime resource identifiers primarily from path parameters (`{project_id}`); nested body-based compound keys are planned for upcoming releases.
 3. **Safe Mutation Gate:** Mutating HTTP verbs are turned off by default to protect target data integrity.

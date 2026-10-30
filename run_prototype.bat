@@ -1,7 +1,7 @@
 @echo off
 echo ========================================================
 echo   APIGuard - Graph-Guided BOLA Detection Engine
-echo   Hack-O-Relay 6.0 ^| GDG DCE ^| Team Wasabi
+echo   Open Source API Security ^| OWASP API #1
 echo ========================================================
 echo.
 echo [1/2] Starting APIGuard FastAPI Engine on http://127.0.0.1:8000 ...

@@ -1,7 +1,7 @@
-# APIGuard — Live Demo Script & Judge Cross-Questioning Defense
+# APIGuard — Live Demo Script & Technical Presentation Defense
 
-> **Hack-O-Relay 6.0** | **GDG DCE** | **Track: Open Innovation**  
-> **Team Wasabi**: Raveena Rajput, Aman Joshi, Taaran
+> **Open Source API Authorization & BOLA Detection Engine**  
+> **Contributors**: Raveena Rajput, Aman Joshi, Taaran
 
 ---
 

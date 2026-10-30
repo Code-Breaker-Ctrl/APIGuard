@@ -14,3 +14,7 @@ dist/
 .pytest_cache/
 .coverage
 htmlcov/
+.claude/
+.vscode/
+.idea/
+*.log

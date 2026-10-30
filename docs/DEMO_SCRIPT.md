@@ -1,7 +1,6 @@
 # APIGuard — Live Demo Script & Technical Presentation Defense
 
-> **Open Source API Authorization & BOLA Detection Engine**  
-> **Contributors**: Raveena Rajput, Aman Joshi, Taaran
+> **Open Source API Authorization & BOLA Detection Engine**
 
 ---
 

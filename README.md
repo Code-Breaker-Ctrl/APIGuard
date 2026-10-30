@@ -1,14 +1,11 @@
 # APIGuard: Graph-Guided API Authorization & BOLA Detection Engine
 
 <p align="center">
-  <a href="https://github.com/Code-Breaker-Ctrl/APIGuard"><img src="https://img.shields.io/badge/GitHub-Code--Breaker--Ctrl%2FAPIGuard-blue.svg?logo=github&style=flat-square" alt="GitHub Repo"></a>
   <img src="https://img.shields.io/badge/Python-3.12-3776AB.svg?logo=python&logoColor=white&style=flat-square" alt="Python 3.12">
   <img src="https://img.shields.io/badge/FastAPI-0.115+-009688.svg?logo=fastapi&logoColor=white&style=flat-square" alt="FastAPI">
   <img src="https://img.shields.io/badge/React-19-61DAFB.svg?logo=react&logoColor=black&style=flat-square" alt="React 19">
   <img src="https://img.shields.io/badge/TypeScript-5.x-3178C6.svg?logo=typescript&logoColor=white&style=flat-square" alt="TypeScript">
-  <img src="https://img.shields.io/badge/Tests-22%2F22%20Passing-brightgreen.svg?style=flat-square" alt="Tests">
   <img src="https://img.shields.io/badge/OWASP-API%20%231%20BOLA-red.svg?style=flat-square" alt="OWASP API #1">
-  <img src="https://img.shields.io/badge/Open%20Source-Hacktoberfest%202026-orange.svg?style=flat-square" alt="Hacktoberfest">
 </p>
 
 > **"The Vulnerability That Hides in Plain Sight — Made Visible."**  
@@ -191,25 +188,6 @@ npm install
 npm run dev
 ```
 Open `http://127.0.0.1:5173` in your browser.
-
----
-
-## 👥 Core Contributors
-- **Raveena Rajput:** Product design, UI/UX architecture, React Flow graph styling, and interactive demo flows.
-- **Aman Joshi:** FastAPI core engine, safe HTTP executor, differential payload verifier, and aiosqlite telemetry.
-- **Taaran:** OpenAPI 3.x schema DAG builder, policy inference engine, empirical benchmark runner, and security research.
-
----
-
-## 🎃 Open Source & Hacktoberfest Contributions
-
-APIGuard is built with an open, modular architecture and welcomes community contributions:
-- **New Vulnerability Patterns:** Extend the inference engine for Broken Function Level Authorization (BFLA / OWASP API #5) or SSRF.
-- **Framework Adapters:** Add remediation templates for Express.js, Spring Boot, Django, or Go Fiber.
-- **Local LLM / Open-Weight Models:** Add integrations with Ollama / Llama 3 / Mistral for 100% offline air-gapped remediation.
-- **OpenAPI 3.1 & GraphQL:** Expand schema parsers for nested compound keys and GraphQL query trees.
-
-Feel free to fork the repository, open issues, and submit PRs!
 
 ---
 

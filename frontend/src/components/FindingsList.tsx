@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShieldAlert, ChevronRight } from 'lucide-react';
+import { ShieldAlert, ChevronRight, FileText } from 'lucide-react';
 import type { Finding } from '../types';
 
 interface FindingsListProps {
@@ -8,6 +8,7 @@ interface FindingsListProps {
   onSelectFinding: (finding: Finding) => void;
   showAllHistory?: boolean;
   onToggleHistory?: () => void;
+  onExportReport?: () => void;
 }
 
 export const FindingsList: React.FC<FindingsListProps> = ({
@@ -16,6 +17,7 @@ export const FindingsList: React.FC<FindingsListProps> = ({
   onSelectFinding,
   showAllHistory,
   onToggleHistory,
+  onExportReport,
 }) => {
   return (
     <div className="flex flex-col h-full bg-[#0d1017] border border-[#1e2536] rounded-xl overflow-hidden shadow-lg">
@@ -25,6 +27,16 @@ export const FindingsList: React.FC<FindingsListProps> = ({
           <span className="font-semibold text-slate-200">Confirmed Findings</span>
         </div>
         <div className="flex items-center gap-2">
+          {onExportReport && (
+            <button
+              onClick={onExportReport}
+              className="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded border border-purple-800/60 bg-purple-950/40 hover:bg-purple-900/60 text-purple-300 font-mono transition"
+              title="Export Security Audit Report"
+            >
+              <FileText className="w-3 h-3" />
+              <span>Export</span>
+            </button>
+          )}
           {onToggleHistory && (
             <button
               onClick={onToggleHistory}

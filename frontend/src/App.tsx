@@ -9,7 +9,8 @@ import {
   GitBranch,
   BarChart3,
   Cpu,
-  HelpCircle
+  HelpCircle,
+  FileText
 } from 'lucide-react';
 import { useGraph } from './hooks/useGraph';
 import { useScan } from './hooks/useScan';
@@ -22,6 +23,7 @@ import { DryRunModal } from './components/DryRunModal';
 import { BenchmarkPanel } from './components/BenchmarkPanel';
 import { RemediationModal } from './components/RemediationModal';
 import { GuidedDemoModal } from './components/GuidedDemoModal';
+import { AuditReportModal } from './components/AuditReportModal';
 import type { Finding, DryRunResponse } from './types';
 import { apiClient } from './api/client';
 
@@ -53,6 +55,7 @@ export default function App() {
   const [showBenchmarkModal, setShowBenchmarkModal] = useState(false);
   const [showRemediationFinding, setShowRemediationFinding] = useState<Finding | null>(null);
   const [showGuidedDemo, setShowGuidedDemo] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
   const [modelStatusText, setModelStatusText] = useState<string>('model call: offline template only');
 
   const refreshModelStatus = useCallback(() => {
@@ -252,6 +255,15 @@ export default function App() {
             <Cpu className="w-3.5 h-3.5" />
             <span>Dry-Run Table</span>
           </button>
+
+          <button
+            onClick={() => setShowReportModal(true)}
+            className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-purple-950/40 hover:bg-purple-900/60 border border-purple-800 text-purple-300 font-semibold transition cursor-pointer"
+            title="Export Pentest & Security Audit Report"
+          >
+            <FileText className="w-3.5 h-3.5" />
+            <span>Export Report</span>
+          </button>
         </div>
 
         {/* Action Controls */}
@@ -408,6 +420,7 @@ export default function App() {
               onSelectFinding={(f) => setSelectedFinding(f)}
               showAllHistory={showAllHistory}
               onToggleHistory={() => setShowAllHistory(!showAllHistory)}
+              onExportReport={() => setShowReportModal(true)}
             />
           </div>
         </section>
@@ -489,6 +502,17 @@ export default function App() {
         </div>
       )}
 
+      {/* AUDIT & PENTEST REPORT MODAL */}
+      <AuditReportModal
+        isOpen={showReportModal}
+        onClose={() => setShowReportModal(false)}
+        findings={findings}
+        nodeCount={nodes.length}
+        edgeCount={edges.length}
+        targetUrl="http://127.0.0.1:8000/target"
+        isTargetPatched={isTargetPatched}
+      />
+
       {/* HONESTY & STATUS STRIP (RULEBOOK REQUIREMENT) */}
       <footer className="h-7 border-t border-[#1c2230] bg-[#080a0f] px-5 flex items-center justify-between text-[10px] text-slate-500 font-mono shrink-0">
         <div className="flex items-center gap-4">
@@ -525,7 +549,7 @@ export default function App() {
           </span>
         </div>
         <div>
-          <span>Hack-O-Relay 6.0 · Team Wasabi · Open Innovation</span>
+          <span>APIGuard · Graph-Guided API Authorization & BOLA Detection Engine</span>
         </div>
       </footer>
 

@@ -1,0 +1,3417 @@
+{
+ "graph": {
+  "nodes": [
+   {
+    "id": "login",
+    "label": "POST /auth/login",
+    "type": "operation",
+    "metadata": {
+     "method": "POST",
+     "path": "/auth/login",
+     "summary": "Authenticate identity and obtain bearer token",
+     "path_params": [],
+     "security": []
+    }
+   },
+   {
+    "id": "createProject",
+    "label": "POST /projects",
+    "type": "operation",
+    "metadata": {
+     "method": "POST",
+     "path": "/projects",
+     "summary": "Create a new project resource",
+     "path_params": [],
+     "security": [
+      "bearerAuth"
+     ]
+    }
+   },
+   {
+    "id": "getProjectById",
+    "label": "GET /projects/{project_id}",
+    "type": "operation",
+    "metadata": {
+     "method": "GET",
+     "path": "/projects/{project_id}",
+     "summary": "Get project details",
+     "path_params": [
+      "project_id"
+     ],
+     "security": [
+      "bearerAuth"
+     ]
+    }
+   },
+   {
+    "id": "updateProject",
+    "label": "PATCH /projects/{project_id}",
+    "type": "operation",
+    "metadata": {
+     "method": "PATCH",
+     "path": "/projects/{project_id}",
+     "summary": "Update project properties",
+     "path_params": [
+      "project_id"
+     ],
+     "security": [
+      "bearerAuth"
+     ]
+    }
+   },
+   {
+    "id": "deleteProject",
+    "label": "DELETE /projects/{project_id}",
+    "type": "operation",
+    "metadata": {
+     "method": "DELETE",
+     "path": "/projects/{project_id}",
+     "summary": "Delete project resource",
+     "path_params": [
+      "project_id"
+     ],
+     "security": [
+      "bearerAuth"
+     ]
+    }
+   },
+   {
+    "id": "exportProjectBilling",
+    "label": "GET /projects/{project_id}/export",
+    "type": "operation",
+    "metadata": {
+     "method": "GET",
+     "path": "/projects/{project_id}/export",
+     "summary": "Export financial and billing data for a project",
+     "path_params": [
+      "project_id"
+     ],
+     "security": [
+      "bearerAuth"
+     ]
+    }
+   },
+   {
+    "id": "getProjectSummary",
+    "label": "GET /projects/{project_id}/summary",
+    "type": "operation",
+    "metadata": {
+     "method": "GET",
+     "path": "/projects/{project_id}/summary",
+     "summary": "Get brief public project stats (verifier trap)",
+     "path_params": [
+      "project_id"
+     ],
+     "security": [
+      "bearerAuth"
+     ]
+    }
+   },
+   {
+    "id": "getProjectMembers",
+    "label": "GET /projects/{project_id}/members",
+    "type": "operation",
+    "metadata": {
+     "method": "GET",
+     "path": "/projects/{project_id}/members",
+     "summary": "Get project members (unimplemented route returning 404)",
+     "path_params": [
+      "project_id"
+     ],
+     "security": [
+      "bearerAuth"
+     ]
+    }
+   },
+   {
+    "id": "res_auth",
+    "label": "Auth",
+    "type": "resource_type",
+    "metadata": {
+     "resource_name": "auth"
+    }
+   },
+   {
+    "id": "res_projects",
+    "label": "Projects",
+    "type": "resource_type",
+    "metadata": {
+     "resource_name": "projects"
+    }
+   },
+   {
+    "id": "id_projects",
+    "label": "projects_id",
+    "type": "identifier",
+    "metadata": {
+     "param_name": "project_id"
+    }
+   }
+  ],
+  "edges": [
+   {
+    "from_node": "login",
+    "to_node": "res_auth",
+    "type": "OPERATES_ON",
+    "confidence": 0.9,
+    "provenance": "schema",
+    "observation_ids": []
+   },
+   {
+    "from_node": "createProject",
+    "to_node": "res_projects",
+    "type": "OPERATES_ON",
+    "confidence": 0.9,
+    "provenance": "schema",
+    "observation_ids": []
+   },
+   {
+    "from_node": "createProject",
+    "to_node": "id_projects",
+    "type": "PRODUCES",
+    "confidence": 0.8,
+    "provenance": "schema",
+    "observation_ids": []
+   },
+   {
+    "from_node": "getProjectById",
+    "to_node": "res_projects",
+    "type": "OPERATES_ON",
+    "confidence": 0.9,
+    "provenance": "schema",
+    "observation_ids": []
+   },
+   {
+    "from_node": "id_projects",
+    "to_node": "getProjectById",
+    "type": "CONSUMES",
+    "confidence": 0.8,
+    "provenance": "schema",
+    "observation_ids": []
+   },
+   {
+    "from_node": "updateProject",
+    "to_node": "res_projects",
+    "type": "OPERATES_ON",
+    "confidence": 0.9,
+    "provenance": "schema",
+    "observation_ids": []
+   },
+   {
+    "from_node": "id_projects",
+    "to_node": "updateProject",
+    "type": "CONSUMES",
+    "confidence": 0.8,
+    "provenance": "schema",
+    "observation_ids": []
+   },
+   {
+    "from_node": "deleteProject",
+    "to_node": "res_projects",
+    "type": "OPERATES_ON",
+    "confidence": 0.9,
+    "provenance": "schema",
+    "observation_ids": []
+   },
+   {
+    "from_node": "id_projects",
+    "to_node": "deleteProject",
+    "type": "CONSUMES",
+    "confidence": 0.8,
+    "provenance": "schema",
+    "observation_ids": []
+   },
+   {
+    "from_node": "exportProjectBilling",
+    "to_node": "res_projects",
+    "type": "OPERATES_ON",
+    "confidence": 0.9,
+    "provenance": "schema",
+    "observation_ids": []
+   },
+   {
+    "from_node": "id_projects",
+    "to_node": "exportProjectBilling",
+    "type": "CONSUMES",
+    "confidence": 0.8,
+    "provenance": "schema",
+    "observation_ids": []
+   },
+   {
+    "from_node": "getProjectById",
+    "to_node": "exportProjectBilling",
+    "type": "NESTED_UNDER",
+    "confidence": 0.5,
+    "provenance": "propagated",
+    "observation_ids": []
+   },
+   {
+    "from_node": "getProjectSummary",
+    "to_node": "res_projects",
+    "type": "OPERATES_ON",
+    "confidence": 0.9,
+    "provenance": "schema",
+    "observation_ids": []
+   },
+   {
+    "from_node": "id_projects",
+    "to_node": "getProjectSummary",
+    "type": "CONSUMES",
+    "confidence": 0.8,
+    "provenance": "schema",
+    "observation_ids": []
+   },
+   {
+    "from_node": "getProjectById",
+    "to_node": "getProjectSummary",
+    "type": "NESTED_UNDER",
+    "confidence": 0.5,
+    "provenance": "propagated",
+    "observation_ids": []
+   },
+   {
+    "from_node": "getProjectMembers",
+    "to_node": "res_projects",
+    "type": "OPERATES_ON",
+    "confidence": 0.9,
+    "provenance": "schema",
+    "observation_ids": []
+   },
+   {
+    "from_node": "id_projects",
+    "to_node": "getProjectMembers",
+    "type": "CONSUMES",
+    "confidence": 0.8,
+    "provenance": "schema",
+    "observation_ids": []
+   },
+   {
+    "from_node": "getProjectById",
+    "to_node": "getProjectMembers",
+    "type": "NESTED_UNDER",
+    "confidence": 0.5,
+    "provenance": "propagated",
+    "observation_ids": []
+   }
+  ]
+ },
+ "identities": [
+  {
+   "key": "user_a",
+   "identity_id": "usr_aman_101",
+   "username": "aman@acme.corp",
+   "role": "customer",
+   "token": "[REDACTED]"
+  },
+  {
+   "key": "user_b",
+   "identity_id": "usr_taaran_202",
+   "username": "taaran@adversary.io",
+   "role": "customer",
+   "token": "[REDACTED]"
+  },
+  {
+   "key": "admin",
+   "identity_id": "usr_admin_001",
+   "username": "admin@corp.internal",
+   "role": "admin",
+   "token": "[REDACTED]"
+  },
+  {
+   "key": "support",
+   "identity_id": "usr_support_002",
+   "username": "support@corp.internal",
+   "role": "support",
+   "token": "[REDACTED]"
+  }
+ ],
+ "remediationStatus": {
+  "openrouter_key_present": false,
+  "gemini_key_present": false,
+  "active_provider": "None",
+  "configured_model": null,
+  "last_error": null,
+  "status": "offline_template_only",
+  "session_real_model_call_succeeded": false
+ },
+ "benchmark": {
+  "timestamp": "2026-10-31T08:59:56Z",
+  "target": "http://127.0.0.1:8000/target",
+  "variants_tested": 5,
+  "aggregate_metrics": {
+   "graph_guided": {
+    "total_confirmed": 6,
+    "total_ground_truth": 6,
+    "aggregate_recall": 1.0,
+    "requests_per_finding": 12.8
+   },
+   "baseline": {
+    "total_confirmed": 4,
+    "total_ground_truth": 6,
+    "aggregate_recall": 0.67,
+    "requests_per_finding": 8.8
+   }
+  },
+  "variants": {
+   "variant_a": {
+    "description": "Defect A only: direct BOLA on primary GET /projects/{project_id}",
+    "ground_truth_count": 1,
+    "graph_guided": {
+     "confirmed": 1,
+     "recall": 1.0,
+     "precision": 1.0,
+     "requests": 15,
+     "req_per_finding": 15.0,
+     "time_to_first_ms": 15.4,
+     "duration_ms": 15.4
+    },
+    "baseline": {
+     "confirmed": 1,
+     "recall": 1.0,
+     "precision": 1.0,
+     "requests": 7,
+     "req_per_finding": 7.0,
+     "time_to_first_ms": 4.3,
+     "duration_ms": 4.3
+    }
+   },
+   "variant_b": {
+    "description": "Defect B only: indirect BOLA on GET /projects/{project_id}/export (primary read is secure)",
+    "ground_truth_count": 1,
+    "graph_guided": {
+     "confirmed": 1,
+     "recall": 1.0,
+     "precision": 1.0,
+     "requests": 15,
+     "req_per_finding": 15.0,
+     "time_to_first_ms": 12.8,
+     "duration_ms": 12.8
+    },
+    "baseline": {
+     "confirmed": 0,
+     "recall": 0.0,
+     "precision": 0.0,
+     "requests": 7,
+     "req_per_finding": null,
+     "time_to_first_ms": null,
+     "duration_ms": 5.2
+    }
+   },
+   "variant_c": {
+    "description": "Defect C only: mutating BOLA on PATCH /projects/{project_id}",
+    "ground_truth_count": 1,
+    "graph_guided": {
+     "confirmed": 1,
+     "recall": 1.0,
+     "precision": 1.0,
+     "requests": 15,
+     "req_per_finding": 15.0,
+     "time_to_first_ms": 9.7,
+     "duration_ms": 9.7
+    },
+    "baseline": {
+     "confirmed": 1,
+     "recall": 1.0,
+     "precision": 1.0,
+     "requests": 7,
+     "req_per_finding": 7.0,
+     "time_to_first_ms": 4.3,
+     "duration_ms": 4.3
+    }
+   },
+   "variant_all": {
+    "description": "All defects enabled (A direct, B indirect export, C mutation)",
+    "ground_truth_count": 3,
+    "graph_guided": {
+     "confirmed": 3,
+     "recall": 1.0,
+     "precision": 1.0,
+     "requests": 19,
+     "req_per_finding": 6.3,
+     "time_to_first_ms": 5.0,
+     "duration_ms": 14.9
+    },
+    "baseline": {
+     "confirmed": 2,
+     "recall": 0.67,
+     "precision": 1.0,
+     "requests": 7,
+     "req_per_finding": 3.5,
+     "time_to_first_ms": 2.2,
+     "duration_ms": 4.5
+    }
+   },
+   "variant_secure": {
+    "description": "All endpoints strictly enforce authorization rules (zero vulnerabilities)",
+    "ground_truth_count": 0,
+    "graph_guided": {
+     "confirmed": 0,
+     "recall": null,
+     "precision": 1.0,
+     "requests": 13,
+     "req_per_finding": null,
+     "time_to_first_ms": null,
+     "duration_ms": 62.6
+    },
+    "baseline": {
+     "confirmed": 0,
+     "recall": null,
+     "precision": 1.0,
+     "requests": 7,
+     "req_per_finding": null,
+     "time_to_first_ms": null,
+     "duration_ms": 6.6
+    }
+   }
+  },
+  "ablations": {
+   "propagation_off_on_variant_b": {
+    "name": "Graph Scanner with Rule Propagation OFF",
+    "ground_truth": 1,
+    "confirmed": 0,
+    "recall": 0.0,
+    "precision": 0.0,
+    "requests": 6,
+    "duration_ms": 5.1,
+    "note": "Measured: scanner run with rule propagation disabled on the Defect B variant."
+   },
+   "oracle_baseline_on_variant_b": {
+    "name": "Oracle Baseline (Manual Rules Hand-Tagged for Every Route)",
+    "ground_truth": 1,
+    "confirmed": 1,
+    "recall": 1.0,
+    "precision": 1.0,
+    "requests": 9,
+    "duration_ms": 5.8,
+    "note": "Measured: baseline given a hand-written ownership rule for every route."
+   }
+  }
+ },
+ "dryRun": {
+  "false": {
+   "planned_steps": [
+    {
+     "step_id": "step_setup_f1b0f3",
+     "operation_id": "createProject",
+     "method": "POST",
+     "url": "http://127.0.0.1:8000/target/projects",
+     "identity": "usr_aman_101",
+     "purpose": "setup",
+     "phase": "A",
+     "cleanup": true,
+     "headers": {
+      "Authorization": "[REDACTED]"
+     },
+     "body_preview": {
+      "name": "Audit Benchmark Project",
+      "confidential_data": "CONFIDENTIAL-AEGIS-SECRET-994",
+      "budget": "$150,000"
+     }
+    },
+    {
+     "step_id": "step_ctrl_1d2439",
+     "operation_id": "getProjectById",
+     "method": "GET",
+     "url": "http://127.0.0.1:8000/target/projects/{project_id}",
+     "identity": "usr_aman_101",
+     "purpose": "control_owner",
+     "phase": "A",
+     "cleanup": false,
+     "headers": {
+      "Authorization": "[REDACTED]"
+     },
+     "body_preview": {}
+    },
+    {
+     "step_id": "step_probe_3a7abc",
+     "operation_id": "getProjectById",
+     "method": "GET",
+     "url": "http://127.0.0.1:8000/target/projects/{project_id}",
+     "identity": "usr_taaran_202",
+     "purpose": "probe_adversary",
+     "phase": "B",
+     "cleanup": false,
+     "headers": {
+      "Authorization": "[REDACTED]"
+     },
+     "body_preview": {}
+    },
+    {
+     "step_id": "step_setup_3168c0",
+     "operation_id": "createProject",
+     "method": "POST",
+     "url": "http://127.0.0.1:8000/target/projects",
+     "identity": "usr_aman_101",
+     "purpose": "setup",
+     "phase": "A",
+     "cleanup": true,
+     "headers": {
+      "Authorization": "[REDACTED]"
+     },
+     "body_preview": {
+      "name": "Audit Benchmark Project",
+      "confidential_data": "CONFIDENTIAL-AEGIS-SECRET-994",
+      "budget": "$150,000"
+     }
+    },
+    {
+     "step_id": "step_ctrl_8a03ea",
+     "operation_id": "exportProjectBilling",
+     "method": "GET",
+     "url": "http://127.0.0.1:8000/target/projects/{project_id}/export",
+     "identity": "usr_aman_101",
+     "purpose": "control_owner",
+     "phase": "A",
+     "cleanup": false,
+     "headers": {
+      "Authorization": "[REDACTED]"
+     },
+     "body_preview": {}
+    },
+    {
+     "step_id": "step_probe_2e740d",
+     "operation_id": "exportProjectBilling",
+     "method": "GET",
+     "url": "http://127.0.0.1:8000/target/projects/{project_id}/export",
+     "identity": "usr_taaran_202",
+     "purpose": "probe_adversary",
+     "phase": "B",
+     "cleanup": false,
+     "headers": {
+      "Authorization": "[REDACTED]"
+     },
+     "body_preview": {}
+    },
+    {
+     "step_id": "step_setup_dbf1e8",
+     "operation_id": "createProject",
+     "method": "POST",
+     "url": "http://127.0.0.1:8000/target/projects",
+     "identity": "usr_aman_101",
+     "purpose": "setup",
+     "phase": "A",
+     "cleanup": true,
+     "headers": {
+      "Authorization": "[REDACTED]"
+     },
+     "body_preview": {
+      "name": "Audit Benchmark Project",
+      "confidential_data": "CONFIDENTIAL-AEGIS-SECRET-994",
+      "budget": "$150,000"
+     }
+    },
+    {
+     "step_id": "step_ctrl_ac9375",
+     "operation_id": "getProjectSummary",
+     "method": "GET",
+     "url": "http://127.0.0.1:8000/target/projects/{project_id}/summary",
+     "identity": "usr_aman_101",
+     "purpose": "control_owner",
+     "phase": "A",
+     "cleanup": false,
+     "headers": {
+      "Authorization": "[REDACTED]"
+     },
+     "body_preview": {}
+    },
+    {
+     "step_id": "step_probe_5e81a5",
+     "operation_id": "getProjectSummary",
+     "method": "GET",
+     "url": "http://127.0.0.1:8000/target/projects/{project_id}/summary",
+     "identity": "usr_taaran_202",
+     "purpose": "probe_adversary",
+     "phase": "B",
+     "cleanup": false,
+     "headers": {
+      "Authorization": "[REDACTED]"
+     },
+     "body_preview": {}
+    },
+    {
+     "step_id": "step_setup_60dc67",
+     "operation_id": "createProject",
+     "method": "POST",
+     "url": "http://127.0.0.1:8000/target/projects",
+     "identity": "usr_aman_101",
+     "purpose": "setup",
+     "phase": "A",
+     "cleanup": true,
+     "headers": {
+      "Authorization": "[REDACTED]"
+     },
+     "body_preview": {
+      "name": "Audit Benchmark Project",
+      "confidential_data": "CONFIDENTIAL-AEGIS-SECRET-994",
+      "budget": "$150,000"
+     }
+    },
+    {
+     "step_id": "step_ctrl_66a7f9",
+     "operation_id": "getProjectMembers",
+     "method": "GET",
+     "url": "http://127.0.0.1:8000/target/projects/{project_id}/members",
+     "identity": "usr_aman_101",
+     "purpose": "control_owner",
+     "phase": "A",
+     "cleanup": false,
+     "headers": {
+      "Authorization": "[REDACTED]"
+     },
+     "body_preview": {}
+    },
+    {
+     "step_id": "step_probe_4eb085",
+     "operation_id": "getProjectMembers",
+     "method": "GET",
+     "url": "http://127.0.0.1:8000/target/projects/{project_id}/members",
+     "identity": "usr_taaran_202",
+     "purpose": "probe_adversary",
+     "phase": "B",
+     "cleanup": false,
+     "headers": {
+      "Authorization": "[REDACTED]"
+     },
+     "body_preview": {}
+    }
+   ],
+   "total_planned": 12,
+   "total_budget": 30,
+   "mutations_enabled": false,
+   "budget_remaining": 18
+  },
+  "true": {
+   "planned_steps": [
+    {
+     "step_id": "step_ctrl_691b77",
+     "operation_id": "login",
+     "method": "POST",
+     "url": "http://127.0.0.1:8000/target/auth/login",
+     "identity": "usr_aman_101",
+     "purpose": "control_owner",
+     "phase": "A",
+     "cleanup": false,
+     "headers": {
+      "Authorization": "[REDACTED]"
+     },
+     "body_preview": {}
+    },
+    {
+     "step_id": "step_probe_d8d992",
+     "operation_id": "login",
+     "method": "POST",
+     "url": "http://127.0.0.1:8000/target/auth/login",
+     "identity": "usr_taaran_202",
+     "purpose": "probe_adversary",
+     "phase": "B",
+     "cleanup": false,
+     "headers": {
+      "Authorization": "[REDACTED]"
+     },
+     "body_preview": {}
+    },
+    {
+     "step_id": "step_ctrl_47d4d5",
+     "operation_id": "createProject",
+     "method": "POST",
+     "url": "http://127.0.0.1:8000/target/projects",
+     "identity": "usr_aman_101",
+     "purpose": "control_owner",
+     "phase": "A",
+     "cleanup": false,
+     "headers": {
+      "Authorization": "[REDACTED]"
+     },
+     "body_preview": {}
+    },
+    {
+     "step_id": "step_probe_fd28af",
+     "operation_id": "createProject",
+     "method": "POST",
+     "url": "http://127.0.0.1:8000/target/projects",
+     "identity": "usr_taaran_202",
+     "purpose": "probe_adversary",
+     "phase": "B",
+     "cleanup": false,
+     "headers": {
+      "Authorization": "[REDACTED]"
+     },
+     "body_preview": {}
+    },
+    {
+     "step_id": "step_setup_1e97e8",
+     "operation_id": "createProject",
+     "method": "POST",
+     "url": "http://127.0.0.1:8000/target/projects",
+     "identity": "usr_aman_101",
+     "purpose": "setup",
+     "phase": "A",
+     "cleanup": true,
+     "headers": {
+      "Authorization": "[REDACTED]"
+     },
+     "body_preview": {
+      "name": "Audit Benchmark Project",
+      "confidential_data": "CONFIDENTIAL-AEGIS-SECRET-994",
+      "budget": "$150,000"
+     }
+    },
+    {
+     "step_id": "step_ctrl_19e22c",
+     "operation_id": "getProjectById",
+     "method": "GET",
+     "url": "http://127.0.0.1:8000/target/projects/{project_id}",
+     "identity": "usr_aman_101",
+     "purpose": "control_owner",
+     "phase": "A",
+     "cleanup": false,
+     "headers": {
+      "Authorization": "[REDACTED]"
+     },
+     "body_preview": {}
+    },
+    {
+     "step_id": "step_probe_33e99a",
+     "operation_id": "getProjectById",
+     "method": "GET",
+     "url": "http://127.0.0.1:8000/target/projects/{project_id}",
+     "identity": "usr_taaran_202",
+     "purpose": "probe_adversary",
+     "phase": "B",
+     "cleanup": false,
+     "headers": {
+      "Authorization": "[REDACTED]"
+     },
+     "body_preview": {}
+    },
+    {
+     "step_id": "step_setup_1fa06c",
+     "operation_id": "createProject",
+     "method": "POST",
+     "url": "http://127.0.0.1:8000/target/projects",
+     "identity": "usr_aman_101",
+     "purpose": "setup",
+     "phase": "A",
+     "cleanup": true,
+     "headers": {
+      "Authorization": "[REDACTED]"
+     },
+     "body_preview": {
+      "name": "Audit Benchmark Project",
+      "confidential_data": "CONFIDENTIAL-AEGIS-SECRET-994",
+      "budget": "$150,000"
+     }
+    },
+    {
+     "step_id": "step_ctrl_bb50b5",
+     "operation_id": "updateProject",
+     "method": "PATCH",
+     "url": "http://127.0.0.1:8000/target/projects/{project_id}",
+     "identity": "usr_aman_101",
+     "purpose": "control_owner",
+     "phase": "A",
+     "cleanup": false,
+     "headers": {
+      "Authorization": "[REDACTED]"
+     },
+     "body_preview": {}
+    },
+    {
+     "step_id": "step_probe_b70d4c",
+     "operation_id": "updateProject",
+     "method": "PATCH",
+     "url": "http://127.0.0.1:8000/target/projects/{project_id}",
+     "identity": "usr_taaran_202",
+     "purpose": "probe_adversary",
+     "phase": "B",
+     "cleanup": false,
+     "headers": {
+      "Authorization": "[REDACTED]"
+     },
+     "body_preview": {}
+    },
+    {
+     "step_id": "step_setup_45bafb",
+     "operation_id": "createProject",
+     "method": "POST",
+     "url": "http://127.0.0.1:8000/target/projects",
+     "identity": "usr_aman_101",
+     "purpose": "setup",
+     "phase": "A",
+     "cleanup": true,
+     "headers": {
+      "Authorization": "[REDACTED]"
+     },
+     "body_preview": {
+      "name": "Audit Benchmark Project",
+      "confidential_data": "CONFIDENTIAL-AEGIS-SECRET-994",
+      "budget": "$150,000"
+     }
+    },
+    {
+     "step_id": "step_ctrl_f55354",
+     "operation_id": "deleteProject",
+     "method": "DELETE",
+     "url": "http://127.0.0.1:8000/target/projects/{project_id}",
+     "identity": "usr_aman_101",
+     "purpose": "control_owner",
+     "phase": "A",
+     "cleanup": false,
+     "headers": {
+      "Authorization": "[REDACTED]"
+     },
+     "body_preview": {}
+    },
+    {
+     "step_id": "step_probe_7670fa",
+     "operation_id": "deleteProject",
+     "method": "DELETE",
+     "url": "http://127.0.0.1:8000/target/projects/{project_id}",
+     "identity": "usr_taaran_202",
+     "purpose": "probe_adversary",
+     "phase": "B",
+     "cleanup": false,
+     "headers": {
+      "Authorization": "[REDACTED]"
+     },
+     "body_preview": {}
+    },
+    {
+     "step_id": "step_setup_eaede8",
+     "operation_id": "createProject",
+     "method": "POST",
+     "url": "http://127.0.0.1:8000/target/projects",
+     "identity": "usr_aman_101",
+     "purpose": "setup",
+     "phase": "A",
+     "cleanup": true,
+     "headers": {
+      "Authorization": "[REDACTED]"
+     },
+     "body_preview": {
+      "name": "Audit Benchmark Project",
+      "confidential_data": "CONFIDENTIAL-AEGIS-SECRET-994",
+      "budget": "$150,000"
+     }
+    },
+    {
+     "step_id": "step_ctrl_dc03e4",
+     "operation_id": "exportProjectBilling",
+     "method": "GET",
+     "url": "http://127.0.0.1:8000/target/projects/{project_id}/export",
+     "identity": "usr_aman_101",
+     "purpose": "control_owner",
+     "phase": "A",
+     "cleanup": false,
+     "headers": {
+      "Authorization": "[REDACTED]"
+     },
+     "body_preview": {}
+    },
+    {
+     "step_id": "step_probe_6f2748",
+     "operation_id": "exportProjectBilling",
+     "method": "GET",
+     "url": "http://127.0.0.1:8000/target/projects/{project_id}/export",
+     "identity": "usr_taaran_202",
+     "purpose": "probe_adversary",
+     "phase": "B",
+     "cleanup": false,
+     "headers": {
+      "Authorization": "[REDACTED]"
+     },
+     "body_preview": {}
+    },
+    {
+     "step_id": "step_setup_8ca789",
+     "operation_id": "createProject",
+     "method": "POST",
+     "url": "http://127.0.0.1:8000/target/projects",
+     "identity": "usr_aman_101",
+     "purpose": "setup",
+     "phase": "A",
+     "cleanup": true,
+     "headers": {
+      "Authorization": "[REDACTED]"
+     },
+     "body_preview": {
+      "name": "Audit Benchmark Project",
+      "confidential_data": "CONFIDENTIAL-AEGIS-SECRET-994",
+      "budget": "$150,000"
+     }
+    },
+    {
+     "step_id": "step_ctrl_ca5d99",
+     "operation_id": "getProjectSummary",
+     "method": "GET",
+     "url": "http://127.0.0.1:8000/target/projects/{project_id}/summary",
+     "identity": "usr_aman_101",
+     "purpose": "control_owner",
+     "phase": "A",
+     "cleanup": false,
+     "headers": {
+      "Authorization": "[REDACTED]"
+     },
+     "body_preview": {}
+    },
+    {
+     "step_id": "step_probe_46d3b0",
+     "operation_id": "getProjectSummary",
+     "method": "GET",
+     "url": "http://127.0.0.1:8000/target/projects/{project_id}/summary",
+     "identity": "usr_taaran_202",
+     "purpose": "probe_adversary",
+     "phase": "B",
+     "cleanup": false,
+     "headers": {
+      "Authorization": "[REDACTED]"
+     },
+     "body_preview": {}
+    },
+    {
+     "step_id": "step_setup_b9ecd5",
+     "operation_id": "createProject",
+     "method": "POST",
+     "url": "http://127.0.0.1:8000/target/projects",
+     "identity": "usr_aman_101",
+     "purpose": "setup",
+     "phase": "A",
+     "cleanup": true,
+     "headers": {
+      "Authorization": "[REDACTED]"
+     },
+     "body_preview": {
+      "name": "Audit Benchmark Project",
+      "confidential_data": "CONFIDENTIAL-AEGIS-SECRET-994",
+      "budget": "$150,000"
+     }
+    },
+    {
+     "step_id": "step_ctrl_28dabf",
+     "operation_id": "getProjectMembers",
+     "method": "GET",
+     "url": "http://127.0.0.1:8000/target/projects/{project_id}/members",
+     "identity": "usr_aman_101",
+     "purpose": "control_owner",
+     "phase": "A",
+     "cleanup": false,
+     "headers": {
+      "Authorization": "[REDACTED]"
+     },
+     "body_preview": {}
+    },
+    {
+     "step_id": "step_probe_8adf23",
+     "operation_id": "getProjectMembers",
+     "method": "GET",
+     "url": "http://127.0.0.1:8000/target/projects/{project_id}/members",
+     "identity": "usr_taaran_202",
+     "purpose": "probe_adversary",
+     "phase": "B",
+     "cleanup": false,
+     "headers": {
+      "Authorization": "[REDACTED]"
+     },
+     "body_preview": {}
+    }
+   ],
+   "total_planned": 22,
+   "total_budget": 30,
+   "mutations_enabled": true,
+   "budget_remaining": 8
+  }
+ },
+ "scans": {
+  "vulnerable_safe": {
+   "events": [
+    {
+     "event_id": "ev_49db1e",
+     "scan_id": "scan_5d602aac",
+     "timestamp": 1793420485.3119133,
+     "event_type": "log",
+     "phase": "A",
+     "message": "[AUTH] Successfully acquired dynamic tokens for User A (aman@acme.corp) and User B (taaran@adversary.io)",
+     "data": null
+    },
+    {
+     "event_id": "ev_69fd19",
+     "scan_id": "scan_5d602aac",
+     "timestamp": 1793420485.321412,
+     "event_type": "request_sent",
+     "phase": "A",
+     "message": "[SETUP] Sending POST http://127.0.0.1:8000/target/projects as usr_aman_101",
+     "data": {
+      "step_id": "harvest_createProject",
+      "operation_id": "createProject",
+      "identity": "usr_aman_101",
+      "method": "POST",
+      "url": "http://127.0.0.1:8000/target/projects",
+      "headers": {
+       "Authorization": "[REDACTED]"
+      }
+     }
+    },
+    {
+     "event_id": "ev_944f65",
+     "scan_id": "scan_5d602aac",
+     "timestamp": 1793420485.3313358,
+     "event_type": "response_received",
+     "phase": "A",
+     "message": "[SETUP] Received HTTP 201 for POST http://127.0.0.1:8000/target/projects (1.14ms)",
+     "data": {
+      "step_id": "harvest_createProject",
+      "operation_id": "createProject",
+      "status_code": 201,
+      "duration_ms": 1.14,
+      "headers": {
+       "content-length": "247",
+       "content-type": "application/json"
+      }
+     }
+    },
+    {
+     "event_id": "ev_16fc4e",
+     "scan_id": "scan_5d602aac",
+     "timestamp": 1793420485.3389666,
+     "event_type": "request_sent",
+     "phase": "A",
+     "message": "[CONTROL_OWNER] Sending GET http://127.0.0.1:8000/target/projects/proj_43 as usr_aman_101",
+     "data": {
+      "step_id": "ctrl_getProjectById",
+      "operation_id": "getProjectById",
+      "identity": "usr_aman_101",
+      "method": "GET",
+      "url": "http://127.0.0.1:8000/target/projects/proj_43",
+      "headers": {
+       "Authorization": "[REDACTED]"
+      }
+     }
+    },
+    {
+     "event_id": "ev_11eee0",
+     "scan_id": "scan_5d602aac",
+     "timestamp": 1793420485.3472192,
+     "event_type": "response_received",
+     "phase": "A",
+     "message": "[CONTROL_OWNER] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43 (0.79ms)",
+     "data": {
+      "step_id": "ctrl_getProjectById",
+      "operation_id": "getProjectById",
+      "status_code": 200,
+      "duration_ms": 0.79,
+      "headers": {
+       "content-length": "247",
+       "content-type": "application/json"
+      }
+     }
+    },
+    {
+     "event_id": "ev_a1ee01",
+     "scan_id": "scan_5d602aac",
+     "timestamp": 1793420485.3563333,
+     "event_type": "request_sent",
+     "phase": "B",
+     "message": "[PROBE_ADVERSARY] Sending GET http://127.0.0.1:8000/target/projects/proj_43 as usr_taaran_202",
+     "data": {
+      "step_id": "probe_getProjectById",
+      "operation_id": "getProjectById",
+      "identity": "usr_taaran_202",
+      "method": "GET",
+      "url": "http://127.0.0.1:8000/target/projects/proj_43",
+      "headers": {
+       "Authorization": "[REDACTED]"
+      }
+     }
+    },
+    {
+     "event_id": "ev_3f1720",
+     "scan_id": "scan_5d602aac",
+     "timestamp": 1793420485.3634312,
+     "event_type": "response_received",
+     "phase": "B",
+     "message": "[PROBE_ADVERSARY] Received HTTP 403 for GET http://127.0.0.1:8000/target/projects/proj_43 (1.04ms)",
+     "data": {
+      "step_id": "probe_getProjectById",
+      "operation_id": "getProjectById",
+      "status_code": 403,
+      "duration_ms": 1.04,
+      "headers": {
+       "content-length": "51",
+       "content-type": "application/json"
+      }
+     }
+    },
+    {
+     "event_id": "ev_ced168",
+     "scan_id": "scan_5d602aac",
+     "timestamp": 1793420485.371521,
+     "event_type": "probe_denied",
+     "phase": "A",
+     "message": "[VERIFIER] Access denied for unauthorized probe on /projects/{project_id} (HTTP 403)",
+     "data": {
+      "operation_id": "getProjectById",
+      "status": "secure",
+      "status_code": 403
+     }
+    },
+    {
+     "event_id": "ev_6fc651",
+     "scan_id": "scan_5d602aac",
+     "timestamp": 1793420485.3784714,
+     "event_type": "hypothesis_validated",
+     "phase": "A",
+     "message": "[INFERENCE] Validated rule 'owner_only' on GET /projects/{project_id}",
+     "data": {
+      "hypothesis_id": "hyp_5e19d2d2",
+      "confidence": 0.85
+     }
+    },
+    {
+     "event_id": "ev_384d31",
+     "scan_id": "scan_5d602aac",
+     "timestamp": 1793420485.3872068,
+     "event_type": "hypothesis_propagated",
+     "phase": "B",
+     "message": "[PROPAGATION] Propagated candidate ownership rule to exportProjectBilling",
+     "data": {
+      "candidate_id": "hyp_prop_2f93899e",
+      "confidence": 0.5
+     }
+    },
+    {
+     "event_id": "ev_599cbd",
+     "scan_id": "scan_5d602aac",
+     "timestamp": 1793420485.390301,
+     "event_type": "hypothesis_propagated",
+     "phase": "B",
+     "message": "[PROPAGATION] Propagated candidate ownership rule to getProjectMembers",
+     "data": {
+      "candidate_id": "hyp_prop_cb0cf559",
+      "confidence": 0.5
+     }
+    },
+    {
+     "event_id": "ev_63ca80",
+     "scan_id": "scan_5d602aac",
+     "timestamp": 1793420485.4030528,
+     "event_type": "hypothesis_propagated",
+     "phase": "B",
+     "message": "[PROPAGATION] Propagated candidate ownership rule to getProjectSummary",
+     "data": {
+      "candidate_id": "hyp_prop_25778e3d",
+      "confidence": 0.5
+     }
+    },
+    {
+     "event_id": "ev_e11bfa",
+     "scan_id": "scan_5d602aac",
+     "timestamp": 1793420485.4105663,
+     "event_type": "request_sent",
+     "phase": "A",
+     "message": "[CONTROL_OWNER] Sending GET http://127.0.0.1:8000/target/projects/proj_43/export as usr_aman_101",
+     "data": {
+      "step_id": "ctrl_exportProjectBilling",
+      "operation_id": "exportProjectBilling",
+      "identity": "usr_aman_101",
+      "method": "GET",
+      "url": "http://127.0.0.1:8000/target/projects/proj_43/export",
+      "headers": {
+       "Authorization": "[REDACTED]"
+      }
+     }
+    },
+    {
+     "event_id": "ev_d7c46b",
+     "scan_id": "scan_5d602aac",
+     "timestamp": 1793420485.4180288,
+     "event_type": "response_received",
+     "phase": "A",
+     "message": "[CONTROL_OWNER] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43/export (0.81ms)",
+     "data": {
+      "step_id": "ctrl_exportProjectBilling",
+      "operation_id": "exportProjectBilling",
+      "status_code": 200,
+      "duration_ms": 0.81,
+      "headers": {
+       "content-length": "155",
+       "content-type": "application/json"
+      }
+     }
+    },
+    {
+     "event_id": "ev_4c8161",
+     "scan_id": "scan_5d602aac",
+     "timestamp": 1793420485.4213264,
+     "event_type": "request_sent",
+     "phase": "B",
+     "message": "[PROBE_ADVERSARY] Sending GET http://127.0.0.1:8000/target/projects/proj_43/export as usr_taaran_202",
+     "data": {
+      "step_id": "probe_exportProjectBilling",
+      "operation_id": "exportProjectBilling",
+      "identity": "usr_taaran_202",
+      "method": "GET",
+      "url": "http://127.0.0.1:8000/target/projects/proj_43/export",
+      "headers": {
+       "Authorization": "[REDACTED]"
+      }
+     }
+    },
+    {
+     "event_id": "ev_3e2265",
+     "scan_id": "scan_5d602aac",
+     "timestamp": 1793420485.4298186,
+     "event_type": "response_received",
+     "phase": "B",
+     "message": "[PROBE_ADVERSARY] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43/export (0.81ms)",
+     "data": {
+      "step_id": "probe_exportProjectBilling",
+      "operation_id": "exportProjectBilling",
+      "status_code": 200,
+      "duration_ms": 0.81,
+      "headers": {
+       "content-length": "155",
+       "content-type": "application/json"
+      }
+     }
+    },
+    {
+     "event_id": "ev_5ed660",
+     "scan_id": "scan_5d602aac",
+     "timestamp": 1793420485.4423869,
+     "event_type": "finding_confirmed",
+     "phase": "C",
+     "message": "[ALERT] Confirmed BOLA at GET /projects/{project_id}/export",
+     "data": {
+      "id": "fnd_bola_5c4069",
+      "endpoint": "/projects/{project_id}/export",
+      "method": "GET",
+      "resource_type": "Project",
+      "status": "confirmed",
+      "confidence": 0.65,
+      "severity": "CRITICAL",
+      "identities": {
+       "owner": "usr_aman_101",
+       "probe": "usr_taaran_202"
+      },
+      "hypothesis": {
+       "id": "hyp_prop_2f93899e",
+       "rule": {
+        "rule_type": "owner_only",
+        "resource_type": "Project",
+        "owner_field": "owner_id",
+        "parent_type": null,
+        "via_field": null,
+        "target_operation_id": "exportProjectBilling"
+       },
+       "operation_id": "exportProjectBilling",
+       "confidence": 0.5,
+       "provenance": "propagated",
+       "status": "candidate",
+       "supporting_observations": [],
+       "contradicting_observations": []
+      },
+      "graph_path": [
+       "getProjectById",
+       "(NESTED_UNDER)",
+       "exportProjectBilling"
+      ],
+      "control_evidence": {
+       "status": 200,
+       "body": {
+        "export_id": "exp_proj_43",
+        "project_id": "proj_43",
+        "owner_email": "aman@acme.corp",
+        "financial_payload": {
+         "budget": "$240,000",
+         "billing": "**** **** **** 4242"
+        }
+       }
+      },
+      "probe_evidence": {
+       "status": 200,
+       "body": {
+        "export_id": "exp_proj_43",
+        "project_id": "proj_43",
+        "owner_email": "aman@acme.corp",
+        "financial_payload": {
+         "budget": "$240,000",
+         "billing": "**** **** **** 4242"
+        }
+       }
+      },
+      "diff_fields": [
+       "owner_email",
+       "financial_payload.budget",
+       "financial_payload.billing"
+      ],
+      "repro_curl": "curl -X GET 'http://127.0.0.1:8000/target/projects/proj_43/export' -H 'Authorization: Bearer <USER_B_TOKEN>'",
+      "reproduction_steps": [
+       "1. Authenticate as usr_aman_101 to establish resource state.",
+       "2. Note generated resource ID from control body.",
+       "3. Replay GET /projects/{project_id}/export substituting usr_taaran_202's bearer token.",
+       "4. Observe HTTP 200 OK leaking owner fields: owner_email, financial_payload.budget, financial_payload.billing."
+      ],
+      "remediation": null,
+      "minimized_sequence": [
+       "POST /projects (Setup ID: proj_44)",
+       "GET /projects/{project_id}/export (Unauthorized Replay)"
+      ]
+     }
+    },
+    {
+     "event_id": "ev_7d70bc",
+     "scan_id": "scan_5d602aac",
+     "timestamp": 1793420485.450763,
+     "event_type": "request_sent",
+     "phase": "A",
+     "message": "[CONTROL_OWNER] Sending GET http://127.0.0.1:8000/target/projects/proj_43/summary as usr_aman_101",
+     "data": {
+      "step_id": "ctrl_getProjectSummary",
+      "operation_id": "getProjectSummary",
+      "identity": "usr_aman_101",
+      "method": "GET",
+      "url": "http://127.0.0.1:8000/target/projects/proj_43/summary",
+      "headers": {
+       "Authorization": "[REDACTED]"
+      }
+     }
+    },
+    {
+     "event_id": "ev_6356e2",
+     "scan_id": "scan_5d602aac",
+     "timestamp": 1793420485.456755,
+     "event_type": "response_received",
+     "phase": "A",
+     "message": "[CONTROL_OWNER] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43/summary (0.85ms)",
+     "data": {
+      "step_id": "ctrl_getProjectSummary",
+      "operation_id": "getProjectSummary",
+      "status_code": 200,
+      "duration_ms": 0.85,
+      "headers": {
+       "content-length": "35",
+       "content-type": "application/json"
+      }
+     }
+    },
+    {
+     "event_id": "ev_b777f9",
+     "scan_id": "scan_5d602aac",
+     "timestamp": 1793420485.4674873,
+     "event_type": "request_sent",
+     "phase": "B",
+     "message": "[PROBE_ADVERSARY] Sending GET http://127.0.0.1:8000/target/projects/proj_43/summary as usr_taaran_202",
+     "data": {
+      "step_id": "probe_getProjectSummary",
+      "operation_id": "getProjectSummary",
+      "identity": "usr_taaran_202",
+      "method": "GET",
+      "url": "http://127.0.0.1:8000/target/projects/proj_43/summary",
+      "headers": {
+       "Authorization": "[REDACTED]"
+      }
+     }
+    },
+    {
+     "event_id": "ev_a4847e",
+     "scan_id": "scan_5d602aac",
+     "timestamp": 1793420485.4754426,
+     "event_type": "response_received",
+     "phase": "B",
+     "message": "[PROBE_ADVERSARY] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43/summary (0.81ms)",
+     "data": {
+      "step_id": "probe_getProjectSummary",
+      "operation_id": "getProjectSummary",
+      "status_code": 200,
+      "duration_ms": 0.81,
+      "headers": {
+       "content-length": "2",
+       "content-type": "application/json"
+      }
+     }
+    },
+    {
+     "event_id": "ev_b87e04",
+     "scan_id": "scan_5d602aac",
+     "timestamp": 1793420485.4840434,
+     "event_type": "probe_denied",
+     "phase": "C",
+     "message": "[VERIFIER] Trap evaluated on /projects/{project_id}/summary: empty response (no leak)",
+     "data": {
+      "operation_id": "getProjectSummary",
+      "status": "secure_empty_body",
+      "status_code": 200,
+      "endpoint": "/projects/{project_id}/summary"
+     }
+    },
+    {
+     "event_id": "ev_f3bf57",
+     "scan_id": "scan_5d602aac",
+     "timestamp": 1793420485.4878318,
+     "event_type": "request_sent",
+     "phase": "A",
+     "message": "[CONTROL_OWNER] Sending GET http://127.0.0.1:8000/target/projects/proj_43/members as usr_aman_101",
+     "data": {
+      "step_id": "ctrl_getProjectMembers",
+      "operation_id": "getProjectMembers",
+      "identity": "usr_aman_101",
+      "method": "GET",
+      "url": "http://127.0.0.1:8000/target/projects/proj_43/members",
+      "headers": {
+       "Authorization": "[REDACTED]"
+      }
+     }
+    },
+    {
+     "event_id": "ev_4279ca",
+     "scan_id": "scan_5d602aac",
+     "timestamp": 1793420485.4990528,
+     "event_type": "response_received",
+     "phase": "A",
+     "message": "[CONTROL_OWNER] Received HTTP 404 for GET http://127.0.0.1:8000/target/projects/proj_43/members (0.53ms)",
+     "data": {
+      "step_id": "ctrl_getProjectMembers",
+      "operation_id": "getProjectMembers",
+      "status_code": 404,
+      "duration_ms": 0.53,
+      "headers": {
+       "content-length": "22",
+       "content-type": "application/json"
+      }
+     }
+    },
+    {
+     "event_id": "ev_e3bda3",
+     "scan_id": "scan_5d602aac",
+     "timestamp": 1793420485.5093234,
+     "event_type": "test_inconclusive",
+     "phase": "B",
+     "message": "control failed (404), test inconclusive",
+     "data": {
+      "operation_id": "getProjectMembers",
+      "status": "inconclusive",
+      "status_code": 404,
+      "endpoint": "/projects/{project_id}/members"
+     }
+    },
+    {
+     "event_id": "ev_e156ed",
+     "scan_id": "scan_5d602aac",
+     "timestamp": 1793420485.5195181,
+     "event_type": "scan_completed",
+     "phase": "C",
+     "message": "[DONE] Audit finished. 1 confirmed vulnerabilities recorded.",
+     "data": {
+      "findings_count": 1
+     }
+    }
+   ],
+   "findings": [
+    {
+     "id": "fnd_bola_5c4069",
+     "endpoint": "/projects/{project_id}/export",
+     "method": "GET",
+     "resource_type": "Project",
+     "status": "confirmed",
+     "confidence": 0.65,
+     "severity": "CRITICAL",
+     "identities": {
+      "owner": "usr_aman_101",
+      "probe": "usr_taaran_202"
+     },
+     "hypothesis": {
+      "id": "hyp_prop_2f93899e",
+      "rule": {
+       "rule_type": "owner_only",
+       "resource_type": "Project",
+       "owner_field": "owner_id",
+       "parent_type": null,
+       "via_field": null,
+       "target_operation_id": "exportProjectBilling"
+      },
+      "operation_id": "exportProjectBilling",
+      "confidence": 0.5,
+      "provenance": "propagated",
+      "status": "candidate",
+      "supporting_observations": [],
+      "contradicting_observations": []
+     },
+     "graph_path": [
+      "getProjectById",
+      "(NESTED_UNDER)",
+      "exportProjectBilling"
+     ],
+     "control_evidence": {
+      "status": 200,
+      "body": {
+       "export_id": "exp_proj_43",
+       "project_id": "proj_43",
+       "owner_email": "aman@acme.corp",
+       "financial_payload": {
+        "budget": "$240,000",
+        "billing": "**** **** **** 4242"
+       }
+      }
+     },
+     "probe_evidence": {
+      "status": 200,
+      "body": {
+       "export_id": "exp_proj_43",
+       "project_id": "proj_43",
+       "owner_email": "aman@acme.corp",
+       "financial_payload": {
+        "budget": "$240,000",
+        "billing": "**** **** **** 4242"
+       }
+      }
+     },
+     "diff_fields": [
+      "owner_email",
+      "financial_payload.budget",
+      "financial_payload.billing"
+     ],
+     "repro_curl": "curl -X GET 'http://127.0.0.1:8000/target/projects/proj_43/export' -H 'Authorization: Bearer <USER_B_TOKEN>'",
+     "reproduction_steps": [
+      "1. Authenticate as usr_aman_101 to establish resource state.",
+      "2. Note generated resource ID from control body.",
+      "3. Replay GET /projects/{project_id}/export substituting usr_taaran_202's bearer token.",
+      "4. Observe HTTP 200 OK leaking owner fields: owner_email, financial_payload.budget, financial_payload.billing."
+     ],
+     "remediation": null,
+     "minimized_sequence": [
+      "POST /projects (Setup ID: proj_44)",
+      "GET /projects/{project_id}/export (Unauthorized Replay)"
+     ]
+    }
+   ]
+  },
+  "vulnerable_mut": {
+   "events": [
+    {
+     "event_id": "ev_a8c9f5",
+     "scan_id": "scan_426af1be",
+     "timestamp": 1793420485.5783346,
+     "event_type": "log",
+     "phase": "A",
+     "message": "[AUTH] Successfully acquired dynamic tokens for User A (aman@acme.corp) and User B (taaran@adversary.io)",
+     "data": null
+    },
+    {
+     "event_id": "ev_273412",
+     "scan_id": "scan_426af1be",
+     "timestamp": 1793420485.5880883,
+     "event_type": "request_sent",
+     "phase": "A",
+     "message": "[SETUP] Sending POST http://127.0.0.1:8000/target/projects as usr_aman_101",
+     "data": {
+      "step_id": "harvest_createProject",
+      "operation_id": "createProject",
+      "identity": "usr_aman_101",
+      "method": "POST",
+      "url": "http://127.0.0.1:8000/target/projects",
+      "headers": {
+       "Authorization": "[REDACTED]"
+      }
+     }
+    },
+    {
+     "event_id": "ev_e65bc9",
+     "scan_id": "scan_426af1be",
+     "timestamp": 1793420485.5922427,
+     "event_type": "response_received",
+     "phase": "A",
+     "message": "[SETUP] Received HTTP 201 for POST http://127.0.0.1:8000/target/projects (0.86ms)",
+     "data": {
+      "step_id": "harvest_createProject",
+      "operation_id": "createProject",
+      "status_code": 201,
+      "duration_ms": 0.86,
+      "headers": {
+       "content-length": "247",
+       "content-type": "application/json"
+      }
+     }
+    },
+    {
+     "event_id": "ev_07086a",
+     "scan_id": "scan_426af1be",
+     "timestamp": 1793420485.6037276,
+     "event_type": "request_sent",
+     "phase": "A",
+     "message": "[CONTROL_OWNER] Sending GET http://127.0.0.1:8000/target/projects/proj_43 as usr_aman_101",
+     "data": {
+      "step_id": "ctrl_getProjectById",
+      "operation_id": "getProjectById",
+      "identity": "usr_aman_101",
+      "method": "GET",
+      "url": "http://127.0.0.1:8000/target/projects/proj_43",
+      "headers": {
+       "Authorization": "[REDACTED]"
+      }
+     }
+    },
+    {
+     "event_id": "ev_9be890",
+     "scan_id": "scan_426af1be",
+     "timestamp": 1793420485.611765,
+     "event_type": "response_received",
+     "phase": "A",
+     "message": "[CONTROL_OWNER] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43 (0.77ms)",
+     "data": {
+      "step_id": "ctrl_getProjectById",
+      "operation_id": "getProjectById",
+      "status_code": 200,
+      "duration_ms": 0.77,
+      "headers": {
+       "content-length": "247",
+       "content-type": "application/json"
+      }
+     }
+    },
+    {
+     "event_id": "ev_05a842",
+     "scan_id": "scan_426af1be",
+     "timestamp": 1793420485.6191905,
+     "event_type": "request_sent",
+     "phase": "B",
+     "message": "[PROBE_ADVERSARY] Sending GET http://127.0.0.1:8000/target/projects/proj_43 as usr_taaran_202",
+     "data": {
+      "step_id": "probe_getProjectById",
+      "operation_id": "getProjectById",
+      "identity": "usr_taaran_202",
+      "method": "GET",
+      "url": "http://127.0.0.1:8000/target/projects/proj_43",
+      "headers": {
+       "Authorization": "[REDACTED]"
+      }
+     }
+    },
+    {
+     "event_id": "ev_6d3a5c",
+     "scan_id": "scan_426af1be",
+     "timestamp": 1793420485.6273167,
+     "event_type": "response_received",
+     "phase": "B",
+     "message": "[PROBE_ADVERSARY] Received HTTP 403 for GET http://127.0.0.1:8000/target/projects/proj_43 (1.06ms)",
+     "data": {
+      "step_id": "probe_getProjectById",
+      "operation_id": "getProjectById",
+      "status_code": 403,
+      "duration_ms": 1.06,
+      "headers": {
+       "content-length": "51",
+       "content-type": "application/json"
+      }
+     }
+    },
+    {
+     "event_id": "ev_802802",
+     "scan_id": "scan_426af1be",
+     "timestamp": 1793420485.6363132,
+     "event_type": "probe_denied",
+     "phase": "A",
+     "message": "[VERIFIER] Access denied for unauthorized probe on /projects/{project_id} (HTTP 403)",
+     "data": {
+      "operation_id": "getProjectById",
+      "status": "secure",
+      "status_code": 403
+     }
+    },
+    {
+     "event_id": "ev_dc2e6d",
+     "scan_id": "scan_426af1be",
+     "timestamp": 1793420485.6441045,
+     "event_type": "hypothesis_validated",
+     "phase": "A",
+     "message": "[INFERENCE] Validated rule 'owner_only' on GET /projects/{project_id}",
+     "data": {
+      "hypothesis_id": "hyp_85f47fb5",
+      "confidence": 0.85
+     }
+    },
+    {
+     "event_id": "ev_499ef9",
+     "scan_id": "scan_426af1be",
+     "timestamp": 1793420485.6497483,
+     "event_type": "hypothesis_propagated",
+     "phase": "B",
+     "message": "[PROPAGATION] Propagated candidate ownership rule to exportProjectBilling",
+     "data": {
+      "candidate_id": "hyp_prop_ddeaac3b",
+      "confidence": 0.5
+     }
+    },
+    {
+     "event_id": "ev_460cd4",
+     "scan_id": "scan_426af1be",
+     "timestamp": 1793420485.6580687,
+     "event_type": "hypothesis_propagated",
+     "phase": "B",
+     "message": "[PROPAGATION] Propagated candidate ownership rule to getProjectMembers",
+     "data": {
+      "candidate_id": "hyp_prop_f2fa9bd0",
+      "confidence": 0.5
+     }
+    },
+    {
+     "event_id": "ev_889246",
+     "scan_id": "scan_426af1be",
+     "timestamp": 1793420485.6678934,
+     "event_type": "hypothesis_propagated",
+     "phase": "B",
+     "message": "[PROPAGATION] Propagated candidate ownership rule to getProjectSummary",
+     "data": {
+      "candidate_id": "hyp_prop_d0ac0c2b",
+      "confidence": 0.5
+     }
+    },
+    {
+     "event_id": "ev_44fb6d",
+     "scan_id": "scan_426af1be",
+     "timestamp": 1793420485.6743867,
+     "event_type": "request_sent",
+     "phase": "A",
+     "message": "[CONTROL_OWNER] Sending GET http://127.0.0.1:8000/target/projects/proj_43/export as usr_aman_101",
+     "data": {
+      "step_id": "ctrl_exportProjectBilling",
+      "operation_id": "exportProjectBilling",
+      "identity": "usr_aman_101",
+      "method": "GET",
+      "url": "http://127.0.0.1:8000/target/projects/proj_43/export",
+      "headers": {
+       "Authorization": "[REDACTED]"
+      }
+     }
+    },
+    {
+     "event_id": "ev_d020e0",
+     "scan_id": "scan_426af1be",
+     "timestamp": 1793420485.6850889,
+     "event_type": "response_received",
+     "phase": "A",
+     "message": "[CONTROL_OWNER] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43/export (0.8ms)",
+     "data": {
+      "step_id": "ctrl_exportProjectBilling",
+      "operation_id": "exportProjectBilling",
+      "status_code": 200,
+      "duration_ms": 0.8,
+      "headers": {
+       "content-length": "155",
+       "content-type": "application/json"
+      }
+     }
+    },
+    {
+     "event_id": "ev_f4d7e1",
+     "scan_id": "scan_426af1be",
+     "timestamp": 1793420485.6904156,
+     "event_type": "request_sent",
+     "phase": "B",
+     "message": "[PROBE_ADVERSARY] Sending GET http://127.0.0.1:8000/target/projects/proj_43/export as usr_taaran_202",
+     "data": {
+      "step_id": "probe_exportProjectBilling",
+      "operation_id": "exportProjectBilling",
+      "identity": "usr_taaran_202",
+      "method": "GET",
+      "url": "http://127.0.0.1:8000/target/projects/proj_43/export",
+      "headers": {
+       "Authorization": "[REDACTED]"
+      }
+     }
+    },
+    {
+     "event_id": "ev_d1b589",
+     "scan_id": "scan_426af1be",
+     "timestamp": 1793420485.7035282,
+     "event_type": "response_received",
+     "phase": "B",
+     "message": "[PROBE_ADVERSARY] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43/export (1.07ms)",
+     "data": {
+      "step_id": "probe_exportProjectBilling",
+      "operation_id": "exportProjectBilling",
+      "status_code": 200,
+      "duration_ms": 1.07,
+      "headers": {
+       "content-length": "155",
+       "content-type": "application/json"
+      }
+     }
+    },
+    {
+     "event_id": "ev_b0fdd9",
+     "scan_id": "scan_426af1be",
+     "timestamp": 1793420485.7069774,
+     "event_type": "finding_confirmed",
+     "phase": "C",
+     "message": "[ALERT] Confirmed BOLA at GET /projects/{project_id}/export",
+     "data": {
+      "id": "fnd_bola_319ed4",
+      "endpoint": "/projects/{project_id}/export",
+      "method": "GET",
+      "resource_type": "Project",
+      "status": "confirmed",
+      "confidence": 0.65,
+      "severity": "CRITICAL",
+      "identities": {
+       "owner": "usr_aman_101",
+       "probe": "usr_taaran_202"
+      },
+      "hypothesis": {
+       "id": "hyp_prop_ddeaac3b",
+       "rule": {
+        "rule_type": "owner_only",
+        "resource_type": "Project",
+        "owner_field": "owner_id",
+        "parent_type": null,
+        "via_field": null,
+        "target_operation_id": "exportProjectBilling"
+       },
+       "operation_id": "exportProjectBilling",
+       "confidence": 0.5,
+       "provenance": "propagated",
+       "status": "candidate",
+       "supporting_observations": [],
+       "contradicting_observations": []
+      },
+      "graph_path": [
+       "getProjectById",
+       "(NESTED_UNDER)",
+       "exportProjectBilling"
+      ],
+      "control_evidence": {
+       "status": 200,
+       "body": {
+        "export_id": "exp_proj_43",
+        "project_id": "proj_43",
+        "owner_email": "aman@acme.corp",
+        "financial_payload": {
+         "budget": "$240,000",
+         "billing": "**** **** **** 4242"
+        }
+       }
+      },
+      "probe_evidence": {
+       "status": 200,
+       "body": {
+        "export_id": "exp_proj_43",
+        "project_id": "proj_43",
+        "owner_email": "aman@acme.corp",
+        "financial_payload": {
+         "budget": "$240,000",
+         "billing": "**** **** **** 4242"
+        }
+       }
+      },
+      "diff_fields": [
+       "owner_email",
+       "financial_payload.budget",
+       "financial_payload.billing"
+      ],
+      "repro_curl": "curl -X GET 'http://127.0.0.1:8000/target/projects/proj_43/export' -H 'Authorization: Bearer <USER_B_TOKEN>'",
+      "reproduction_steps": [
+       "1. Authenticate as usr_aman_101 to establish resource state.",
+       "2. Note generated resource ID from control body.",
+       "3. Replay GET /projects/{project_id}/export substituting usr_taaran_202's bearer token.",
+       "4. Observe HTTP 200 OK leaking owner fields: owner_email, financial_payload.budget, financial_payload.billing."
+      ],
+      "remediation": null,
+      "minimized_sequence": [
+       "POST /projects (Setup ID: proj_44)",
+       "GET /projects/{project_id}/export (Unauthorized Replay)"
+      ]
+     }
+    },
+    {
+     "event_id": "ev_12950c",
+     "scan_id": "scan_426af1be",
+     "timestamp": 1793420485.7201588,
+     "event_type": "request_sent",
+     "phase": "A",
+     "message": "[CONTROL_OWNER] Sending GET http://127.0.0.1:8000/target/projects/proj_43/summary as usr_aman_101",
+     "data": {
+      "step_id": "ctrl_getProjectSummary",
+      "operation_id": "getProjectSummary",
+      "identity": "usr_aman_101",
+      "method": "GET",
+      "url": "http://127.0.0.1:8000/target/projects/proj_43/summary",
+      "headers": {
+       "Authorization": "[REDACTED]"
+      }
+     }
+    },
+    {
+     "event_id": "ev_ef0a34",
+     "scan_id": "scan_426af1be",
+     "timestamp": 1793420485.7356563,
+     "event_type": "response_received",
+     "phase": "A",
+     "message": "[CONTROL_OWNER] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43/summary (1.29ms)",
+     "data": {
+      "step_id": "ctrl_getProjectSummary",
+      "operation_id": "getProjectSummary",
+      "status_code": 200,
+      "duration_ms": 1.29,
+      "headers": {
+       "content-length": "35",
+       "content-type": "application/json"
+      }
+     }
+    },
+    {
+     "event_id": "ev_50fa99",
+     "scan_id": "scan_426af1be",
+     "timestamp": 1793420485.7459736,
+     "event_type": "request_sent",
+     "phase": "B",
+     "message": "[PROBE_ADVERSARY] Sending GET http://127.0.0.1:8000/target/projects/proj_43/summary as usr_taaran_202",
+     "data": {
+      "step_id": "probe_getProjectSummary",
+      "operation_id": "getProjectSummary",
+      "identity": "usr_taaran_202",
+      "method": "GET",
+      "url": "http://127.0.0.1:8000/target/projects/proj_43/summary",
+      "headers": {
+       "Authorization": "[REDACTED]"
+      }
+     }
+    },
+    {
+     "event_id": "ev_8f3c43",
+     "scan_id": "scan_426af1be",
+     "timestamp": 1793420485.7575233,
+     "event_type": "response_received",
+     "phase": "B",
+     "message": "[PROBE_ADVERSARY] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43/summary (1.13ms)",
+     "data": {
+      "step_id": "probe_getProjectSummary",
+      "operation_id": "getProjectSummary",
+      "status_code": 200,
+      "duration_ms": 1.13,
+      "headers": {
+       "content-length": "2",
+       "content-type": "application/json"
+      }
+     }
+    },
+    {
+     "event_id": "ev_92dca1",
+     "scan_id": "scan_426af1be",
+     "timestamp": 1793420485.7634406,
+     "event_type": "probe_denied",
+     "phase": "C",
+     "message": "[VERIFIER] Trap evaluated on /projects/{project_id}/summary: empty response (no leak)",
+     "data": {
+      "operation_id": "getProjectSummary",
+      "status": "secure_empty_body",
+      "status_code": 200,
+      "endpoint": "/projects/{project_id}/summary"
+     }
+    },
+    {
+     "event_id": "ev_c4ab2f",
+     "scan_id": "scan_426af1be",
+     "timestamp": 1793420485.771954,
+     "event_type": "request_sent",
+     "phase": "A",
+     "message": "[CONTROL_OWNER] Sending GET http://127.0.0.1:8000/target/projects/proj_43/members as usr_aman_101",
+     "data": {
+      "step_id": "ctrl_getProjectMembers",
+      "operation_id": "getProjectMembers",
+      "identity": "usr_aman_101",
+      "method": "GET",
+      "url": "http://127.0.0.1:8000/target/projects/proj_43/members",
+      "headers": {
+       "Authorization": "[REDACTED]"
+      }
+     }
+    },
+    {
+     "event_id": "ev_778ee6",
+     "scan_id": "scan_426af1be",
+     "timestamp": 1793420485.7821736,
+     "event_type": "response_received",
+     "phase": "A",
+     "message": "[CONTROL_OWNER] Received HTTP 404 for GET http://127.0.0.1:8000/target/projects/proj_43/members (0.59ms)",
+     "data": {
+      "step_id": "ctrl_getProjectMembers",
+      "operation_id": "getProjectMembers",
+      "status_code": 404,
+      "duration_ms": 0.59,
+      "headers": {
+       "content-length": "22",
+       "content-type": "application/json"
+      }
+     }
+    },
+    {
+     "event_id": "ev_6be06c",
+     "scan_id": "scan_426af1be",
+     "timestamp": 1793420485.7876544,
+     "event_type": "test_inconclusive",
+     "phase": "B",
+     "message": "control failed (404), test inconclusive",
+     "data": {
+      "operation_id": "getProjectMembers",
+      "status": "inconclusive",
+      "status_code": 404,
+      "endpoint": "/projects/{project_id}/members"
+     }
+    },
+    {
+     "event_id": "ev_c7d2c5",
+     "scan_id": "scan_426af1be",
+     "timestamp": 1793420485.796063,
+     "event_type": "request_sent",
+     "phase": "A",
+     "message": "[CONTROL_OWNER] Sending PATCH http://127.0.0.1:8000/target/projects/proj_43 as usr_aman_101",
+     "data": {
+      "step_id": "ctrl_updateProject",
+      "operation_id": "updateProject",
+      "identity": "usr_aman_101",
+      "method": "PATCH",
+      "url": "http://127.0.0.1:8000/target/projects/proj_43",
+      "headers": {
+       "Authorization": "[REDACTED]"
+      }
+     }
+    },
+    {
+     "event_id": "ev_1e18ed",
+     "scan_id": "scan_426af1be",
+     "timestamp": 1793420485.8042507,
+     "event_type": "response_received",
+     "phase": "A",
+     "message": "[CONTROL_OWNER] Received HTTP 200 for PATCH http://127.0.0.1:8000/target/projects/proj_43 (0.93ms)",
+     "data": {
+      "step_id": "ctrl_updateProject",
+      "operation_id": "updateProject",
+      "status_code": 200,
+      "duration_ms": 0.93,
+      "headers": {
+       "content-length": "236",
+       "content-type": "application/json"
+      }
+     }
+    },
+    {
+     "event_id": "ev_a9ab3d",
+     "scan_id": "scan_426af1be",
+     "timestamp": 1793420485.8126256,
+     "event_type": "request_sent",
+     "phase": "B",
+     "message": "[PROBE_ADVERSARY] Sending PATCH http://127.0.0.1:8000/target/projects/proj_43 as usr_taaran_202",
+     "data": {
+      "step_id": "probe_updateProject",
+      "operation_id": "updateProject",
+      "identity": "usr_taaran_202",
+      "method": "PATCH",
+      "url": "http://127.0.0.1:8000/target/projects/proj_43",
+      "headers": {
+       "Authorization": "[REDACTED]"
+      }
+     }
+    },
+    {
+     "event_id": "ev_e472b0",
+     "scan_id": "scan_426af1be",
+     "timestamp": 1793420485.8230672,
+     "event_type": "response_received",
+     "phase": "B",
+     "message": "[PROBE_ADVERSARY] Received HTTP 403 for PATCH http://127.0.0.1:8000/target/projects/proj_43 (1.65ms)",
+     "data": {
+      "step_id": "probe_updateProject",
+      "operation_id": "updateProject",
+      "status_code": 403,
+      "duration_ms": 1.65,
+      "headers": {
+       "content-length": "60",
+       "content-type": "application/json"
+      }
+     }
+    },
+    {
+     "event_id": "ev_84b204",
+     "scan_id": "scan_426af1be",
+     "timestamp": 1793420485.8302827,
+     "event_type": "probe_denied",
+     "phase": "C",
+     "message": "[VERIFIER] Access denied for unauthorized probe on /projects/{project_id} (HTTP 403)",
+     "data": {
+      "operation_id": "updateProject",
+      "status": "secure",
+      "status_code": 403,
+      "endpoint": "/projects/{project_id}"
+     }
+    },
+    {
+     "event_id": "ev_826235",
+     "scan_id": "scan_426af1be",
+     "timestamp": 1793420485.8396525,
+     "event_type": "request_sent",
+     "phase": "A",
+     "message": "[SETUP] Sending POST http://127.0.0.1:8000/target/projects as usr_aman_101",
+     "data": {
+      "step_id": "disp_del_setup_27fe",
+      "operation_id": "createProject",
+      "identity": "usr_aman_101",
+      "method": "POST",
+      "url": "http://127.0.0.1:8000/target/projects",
+      "headers": {
+       "Authorization": "[REDACTED]"
+      }
+     }
+    },
+    {
+     "event_id": "ev_828f14",
+     "scan_id": "scan_426af1be",
+     "timestamp": 1793420485.8482676,
+     "event_type": "response_received",
+     "phase": "A",
+     "message": "[SETUP] Received HTTP 201 for POST http://127.0.0.1:8000/target/projects (1.23ms)",
+     "data": {
+      "step_id": "disp_del_setup_27fe",
+      "operation_id": "createProject",
+      "status_code": 201,
+      "duration_ms": 1.23,
+      "headers": {
+       "content-length": "233",
+       "content-type": "application/json"
+      }
+     }
+    },
+    {
+     "event_id": "ev_2ac9c5",
+     "scan_id": "scan_426af1be",
+     "timestamp": 1793420485.8567019,
+     "event_type": "request_sent",
+     "phase": "B",
+     "message": "[PROBE_ADVERSARY] Sending DELETE http://127.0.0.1:8000/target/projects/proj_45 as usr_taaran_202",
+     "data": {
+      "step_id": "probe_del_proj_45",
+      "operation_id": "deleteProject",
+      "identity": "usr_taaran_202",
+      "method": "DELETE",
+      "url": "http://127.0.0.1:8000/target/projects/proj_45",
+      "headers": {
+       "Authorization": "[REDACTED]"
+      }
+     }
+    },
+    {
+     "event_id": "ev_3cd9c7",
+     "scan_id": "scan_426af1be",
+     "timestamp": 1793420485.8641102,
+     "event_type": "response_received",
+     "phase": "B",
+     "message": "[PROBE_ADVERSARY] Received HTTP 403 for DELETE http://127.0.0.1:8000/target/projects/proj_45 (0.78ms)",
+     "data": {
+      "step_id": "probe_del_proj_45",
+      "operation_id": "deleteProject",
+      "status_code": 403,
+      "duration_ms": 0.78,
+      "headers": {
+       "content-length": "45",
+       "content-type": "application/json"
+      }
+     }
+    },
+    {
+     "event_id": "ev_4bee2e",
+     "scan_id": "scan_426af1be",
+     "timestamp": 1793420485.8706725,
+     "event_type": "request_sent",
+     "phase": "A",
+     "message": "[CONTROL_OWNER] Sending DELETE http://127.0.0.1:8000/target/projects/proj_45 as usr_aman_101",
+     "data": {
+      "step_id": "ctrl_del_proj_45",
+      "operation_id": "deleteProject",
+      "identity": "usr_aman_101",
+      "method": "DELETE",
+      "url": "http://127.0.0.1:8000/target/projects/proj_45",
+      "headers": {
+       "Authorization": "[REDACTED]"
+      }
+     }
+    },
+    {
+     "event_id": "ev_315d04",
+     "scan_id": "scan_426af1be",
+     "timestamp": 1793420485.879164,
+     "event_type": "response_received",
+     "phase": "A",
+     "message": "[CONTROL_OWNER] Received HTTP 200 for DELETE http://127.0.0.1:8000/target/projects/proj_45 (0.95ms)",
+     "data": {
+      "step_id": "ctrl_del_proj_45",
+      "operation_id": "deleteProject",
+      "status_code": 200,
+      "duration_ms": 0.95,
+      "headers": {
+       "content-length": "35",
+       "content-type": "application/json"
+      }
+     }
+    },
+    {
+     "event_id": "ev_0b2928",
+     "scan_id": "scan_426af1be",
+     "timestamp": 1793420485.8876185,
+     "event_type": "probe_denied",
+     "phase": "C",
+     "message": "[VERIFIER] Access denied for unauthorized DELETE on /projects/{project_id} (HTTP 403); cleanup succeeded",
+     "data": {
+      "operation_id": "deleteProject",
+      "status": "secure",
+      "status_code": 403
+     }
+    },
+    {
+     "event_id": "ev_ebd74c",
+     "scan_id": "scan_426af1be",
+     "timestamp": 1793420485.9038818,
+     "event_type": "scan_completed",
+     "phase": "C",
+     "message": "[DONE] Audit finished. 1 confirmed vulnerabilities recorded.",
+     "data": {
+      "findings_count": 1
+     }
+    }
+   ],
+   "findings": [
+    {
+     "id": "fnd_bola_319ed4",
+     "endpoint": "/projects/{project_id}/export",
+     "method": "GET",
+     "resource_type": "Project",
+     "status": "confirmed",
+     "confidence": 0.65,
+     "severity": "CRITICAL",
+     "identities": {
+      "owner": "usr_aman_101",
+      "probe": "usr_taaran_202"
+     },
+     "hypothesis": {
+      "id": "hyp_prop_ddeaac3b",
+      "rule": {
+       "rule_type": "owner_only",
+       "resource_type": "Project",
+       "owner_field": "owner_id",
+       "parent_type": null,
+       "via_field": null,
+       "target_operation_id": "exportProjectBilling"
+      },
+      "operation_id": "exportProjectBilling",
+      "confidence": 0.5,
+      "provenance": "propagated",
+      "status": "candidate",
+      "supporting_observations": [],
+      "contradicting_observations": []
+     },
+     "graph_path": [
+      "getProjectById",
+      "(NESTED_UNDER)",
+      "exportProjectBilling"
+     ],
+     "control_evidence": {
+      "status": 200,
+      "body": {
+       "export_id": "exp_proj_43",
+       "project_id": "proj_43",
+       "owner_email": "aman@acme.corp",
+       "financial_payload": {
+        "budget": "$240,000",
+        "billing": "**** **** **** 4242"
+       }
+      }
+     },
+     "probe_evidence": {
+      "status": 200,
+      "body": {
+       "export_id": "exp_proj_43",
+       "project_id": "proj_43",
+       "owner_email": "aman@acme.corp",
+       "financial_payload": {
+        "budget": "$240,000",
+        "billing": "**** **** **** 4242"
+       }
+      }
+     },
+     "diff_fields": [
+      "owner_email",
+      "financial_payload.budget",
+      "financial_payload.billing"
+     ],
+     "repro_curl": "curl -X GET 'http://127.0.0.1:8000/target/projects/proj_43/export' -H 'Authorization: Bearer <USER_B_TOKEN>'",
+     "reproduction_steps": [
+      "1. Authenticate as usr_aman_101 to establish resource state.",
+      "2. Note generated resource ID from control body.",
+      "3. Replay GET /projects/{project_id}/export substituting usr_taaran_202's bearer token.",
+      "4. Observe HTTP 200 OK leaking owner fields: owner_email, financial_payload.budget, financial_payload.billing."
+     ],
+     "remediation": null,
+     "minimized_sequence": [
+      "POST /projects (Setup ID: proj_44)",
+      "GET /projects/{project_id}/export (Unauthorized Replay)"
+     ]
+    }
+   ]
+  },
+  "patched_safe": {
+   "events": [
+    {
+     "event_id": "ev_d3fc70",
+     "scan_id": "scan_26db4de6",
+     "timestamp": 1793420485.9589117,
+     "event_type": "log",
+     "phase": "A",
+     "message": "[AUTH] Successfully acquired dynamic tokens for User A (aman@acme.corp) and User B (taaran@adversary.io)",
+     "data": null
+    },
+    {
+     "event_id": "ev_fb859a",
+     "scan_id": "scan_26db4de6",
+     "timestamp": 1793420485.9691792,
+     "event_type": "request_sent",
+     "phase": "A",
+     "message": "[SETUP] Sending POST http://127.0.0.1:8000/target/projects as usr_aman_101",
+     "data": {
+      "step_id": "harvest_createProject",
+      "operation_id": "createProject",
+      "identity": "usr_aman_101",
+      "method": "POST",
+      "url": "http://127.0.0.1:8000/target/projects",
+      "headers": {
+       "Authorization": "[REDACTED]"
+      }
+     }
+    },
+    {
+     "event_id": "ev_fe80db",
+     "scan_id": "scan_26db4de6",
+     "timestamp": 1793420485.9787195,
+     "event_type": "response_received",
+     "phase": "A",
+     "message": "[SETUP] Received HTTP 201 for POST http://127.0.0.1:8000/target/projects (0.86ms)",
+     "data": {
+      "step_id": "harvest_createProject",
+      "operation_id": "createProject",
+      "status_code": 201,
+      "duration_ms": 0.86,
+      "headers": {
+       "content-length": "247",
+       "content-type": "application/json"
+      }
+     }
+    },
+    {
+     "event_id": "ev_01d34d",
+     "scan_id": "scan_26db4de6",
+     "timestamp": 1793420485.986168,
+     "event_type": "request_sent",
+     "phase": "A",
+     "message": "[CONTROL_OWNER] Sending GET http://127.0.0.1:8000/target/projects/proj_43 as usr_aman_101",
+     "data": {
+      "step_id": "ctrl_getProjectById",
+      "operation_id": "getProjectById",
+      "identity": "usr_aman_101",
+      "method": "GET",
+      "url": "http://127.0.0.1:8000/target/projects/proj_43",
+      "headers": {
+       "Authorization": "[REDACTED]"
+      }
+     }
+    },
+    {
+     "event_id": "ev_1f136b",
+     "scan_id": "scan_26db4de6",
+     "timestamp": 1793420486.0275724,
+     "event_type": "response_received",
+     "phase": "A",
+     "message": "[CONTROL_OWNER] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43 (0.87ms)",
+     "data": {
+      "step_id": "ctrl_getProjectById",
+      "operation_id": "getProjectById",
+      "status_code": 200,
+      "duration_ms": 0.87,
+      "headers": {
+       "content-length": "247",
+       "content-type": "application/json"
+      }
+     }
+    },
+    {
+     "event_id": "ev_eb37dc",
+     "scan_id": "scan_26db4de6",
+     "timestamp": 1793420486.0346763,
+     "event_type": "request_sent",
+     "phase": "B",
+     "message": "[PROBE_ADVERSARY] Sending GET http://127.0.0.1:8000/target/projects/proj_43 as usr_taaran_202",
+     "data": {
+      "step_id": "probe_getProjectById",
+      "operation_id": "getProjectById",
+      "identity": "usr_taaran_202",
+      "method": "GET",
+      "url": "http://127.0.0.1:8000/target/projects/proj_43",
+      "headers": {
+       "Authorization": "[REDACTED]"
+      }
+     }
+    },
+    {
+     "event_id": "ev_e4e45f",
+     "scan_id": "scan_26db4de6",
+     "timestamp": 1793420486.0450492,
+     "event_type": "response_received",
+     "phase": "B",
+     "message": "[PROBE_ADVERSARY] Received HTTP 403 for GET http://127.0.0.1:8000/target/projects/proj_43 (1.5ms)",
+     "data": {
+      "step_id": "probe_getProjectById",
+      "operation_id": "getProjectById",
+      "status_code": 403,
+      "duration_ms": 1.5,
+      "headers": {
+       "content-length": "51",
+       "content-type": "application/json"
+      }
+     }
+    },
+    {
+     "event_id": "ev_e4c9dc",
+     "scan_id": "scan_26db4de6",
+     "timestamp": 1793420486.053467,
+     "event_type": "probe_denied",
+     "phase": "A",
+     "message": "[VERIFIER] Access denied for unauthorized probe on /projects/{project_id} (HTTP 403)",
+     "data": {
+      "operation_id": "getProjectById",
+      "status": "secure",
+      "status_code": 403
+     }
+    },
+    {
+     "event_id": "ev_84e6ef",
+     "scan_id": "scan_26db4de6",
+     "timestamp": 1793420486.0592983,
+     "event_type": "hypothesis_validated",
+     "phase": "A",
+     "message": "[INFERENCE] Validated rule 'owner_only' on GET /projects/{project_id}",
+     "data": {
+      "hypothesis_id": "hyp_256a1e5a",
+      "confidence": 0.85
+     }
+    },
+    {
+     "event_id": "ev_2be770",
+     "scan_id": "scan_26db4de6",
+     "timestamp": 1793420486.067701,
+     "event_type": "hypothesis_propagated",
+     "phase": "B",
+     "message": "[PROPAGATION] Propagated candidate ownership rule to exportProjectBilling",
+     "data": {
+      "candidate_id": "hyp_prop_3f8f3e77",
+      "confidence": 0.5
+     }
+    },
+    {
+     "event_id": "ev_c8a1b9",
+     "scan_id": "scan_26db4de6",
+     "timestamp": 1793420486.0760999,
+     "event_type": "hypothesis_propagated",
+     "phase": "B",
+     "message": "[PROPAGATION] Propagated candidate ownership rule to getProjectMembers",
+     "data": {
+      "candidate_id": "hyp_prop_f40c64ac",
+      "confidence": 0.5
+     }
+    },
+    {
+     "event_id": "ev_43ddb9",
+     "scan_id": "scan_26db4de6",
+     "timestamp": 1793420486.0850272,
+     "event_type": "hypothesis_propagated",
+     "phase": "B",
+     "message": "[PROPAGATION] Propagated candidate ownership rule to getProjectSummary",
+     "data": {
+      "candidate_id": "hyp_prop_56a3ff42",
+      "confidence": 0.5
+     }
+    },
+    {
+     "event_id": "ev_0777c4",
+     "scan_id": "scan_26db4de6",
+     "timestamp": 1793420486.0862193,
+     "event_type": "request_sent",
+     "phase": "A",
+     "message": "[CONTROL_OWNER] Sending GET http://127.0.0.1:8000/target/projects/proj_43/export as usr_aman_101",
+     "data": {
+      "step_id": "ctrl_exportProjectBilling",
+      "operation_id": "exportProjectBilling",
+      "identity": "usr_aman_101",
+      "method": "GET",
+      "url": "http://127.0.0.1:8000/target/projects/proj_43/export",
+      "headers": {
+       "Authorization": "[REDACTED]"
+      }
+     }
+    },
+    {
+     "event_id": "ev_3e6f9a",
+     "scan_id": "scan_26db4de6",
+     "timestamp": 1793420486.1022863,
+     "event_type": "response_received",
+     "phase": "A",
+     "message": "[CONTROL_OWNER] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43/export (0.98ms)",
+     "data": {
+      "step_id": "ctrl_exportProjectBilling",
+      "operation_id": "exportProjectBilling",
+      "status_code": 200,
+      "duration_ms": 0.98,
+      "headers": {
+       "content-length": "155",
+       "content-type": "application/json"
+      }
+     }
+    },
+    {
+     "event_id": "ev_1cd3d6",
+     "scan_id": "scan_26db4de6",
+     "timestamp": 1793420486.1091547,
+     "event_type": "request_sent",
+     "phase": "B",
+     "message": "[PROBE_ADVERSARY] Sending GET http://127.0.0.1:8000/target/projects/proj_43/export as usr_taaran_202",
+     "data": {
+      "step_id": "probe_exportProjectBilling",
+      "operation_id": "exportProjectBilling",
+      "identity": "usr_taaran_202",
+      "method": "GET",
+      "url": "http://127.0.0.1:8000/target/projects/proj_43/export",
+      "headers": {
+       "Authorization": "[REDACTED]"
+      }
+     }
+    },
+    {
+     "event_id": "ev_e1926f",
+     "scan_id": "scan_26db4de6",
+     "timestamp": 1793420486.1194115,
+     "event_type": "response_received",
+     "phase": "B",
+     "message": "[PROBE_ADVERSARY] Received HTTP 403 for GET http://127.0.0.1:8000/target/projects/proj_43/export (1.28ms)",
+     "data": {
+      "step_id": "probe_exportProjectBilling",
+      "operation_id": "exportProjectBilling",
+      "status_code": 403,
+      "duration_ms": 1.28,
+      "headers": {
+       "content-length": "58",
+       "content-type": "application/json"
+      }
+     }
+    },
+    {
+     "event_id": "ev_292e26",
+     "scan_id": "scan_26db4de6",
+     "timestamp": 1793420486.1253595,
+     "event_type": "probe_denied",
+     "phase": "C",
+     "message": "[VERIFIER] Access denied for unauthorized probe on /projects/{project_id}/export (HTTP 403)",
+     "data": {
+      "operation_id": "exportProjectBilling",
+      "status": "secure",
+      "status_code": 403,
+      "endpoint": "/projects/{project_id}/export"
+     }
+    },
+    {
+     "event_id": "ev_55cddc",
+     "scan_id": "scan_26db4de6",
+     "timestamp": 1793420486.1392045,
+     "event_type": "request_sent",
+     "phase": "A",
+     "message": "[CONTROL_OWNER] Sending GET http://127.0.0.1:8000/target/projects/proj_43/summary as usr_aman_101",
+     "data": {
+      "step_id": "ctrl_getProjectSummary",
+      "operation_id": "getProjectSummary",
+      "identity": "usr_aman_101",
+      "method": "GET",
+      "url": "http://127.0.0.1:8000/target/projects/proj_43/summary",
+      "headers": {
+       "Authorization": "[REDACTED]"
+      }
+     }
+    },
+    {
+     "event_id": "ev_46953b",
+     "scan_id": "scan_26db4de6",
+     "timestamp": 1793420486.1507206,
+     "event_type": "response_received",
+     "phase": "A",
+     "message": "[CONTROL_OWNER] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43/summary (1.78ms)",
+     "data": {
+      "step_id": "ctrl_getProjectSummary",
+      "operation_id": "getProjectSummary",
+      "status_code": 200,
+      "duration_ms": 1.78,
+      "headers": {
+       "content-length": "35",
+       "content-type": "application/json"
+      }
+     }
+    },
+    {
+     "event_id": "ev_1156ec",
+     "scan_id": "scan_26db4de6",
+     "timestamp": 1793420486.170815,
+     "event_type": "request_sent",
+     "phase": "B",
+     "message": "[PROBE_ADVERSARY] Sending GET http://127.0.0.1:8000/target/projects/proj_43/summary as usr_taaran_202",
+     "data": {
+      "step_id": "probe_getProjectSummary",
+      "operation_id": "getProjectSummary",
+      "identity": "usr_taaran_202",
+      "method": "GET",
+      "url": "http://127.0.0.1:8000/target/projects/proj_43/summary",
+      "headers": {
+       "Authorization": "[REDACTED]"
+      }
+     }
+    },
+    {
+     "event_id": "ev_54b8af",
+     "scan_id": "scan_26db4de6",
+     "timestamp": 1793420486.1803217,
+     "event_type": "response_received",
+     "phase": "B",
+     "message": "[PROBE_ADVERSARY] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43/summary (1.1ms)",
+     "data": {
+      "step_id": "probe_getProjectSummary",
+      "operation_id": "getProjectSummary",
+      "status_code": 200,
+      "duration_ms": 1.1,
+      "headers": {
+       "content-length": "2",
+       "content-type": "application/json"
+      }
+     }
+    },
+    {
+     "event_id": "ev_d3a7f9",
+     "scan_id": "scan_26db4de6",
+     "timestamp": 1793420486.1898706,
+     "event_type": "probe_denied",
+     "phase": "C",
+     "message": "[VERIFIER] Trap evaluated on /projects/{project_id}/summary: empty response (no leak)",
+     "data": {
+      "operation_id": "getProjectSummary",
+      "status": "secure_empty_body",
+      "status_code": 200,
+      "endpoint": "/projects/{project_id}/summary"
+     }
+    },
+    {
+     "event_id": "ev_9f07ed",
+     "scan_id": "scan_26db4de6",
+     "timestamp": 1793420486.201243,
+     "event_type": "request_sent",
+     "phase": "A",
+     "message": "[CONTROL_OWNER] Sending GET http://127.0.0.1:8000/target/projects/proj_43/members as usr_aman_101",
+     "data": {
+      "step_id": "ctrl_getProjectMembers",
+      "operation_id": "getProjectMembers",
+      "identity": "usr_aman_101",
+      "method": "GET",
+      "url": "http://127.0.0.1:8000/target/projects/proj_43/members",
+      "headers": {
+       "Authorization": "[REDACTED]"
+      }
+     }
+    },
+    {
+     "event_id": "ev_f47903",
+     "scan_id": "scan_26db4de6",
+     "timestamp": 1793420486.2080948,
+     "event_type": "response_received",
+     "phase": "A",
+     "message": "[CONTROL_OWNER] Received HTTP 404 for GET http://127.0.0.1:8000/target/projects/proj_43/members (0.55ms)",
+     "data": {
+      "step_id": "ctrl_getProjectMembers",
+      "operation_id": "getProjectMembers",
+      "status_code": 404,
+      "duration_ms": 0.55,
+      "headers": {
+       "content-length": "22",
+       "content-type": "application/json"
+      }
+     }
+    },
+    {
+     "event_id": "ev_327e32",
+     "scan_id": "scan_26db4de6",
+     "timestamp": 1793420486.2161427,
+     "event_type": "test_inconclusive",
+     "phase": "B",
+     "message": "control failed (404), test inconclusive",
+     "data": {
+      "operation_id": "getProjectMembers",
+      "status": "inconclusive",
+      "status_code": 404,
+      "endpoint": "/projects/{project_id}/members"
+     }
+    },
+    {
+     "event_id": "ev_9ee082",
+     "scan_id": "scan_26db4de6",
+     "timestamp": 1793420486.2257667,
+     "event_type": "scan_completed",
+     "phase": "C",
+     "message": "[DONE] Audit finished. 0 confirmed vulnerabilities recorded.",
+     "data": {
+      "findings_count": 0
+     }
+    }
+   ],
+   "findings": []
+  },
+  "patched_mut": {
+   "events": [
+    {
+     "event_id": "ev_07b8b4",
+     "scan_id": "scan_af8220e1",
+     "timestamp": 1793420486.2824845,
+     "event_type": "log",
+     "phase": "A",
+     "message": "[AUTH] Successfully acquired dynamic tokens for User A (aman@acme.corp) and User B (taaran@adversary.io)",
+     "data": null
+    },
+    {
+     "event_id": "ev_398b49",
+     "scan_id": "scan_af8220e1",
+     "timestamp": 1793420486.2937124,
+     "event_type": "request_sent",
+     "phase": "A",
+     "message": "[SETUP] Sending POST http://127.0.0.1:8000/target/projects as usr_aman_101",
+     "data": {
+      "step_id": "harvest_createProject",
+      "operation_id": "createProject",
+      "identity": "usr_aman_101",
+      "method": "POST",
+      "url": "http://127.0.0.1:8000/target/projects",
+      "headers": {
+       "Authorization": "[REDACTED]"
+      }
+     }
+    },
+    {
+     "event_id": "ev_d0f552",
+     "scan_id": "scan_af8220e1",
+     "timestamp": 1793420486.3023243,
+     "event_type": "response_received",
+     "phase": "A",
+     "message": "[SETUP] Received HTTP 201 for POST http://127.0.0.1:8000/target/projects (0.94ms)",
+     "data": {
+      "step_id": "harvest_createProject",
+      "operation_id": "createProject",
+      "status_code": 201,
+      "duration_ms": 0.94,
+      "headers": {
+       "content-length": "247",
+       "content-type": "application/json"
+      }
+     }
+    },
+    {
+     "event_id": "ev_7abca8",
+     "scan_id": "scan_af8220e1",
+     "timestamp": 1793420486.3070784,
+     "event_type": "request_sent",
+     "phase": "A",
+     "message": "[CONTROL_OWNER] Sending GET http://127.0.0.1:8000/target/projects/proj_43 as usr_aman_101",
+     "data": {
+      "step_id": "ctrl_getProjectById",
+      "operation_id": "getProjectById",
+      "identity": "usr_aman_101",
+      "method": "GET",
+      "url": "http://127.0.0.1:8000/target/projects/proj_43",
+      "headers": {
+       "Authorization": "[REDACTED]"
+      }
+     }
+    },
+    {
+     "event_id": "ev_6a62e4",
+     "scan_id": "scan_af8220e1",
+     "timestamp": 1793420486.319077,
+     "event_type": "response_received",
+     "phase": "A",
+     "message": "[CONTROL_OWNER] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43 (0.94ms)",
+     "data": {
+      "step_id": "ctrl_getProjectById",
+      "operation_id": "getProjectById",
+      "status_code": 200,
+      "duration_ms": 0.94,
+      "headers": {
+       "content-length": "247",
+       "content-type": "application/json"
+      }
+     }
+    },
+    {
+     "event_id": "ev_070bd6",
+     "scan_id": "scan_af8220e1",
+     "timestamp": 1793420486.3234024,
+     "event_type": "request_sent",
+     "phase": "B",
+     "message": "[PROBE_ADVERSARY] Sending GET http://127.0.0.1:8000/target/projects/proj_43 as usr_taaran_202",
+     "data": {
+      "step_id": "probe_getProjectById",
+      "operation_id": "getProjectById",
+      "identity": "usr_taaran_202",
+      "method": "GET",
+      "url": "http://127.0.0.1:8000/target/projects/proj_43",
+      "headers": {
+       "Authorization": "[REDACTED]"
+      }
+     }
+    },
+    {
+     "event_id": "ev_b50e9a",
+     "scan_id": "scan_af8220e1",
+     "timestamp": 1793420486.3362346,
+     "event_type": "response_received",
+     "phase": "B",
+     "message": "[PROBE_ADVERSARY] Received HTTP 403 for GET http://127.0.0.1:8000/target/projects/proj_43 (0.83ms)",
+     "data": {
+      "step_id": "probe_getProjectById",
+      "operation_id": "getProjectById",
+      "status_code": 403,
+      "duration_ms": 0.83,
+      "headers": {
+       "content-length": "51",
+       "content-type": "application/json"
+      }
+     }
+    },
+    {
+     "event_id": "ev_1c0575",
+     "scan_id": "scan_af8220e1",
+     "timestamp": 1793420486.346094,
+     "event_type": "probe_denied",
+     "phase": "A",
+     "message": "[VERIFIER] Access denied for unauthorized probe on /projects/{project_id} (HTTP 403)",
+     "data": {
+      "operation_id": "getProjectById",
+      "status": "secure",
+      "status_code": 403
+     }
+    },
+    {
+     "event_id": "ev_d01917",
+     "scan_id": "scan_af8220e1",
+     "timestamp": 1793420486.3535554,
+     "event_type": "hypothesis_validated",
+     "phase": "A",
+     "message": "[INFERENCE] Validated rule 'owner_only' on GET /projects/{project_id}",
+     "data": {
+      "hypothesis_id": "hyp_adfcf019",
+      "confidence": 0.85
+     }
+    },
+    {
+     "event_id": "ev_b60b88",
+     "scan_id": "scan_af8220e1",
+     "timestamp": 1793420486.3565154,
+     "event_type": "hypothesis_propagated",
+     "phase": "B",
+     "message": "[PROPAGATION] Propagated candidate ownership rule to exportProjectBilling",
+     "data": {
+      "candidate_id": "hyp_prop_8a835137",
+      "confidence": 0.5
+     }
+    },
+    {
+     "event_id": "ev_b39a49",
+     "scan_id": "scan_af8220e1",
+     "timestamp": 1793420486.364559,
+     "event_type": "hypothesis_propagated",
+     "phase": "B",
+     "message": "[PROPAGATION] Propagated candidate ownership rule to getProjectMembers",
+     "data": {
+      "candidate_id": "hyp_prop_9f6d69be",
+      "confidence": 0.5
+     }
+    },
+    {
+     "event_id": "ev_3578b4",
+     "scan_id": "scan_af8220e1",
+     "timestamp": 1793420486.3729572,
+     "event_type": "hypothesis_propagated",
+     "phase": "B",
+     "message": "[PROPAGATION] Propagated candidate ownership rule to getProjectSummary",
+     "data": {
+      "candidate_id": "hyp_prop_1f123894",
+      "confidence": 0.5
+     }
+    },
+    {
+     "event_id": "ev_dc6225",
+     "scan_id": "scan_af8220e1",
+     "timestamp": 1793420486.3850083,
+     "event_type": "request_sent",
+     "phase": "A",
+     "message": "[CONTROL_OWNER] Sending GET http://127.0.0.1:8000/target/projects/proj_43/export as usr_aman_101",
+     "data": {
+      "step_id": "ctrl_exportProjectBilling",
+      "operation_id": "exportProjectBilling",
+      "identity": "usr_aman_101",
+      "method": "GET",
+      "url": "http://127.0.0.1:8000/target/projects/proj_43/export",
+      "headers": {
+       "Authorization": "[REDACTED]"
+      }
+     }
+    },
+    {
+     "event_id": "ev_33bcc1",
+     "scan_id": "scan_af8220e1",
+     "timestamp": 1793420486.3894405,
+     "event_type": "response_received",
+     "phase": "A",
+     "message": "[CONTROL_OWNER] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43/export (0.84ms)",
+     "data": {
+      "step_id": "ctrl_exportProjectBilling",
+      "operation_id": "exportProjectBilling",
+      "status_code": 200,
+      "duration_ms": 0.84,
+      "headers": {
+       "content-length": "155",
+       "content-type": "application/json"
+      }
+     }
+    },
+    {
+     "event_id": "ev_0de75d",
+     "scan_id": "scan_af8220e1",
+     "timestamp": 1793420486.4009185,
+     "event_type": "request_sent",
+     "phase": "B",
+     "message": "[PROBE_ADVERSARY] Sending GET http://127.0.0.1:8000/target/projects/proj_43/export as usr_taaran_202",
+     "data": {
+      "step_id": "probe_exportProjectBilling",
+      "operation_id": "exportProjectBilling",
+      "identity": "usr_taaran_202",
+      "method": "GET",
+      "url": "http://127.0.0.1:8000/target/projects/proj_43/export",
+      "headers": {
+       "Authorization": "[REDACTED]"
+      }
+     }
+    },
+    {
+     "event_id": "ev_9d0fbd",
+     "scan_id": "scan_af8220e1",
+     "timestamp": 1793420486.4101238,
+     "event_type": "response_received",
+     "phase": "B",
+     "message": "[PROBE_ADVERSARY] Received HTTP 403 for GET http://127.0.0.1:8000/target/projects/proj_43/export (1.16ms)",
+     "data": {
+      "step_id": "probe_exportProjectBilling",
+      "operation_id": "exportProjectBilling",
+      "status_code": 403,
+      "duration_ms": 1.16,
+      "headers": {
+       "content-length": "58",
+       "content-type": "application/json"
+      }
+     }
+    },
+    {
+     "event_id": "ev_3bff10",
+     "scan_id": "scan_af8220e1",
+     "timestamp": 1793420486.4220774,
+     "event_type": "probe_denied",
+     "phase": "C",
+     "message": "[VERIFIER] Access denied for unauthorized probe on /projects/{project_id}/export (HTTP 403)",
+     "data": {
+      "operation_id": "exportProjectBilling",
+      "status": "secure",
+      "status_code": 403,
+      "endpoint": "/projects/{project_id}/export"
+     }
+    },
+    {
+     "event_id": "ev_42263b",
+     "scan_id": "scan_af8220e1",
+     "timestamp": 1793420486.4336665,
+     "event_type": "request_sent",
+     "phase": "A",
+     "message": "[CONTROL_OWNER] Sending GET http://127.0.0.1:8000/target/projects/proj_43/summary as usr_aman_101",
+     "data": {
+      "step_id": "ctrl_getProjectSummary",
+      "operation_id": "getProjectSummary",
+      "identity": "usr_aman_101",
+      "method": "GET",
+      "url": "http://127.0.0.1:8000/target/projects/proj_43/summary",
+      "headers": {
+       "Authorization": "[REDACTED]"
+      }
+     }
+    },
+    {
+     "event_id": "ev_0968e9",
+     "scan_id": "scan_af8220e1",
+     "timestamp": 1793420486.4474163,
+     "event_type": "response_received",
+     "phase": "A",
+     "message": "[CONTROL_OWNER] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43/summary (1.0ms)",
+     "data": {
+      "step_id": "ctrl_getProjectSummary",
+      "operation_id": "getProjectSummary",
+      "status_code": 200,
+      "duration_ms": 1.0,
+      "headers": {
+       "content-length": "35",
+       "content-type": "application/json"
+      }
+     }
+    },
+    {
+     "event_id": "ev_31d55f",
+     "scan_id": "scan_af8220e1",
+     "timestamp": 1793420486.4576852,
+     "event_type": "request_sent",
+     "phase": "B",
+     "message": "[PROBE_ADVERSARY] Sending GET http://127.0.0.1:8000/target/projects/proj_43/summary as usr_taaran_202",
+     "data": {
+      "step_id": "probe_getProjectSummary",
+      "operation_id": "getProjectSummary",
+      "identity": "usr_taaran_202",
+      "method": "GET",
+      "url": "http://127.0.0.1:8000/target/projects/proj_43/summary",
+      "headers": {
+       "Authorization": "[REDACTED]"
+      }
+     }
+    },
+    {
+     "event_id": "ev_0d88a1",
+     "scan_id": "scan_af8220e1",
+     "timestamp": 1793420486.4693193,
+     "event_type": "response_received",
+     "phase": "B",
+     "message": "[PROBE_ADVERSARY] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43/summary (1.11ms)",
+     "data": {
+      "step_id": "probe_getProjectSummary",
+      "operation_id": "getProjectSummary",
+      "status_code": 200,
+      "duration_ms": 1.11,
+      "headers": {
+       "content-length": "2",
+       "content-type": "application/json"
+      }
+     }
+    },
+    {
+     "event_id": "ev_e951ac",
+     "scan_id": "scan_af8220e1",
+     "timestamp": 1793420486.4830446,
+     "event_type": "probe_denied",
+     "phase": "C",
+     "message": "[VERIFIER] Trap evaluated on /projects/{project_id}/summary: empty response (no leak)",
+     "data": {
+      "operation_id": "getProjectSummary",
+      "status": "secure_empty_body",
+      "status_code": 200,
+      "endpoint": "/projects/{project_id}/summary"
+     }
+    },
+    {
+     "event_id": "ev_865cc6",
+     "scan_id": "scan_af8220e1",
+     "timestamp": 1793420486.4911852,
+     "event_type": "request_sent",
+     "phase": "A",
+     "message": "[CONTROL_OWNER] Sending GET http://127.0.0.1:8000/target/projects/proj_43/members as usr_aman_101",
+     "data": {
+      "step_id": "ctrl_getProjectMembers",
+      "operation_id": "getProjectMembers",
+      "identity": "usr_aman_101",
+      "method": "GET",
+      "url": "http://127.0.0.1:8000/target/projects/proj_43/members",
+      "headers": {
+       "Authorization": "[REDACTED]"
+      }
+     }
+    },
+    {
+     "event_id": "ev_5d06b0",
+     "scan_id": "scan_af8220e1",
+     "timestamp": 1793420486.5009747,
+     "event_type": "response_received",
+     "phase": "A",
+     "message": "[CONTROL_OWNER] Received HTTP 404 for GET http://127.0.0.1:8000/target/projects/proj_43/members (0.43ms)",
+     "data": {
+      "step_id": "ctrl_getProjectMembers",
+      "operation_id": "getProjectMembers",
+      "status_code": 404,
+      "duration_ms": 0.43,
+      "headers": {
+       "content-length": "22",
+       "content-type": "application/json"
+      }
+     }
+    },
+    {
+     "event_id": "ev_3e6cbb",
+     "scan_id": "scan_af8220e1",
+     "timestamp": 1793420486.5086432,
+     "event_type": "test_inconclusive",
+     "phase": "B",
+     "message": "control failed (404), test inconclusive",
+     "data": {
+      "operation_id": "getProjectMembers",
+      "status": "inconclusive",
+      "status_code": 404,
+      "endpoint": "/projects/{project_id}/members"
+     }
+    },
+    {
+     "event_id": "ev_69382f",
+     "scan_id": "scan_af8220e1",
+     "timestamp": 1793420486.5179777,
+     "event_type": "request_sent",
+     "phase": "A",
+     "message": "[CONTROL_OWNER] Sending PATCH http://127.0.0.1:8000/target/projects/proj_43 as usr_aman_101",
+     "data": {
+      "step_id": "ctrl_updateProject",
+      "operation_id": "updateProject",
+      "identity": "usr_aman_101",
+      "method": "PATCH",
+      "url": "http://127.0.0.1:8000/target/projects/proj_43",
+      "headers": {
+       "Authorization": "[REDACTED]"
+      }
+     }
+    },
+    {
+     "event_id": "ev_e991ae",
+     "scan_id": "scan_af8220e1",
+     "timestamp": 1793420486.5276852,
+     "event_type": "response_received",
+     "phase": "A",
+     "message": "[CONTROL_OWNER] Received HTTP 200 for PATCH http://127.0.0.1:8000/target/projects/proj_43 (1.05ms)",
+     "data": {
+      "step_id": "ctrl_updateProject",
+      "operation_id": "updateProject",
+      "status_code": 200,
+      "duration_ms": 1.05,
+      "headers": {
+       "content-length": "236",
+       "content-type": "application/json"
+      }
+     }
+    },
+    {
+     "event_id": "ev_c21cc3",
+     "scan_id": "scan_af8220e1",
+     "timestamp": 1793420486.5347366,
+     "event_type": "request_sent",
+     "phase": "B",
+     "message": "[PROBE_ADVERSARY] Sending PATCH http://127.0.0.1:8000/target/projects/proj_43 as usr_taaran_202",
+     "data": {
+      "step_id": "probe_updateProject",
+      "operation_id": "updateProject",
+      "identity": "usr_taaran_202",
+      "method": "PATCH",
+      "url": "http://127.0.0.1:8000/target/projects/proj_43",
+      "headers": {
+       "Authorization": "[REDACTED]"
+      }
+     }
+    },
+    {
+     "event_id": "ev_bf789c",
+     "scan_id": "scan_af8220e1",
+     "timestamp": 1793420486.5430722,
+     "event_type": "response_received",
+     "phase": "B",
+     "message": "[PROBE_ADVERSARY] Received HTTP 403 for PATCH http://127.0.0.1:8000/target/projects/proj_43 (1.03ms)",
+     "data": {
+      "step_id": "probe_updateProject",
+      "operation_id": "updateProject",
+      "status_code": 403,
+      "duration_ms": 1.03,
+      "headers": {
+       "content-length": "60",
+       "content-type": "application/json"
+      }
+     }
+    },
+    {
+     "event_id": "ev_fa1566",
+     "scan_id": "scan_af8220e1",
+     "timestamp": 1793420486.551146,
+     "event_type": "probe_denied",
+     "phase": "C",
+     "message": "[VERIFIER] Access denied for unauthorized probe on /projects/{project_id} (HTTP 403)",
+     "data": {
+      "operation_id": "updateProject",
+      "status": "secure",
+      "status_code": 403,
+      "endpoint": "/projects/{project_id}"
+     }
+    },
+    {
+     "event_id": "ev_f5194f",
+     "scan_id": "scan_af8220e1",
+     "timestamp": 1793420486.5593307,
+     "event_type": "request_sent",
+     "phase": "A",
+     "message": "[SETUP] Sending POST http://127.0.0.1:8000/target/projects as usr_aman_101",
+     "data": {
+      "step_id": "disp_del_setup_1c69",
+      "operation_id": "createProject",
+      "identity": "usr_aman_101",
+      "method": "POST",
+      "url": "http://127.0.0.1:8000/target/projects",
+      "headers": {
+       "Authorization": "[REDACTED]"
+      }
+     }
+    },
+    {
+     "event_id": "ev_d227d0",
+     "scan_id": "scan_af8220e1",
+     "timestamp": 1793420486.567558,
+     "event_type": "response_received",
+     "phase": "A",
+     "message": "[SETUP] Received HTTP 201 for POST http://127.0.0.1:8000/target/projects (0.77ms)",
+     "data": {
+      "step_id": "disp_del_setup_1c69",
+      "operation_id": "createProject",
+      "status_code": 201,
+      "duration_ms": 0.77,
+      "headers": {
+       "content-length": "233",
+       "content-type": "application/json"
+      }
+     }
+    },
+    {
+     "event_id": "ev_af77cc",
+     "scan_id": "scan_af8220e1",
+     "timestamp": 1793420486.5755966,
+     "event_type": "request_sent",
+     "phase": "B",
+     "message": "[PROBE_ADVERSARY] Sending DELETE http://127.0.0.1:8000/target/projects/proj_44 as usr_taaran_202",
+     "data": {
+      "step_id": "probe_del_proj_44",
+      "operation_id": "deleteProject",
+      "identity": "usr_taaran_202",
+      "method": "DELETE",
+      "url": "http://127.0.0.1:8000/target/projects/proj_44",
+      "headers": {
+       "Authorization": "[REDACTED]"
+      }
+     }
+    },
+    {
+     "event_id": "ev_56093b",
+     "scan_id": "scan_af8220e1",
+     "timestamp": 1793420486.5839136,
+     "event_type": "response_received",
+     "phase": "B",
+     "message": "[PROBE_ADVERSARY] Received HTTP 403 for DELETE http://127.0.0.1:8000/target/projects/proj_44 (0.97ms)",
+     "data": {
+      "step_id": "probe_del_proj_44",
+      "operation_id": "deleteProject",
+      "status_code": 403,
+      "duration_ms": 0.97,
+      "headers": {
+       "content-length": "45",
+       "content-type": "application/json"
+      }
+     }
+    },
+    {
+     "event_id": "ev_776f7a",
+     "scan_id": "scan_af8220e1",
+     "timestamp": 1793420486.5923235,
+     "event_type": "request_sent",
+     "phase": "A",
+     "message": "[CONTROL_OWNER] Sending DELETE http://127.0.0.1:8000/target/projects/proj_44 as usr_aman_101",
+     "data": {
+      "step_id": "ctrl_del_proj_44",
+      "operation_id": "deleteProject",
+      "identity": "usr_aman_101",
+      "method": "DELETE",
+      "url": "http://127.0.0.1:8000/target/projects/proj_44",
+      "headers": {
+       "Authorization": "[REDACTED]"
+      }
+     }
+    },
+    {
+     "event_id": "ev_99169b",
+     "scan_id": "scan_af8220e1",
+     "timestamp": 1793420486.6006284,
+     "event_type": "response_received",
+     "phase": "A",
+     "message": "[CONTROL_OWNER] Received HTTP 200 for DELETE http://127.0.0.1:8000/target/projects/proj_44 (0.85ms)",
+     "data": {
+      "step_id": "ctrl_del_proj_44",
+      "operation_id": "deleteProject",
+      "status_code": 200,
+      "duration_ms": 0.85,
+      "headers": {
+       "content-length": "35",
+       "content-type": "application/json"
+      }
+     }
+    },
+    {
+     "event_id": "ev_2c357a",
+     "scan_id": "scan_af8220e1",
+     "timestamp": 1793420486.6088822,
+     "event_type": "probe_denied",
+     "phase": "C",
+     "message": "[VERIFIER] Access denied for unauthorized DELETE on /projects/{project_id} (HTTP 403); cleanup succeeded",
+     "data": {
+      "operation_id": "deleteProject",
+      "status": "secure",
+      "status_code": 403
+     }
+    },
+    {
+     "event_id": "ev_b137a7",
+     "scan_id": "scan_af8220e1",
+     "timestamp": 1793420486.616957,
+     "event_type": "scan_completed",
+     "phase": "C",
+     "message": "[DONE] Audit finished. 0 confirmed vulnerabilities recorded.",
+     "data": {
+      "findings_count": 0
+     }
+    }
+   ],
+   "findings": []
+  }
+ },
+ "remediation": {
+  "id": "rem_70e17d8b",
+  "finding_id": "fnd_bola_5c4069",
+  "timestamp": 1793420486.6395378,
+  "endpoint": "/projects/{project_id}/export",
+  "source": "offline_template",
+  "provider": "offline",
+  "model": "Offline template",
+  "badge_text": "Offline template (illustrative, not model output)",
+  "v1_prompt": "Fix this BOLA security bug in our API: endpoint GET /projects/{project_id}/export allows unauthorized users to read data.",
+  "v1_output": "# [Illustrative template, not model output]\n# Common pitfall: Authentication-only check (fails to verify tenant resource ownership)\n\n@app.get(\"/projects/{project_id}/export\")\ndef export_project_billing(project_id: str, current_user: User = Depends(get_current_user)):\n    # Vulnerable: Only verifies that caller is authenticated, not that they own Project\n    if not current_user:\n        raise HTTPException(status_code=401, detail=\"Unauthorized\")\n    return execute_export(project_id)\n",
+  "v2_prompt": "Context: Graph-Guided BOLA Engine detected authorization defect on GET /projects/{project_id}/export.\nResource: Project. Leaked owner-specific fields: owner_email, financial_payload.budget, financial_payload.billing.\nGenerate a secure FastAPI route fix verifying that the authenticated user owns Project or possesses role 'admin', and provide a pytest unit test.",
+  "v2_output": "# [Illustrative template, not model output]\n# Reference fix: Resource-level owner verification\n\n@app.get(\"/projects/{project_id}/export\")\ndef export_project_billing(project_id: str, current_user: User = Depends(get_current_user)):\n    # 1. Fetch parent resource and verify existence\n    project = get_project_or_404(project_id)\n\n    # 2. Enforce Graph-Inferred Owner-Only Authorization Policy\n    if project.owner_id != current_user.id and current_user.role != \"admin\":\n        raise HTTPException(\n            status_code=status.HTTP_403_FORBIDDEN,\n            detail=\"Access forbidden: you do not have permission to access this resource\"\n        )\n\n    # 3. Authorized access allowed\n    return execute_authorized_export(project)\n\n\n# Verification Test:\ndef test_bola_remediation_blocked():\n    # Verify unauthorized identity is rejected with HTTP 403 Forbidden\n    client = TestClient(app)\n    response = client.get(\n        \"/projects/proj_42/export\",\n        headers={\"Authorization\": \"Bearer \" + taaran_token}\n    )\n    assert response.status_code == 403\n    assert \"forbidden\" in response.json().get(\"detail\", \"\").lower()\n",
+  "code_patch": "# [Illustrative template, not model output]\n# Reference fix: Resource-level owner verification\n\n@app.get(\"/projects/{project_id}/export\")\ndef export_project_billing(project_id: str, current_user: User = Depends(get_current_user)):\n    # 1. Fetch parent resource and verify existence\n    project = get_project_or_404(project_id)\n\n    # 2. Enforce Graph-Inferred Owner-Only Authorization Policy\n    if project.owner_id != current_user.id and current_user.role != \"admin\":\n        raise HTTPException(\n            status_code=status.HTTP_403_FORBIDDEN,\n            detail=\"Access forbidden: you do not have permission to access this resource\"\n        )\n\n    # 3. Authorized access allowed\n    return execute_authorized_export(project)\n",
+  "explanation": "The target endpoint /projects/{project_id}/export failed to check ownership. In the parent endpoint, GET /projects/{project_id} checked owner_id. The fix propagates this ownership check to ensure only the resource owner (or an administrator) can access /projects/{project_id}/export.",
+  "unit_test": "def test_bola_remediation_blocked():\n    # Verify unauthorized identity is rejected with HTTP 403 Forbidden\n    client = TestClient(app)\n    response = client.get(\n        \"/projects/proj_42/export\",\n        headers={\"Authorization\": \"Bearer \" + taaran_token}\n    )\n    assert response.status_code == 403\n    assert \"forbidden\" in response.json().get(\"detail\", \"\").lower()\n",
+  "error_reason": "Neither OPENROUTER_API_KEY nor GEMINI_API_KEY configured in backend/.env",
+  "is_real": 0
+ }
+}

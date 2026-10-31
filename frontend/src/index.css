@@ -266,3 +266,8 @@ input[type="checkbox"]:checked::after { content: ""; width: 8px; height: 8px; ba
   background: rgba(12, 10, 8, .6);
   box-shadow: inset 0 0 0 1px rgba(212, 168, 67, .1);
 }
+
+/* On narrow screens the panels stack over the tree, so let it recede */
+@media (max-width: 1023px) {
+  .grace-backdrop .erdtree { opacity: calc(var(--tree-o) * .45); }
+}

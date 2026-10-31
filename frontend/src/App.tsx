@@ -26,7 +26,7 @@ import { GuidedDemoModal } from './components/GuidedDemoModal';
 import { AuditReportModal } from './components/AuditReportModal';
 import { GraceBackdrop } from './components/GraceBackdrop';
 import type { Finding, DryRunResponse } from './types';
-import { apiClient } from './api/client';
+import { apiClient, IS_DEMO } from './api/client';
 
 const TARGET_LABEL = '127.0.0.1:8000';
 
@@ -415,7 +415,7 @@ export default function App() {
           <span className={`w-2 h-2 ${modelOk ? 'bg-emerald-400' : modelWarn ? 'bg-amber-400' : 'bg-slate-500'}`} />
           <span className={modelOk ? 'text-emerald-400' : modelWarn ? 'text-amber-400' : ''}>{modelStatusText}</span>
         </span>
-        <span>Press D for the guided demo</span>
+        <span>{IS_DEMO ? 'Hosted demo: replays a recorded run of the real engine' : 'Press D for the guided demo'}</span>
       </footer>
 
     </div>

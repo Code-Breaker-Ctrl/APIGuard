@@ -1,6 +1,7 @@
+import { demoClient } from '../demo/demoClient';
 import type { GraphResponse, Finding, ScanEvent, BenchmarkData, IdentityInfo, DryRunResponse, RemediationResponse, RemediationStatus } from '../types';
 
-export const apiClient = {
+const liveClient = {
   async getHealth(): Promise<{ status: string }> {
     const res = await fetch('/api/health');
     if (!res.ok) throw new Error(`Health check failed: HTTP ${res.status}`);
@@ -158,3 +159,8 @@ export const apiClient = {
     return res.json();
   }
 };
+
+/** True in the hosted GitHub Pages build (VITE_DEMO=1): replays recorded engine runs, no backend. */
+export const IS_DEMO = import.meta.env.VITE_DEMO === '1';
+
+export const apiClient: typeof liveClient = IS_DEMO ? demoClient : liveClient;

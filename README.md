@@ -28,6 +28,16 @@ Most DAST scanners test endpoints in isolation: they fuzz parameters, receive `4
 
 ---
 
+## 🌐 Live Demo
+
+**https://code-breaker-ctrl.github.io/APIGuard/**
+
+The hosted site is a static build with no backend, so it **replays recorded runs of the real engine** (graph, event stream, findings, dry-run plan and benchmark numbers are all genuine engine output captured by [`scripts/record_demo.py`](scripts/record_demo.py)). The footer says so on every page. Importing your own spec and calling a live model need the local backend; see *Setup & Quick Start* below.
+
+Re-record after changing the engine: `python scripts/record_demo.py`. The site redeploys on every push to `main` via `.github/workflows/pages.yml`.
+
+---
+
 ## 📸 Demo Screenshots (Real Captured Execution)
 
 | Screen | Description |

@@ -29,7 +29,7 @@ import { HeroBanner, MiniBrand } from './components/HeroBanner';
 import type { Finding, DryRunResponse } from './types';
 import { apiClient, IS_DEMO } from './api/client';
 
-const TARGET_LABEL = '127.0.0.1:8000';
+
 
 export default function App() {
   const { nodes, edges, isLoading: isGraphLoading, importSpec, loadGraph } = useGraph();
@@ -247,7 +247,7 @@ export default function App() {
           <button className="btn-ghost" aria-pressed={enableMutations} onClick={() => setEnableMutations(!enableMutations)} title="Allow PATCH / DELETE probes">
             Mutations
           </button>
-          <span className="hidden xl:inline text-sm text-slate-400">target {TARGET_LABEL}</span>
+
         </div>
 
         <div className="flex items-center gap-2">

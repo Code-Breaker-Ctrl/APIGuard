@@ -61,6 +61,8 @@ async def run_benchmark(
         total_gt = 0
         total_graph_confirmed = 0
         total_base_confirmed = 0
+        total_graph_tp = 0
+        total_base_tp = 0
         total_graph_requests = 0
         total_base_requests = 0
 
@@ -103,6 +105,8 @@ async def run_benchmark(
 
             total_graph_confirmed += len(graph_findings)
             total_base_confirmed += len(base_findings)
+            total_graph_tp += g_tp
+            total_base_tp += b_tp
             total_graph_requests += graph_exec.requests_sent
             total_base_requests += base_exec.requests_sent
 
@@ -148,26 +152,37 @@ async def run_benchmark(
         oracle_findings = await oracle_scanner.scan_operations(operations, user_a, user_b, enable_mutations=True, client=client)
         t_oracle = round((time.perf_counter() - t_o0) * 1000, 1)
 
+        gt_b = load_manifest("variant_b").get("vulnerable_endpoints", [])
+
+        def _ablation_metrics(findings):
+            tp = len([f for f in findings if any(v["endpoint"] == f.endpoint for v in gt_b)])
+            recall = round(tp / len(gt_b), 2) if gt_b else None
+            precision = round(tp / len(findings), 2) if findings else (1.0 if not gt_b else 0.0)
+            return recall, precision
+
+        np_recall, np_precision = _ablation_metrics(no_prop_findings)
+        or_recall, or_precision = _ablation_metrics(oracle_findings)
+
         ablations = {
             "propagation_off_on_variant_b": {
                 "name": "Graph Scanner with Rule Propagation OFF",
-                "ground_truth": 1,
+                "ground_truth": len(gt_b),
                 "confirmed": len(no_prop_findings),
-                "recall": 0.0,
-                "precision": 0.0,
+                "recall": np_recall,
+                "precision": np_precision,
                 "requests": no_prop_exec.requests_sent,
                 "duration_ms": t_no_prop,
-                "note": "In our ablation, disabling propagation missed the indirect defect (1 defect, 1 target API)."
+                "note": "Measured: scanner run with rule propagation disabled on the Defect B variant."
             },
             "oracle_baseline_on_variant_b": {
                 "name": "Oracle Baseline (Manual Rules Hand-Tagged for Every Route)",
-                "ground_truth": 1,
+                "ground_truth": len(gt_b),
                 "confirmed": len(oracle_findings),
-                "recall": 1.0,
-                "precision": 1.0,
+                "recall": or_recall,
+                "precision": or_precision,
                 "requests": oracle_exec.requests_sent,
                 "duration_ms": t_oracle,
-                "note": "Matches graph performance only when humans manually declare rules for all endpoints."
+                "note": "Measured: baseline given a hand-written ownership rule for every route."
             }
         }
 
@@ -183,13 +198,13 @@ async def run_benchmark(
                 "graph_guided": {
                     "total_confirmed": total_graph_confirmed,
                     "total_ground_truth": total_gt,
-                    "aggregate_recall": round(total_graph_confirmed / total_gt, 2) if total_gt else 1.0,
+                    "aggregate_recall": round(total_graph_tp / total_gt, 2) if total_gt else 1.0,
                     "requests_per_finding": round(total_graph_requests / total_graph_confirmed, 1) if total_graph_confirmed else 0
                 },
                 "baseline": {
                     "total_confirmed": total_base_confirmed,
                     "total_ground_truth": total_gt,
-                    "aggregate_recall": round(total_base_confirmed / total_gt, 2) if total_gt else 1.0,
+                    "aggregate_recall": round(total_base_tp / total_gt, 2) if total_gt else 1.0,
                     "requests_per_finding": round(total_base_requests / total_base_confirmed, 1) if total_base_confirmed else 0
                 }
             },
@@ -202,6 +217,9 @@ async def run_benchmark(
             json.dump(summary, f, indent=2)
 
         # Write markdown report
+        def _pct(v):
+            return f"{int(v * 100)}%" if v is not None else "n/a"
+
         md_lines = [
             "# APIGuard Benchmark Results",
             f"*Measured automatically on {summary['timestamp']} against target: `{base_url}`*",
@@ -229,14 +247,14 @@ async def run_benchmark(
             "## Ablations (Measured on Defect B Variant)",
             "| Configuration | Confirmed | Recall | Precision | Requests | Notes |",
             "| :--- | :---: | :---: | :---: | :---: | :--- |",
-            f"| **APIGuard (Propagation ON)** | **1** | **100%** | **100%** | {variant_results['variant_b']['graph_guided']['requests']} | Full Graph-Guided Scanner |",
-            f"| **Ablation: Propagation OFF** | **0** | **0%** | **0%** | {no_prop_exec.requests_sent} | Disabling rule propagation causes scanner to miss Defect B entirely |",
-            f"| **Ablation: Oracle Baseline** | **1** | **100%** | **100%** | {oracle_exec.requests_sent} | Baseline matches graph only with manual rule specification for every route |",
+            f"| **APIGuard (Propagation ON)** | {variant_results['variant_b']['graph_guided']['confirmed']} | {_pct(variant_results['variant_b']['graph_guided']['recall'])} | {_pct(variant_results['variant_b']['graph_guided']['precision'])} | {variant_results['variant_b']['graph_guided']['requests']} | Full Graph-Guided Scanner |",
+            f"| **Ablation: Propagation OFF** | {len(no_prop_findings)} | {_pct(np_recall)} | {_pct(np_precision)} | {no_prop_exec.requests_sent} | Rule propagation disabled |",
+            f"| **Ablation: Oracle Baseline** | {len(oracle_findings)} | {_pct(or_recall)} | {_pct(or_precision)} | {oracle_exec.requests_sent} | Baseline with a manual rule for every route |",
             "",
             "## Key Takeaways",
             "- **Defect B (Variant `variant_b`):** APIGuard achieves **100% recall** by propagating ownership rules to graph-adjacent operations. Baseline achieves **0% recall** because it evaluates `/export` without DAG context.",
             "- **Zero False Positives:** In `variant_secure`, APIGuard maintains **100% precision** with 0 false positives.",
-            "- **Ablation:** In our ablation, disabling propagation missed the indirect defect (1 defect, 1 target API)."
+            "- **Ablation:** See the ablation table above; all values are measured in this run."
         ])
 
         with open(os.path.join(BENCHMARKS_DIR, "results.md"), "w", encoding="utf-8") as f:

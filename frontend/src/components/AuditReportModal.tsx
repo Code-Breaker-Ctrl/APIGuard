@@ -23,6 +23,26 @@ interface AuditReportModalProps {
   isTargetPatched?: boolean;
 }
 
+// Finding fields originate from the imported spec and target responses, so treat them as untrusted.
+const escapeHtml = (value: unknown): string =>
+  String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+
+// Keeps a value safe inside a single-line Markdown inline-code span.
+const mdInline = (value: unknown): string =>
+  String(value ?? '').replace(/[`\r\n]/g, ' ');
+
+// Keeps a value from closing a fenced code block early.
+const mdFenced = (value: unknown): string =>
+  String(value ?? '').replace(/```/g, "'''");
+
+const toIdentifier = (value: unknown): string =>
+  String(value ?? 'resource').replace(/[^a-zA-Z0-9_]/g, '_').toLowerCase();
+
 export const AuditReportModal: React.FC<AuditReportModalProps> = ({
   isOpen,
   onClose,
@@ -45,7 +65,7 @@ export const AuditReportModal: React.FC<AuditReportModalProps> = ({
 
     lines.push('# 🛡️ APIGuard Security Assessment & BOLA Audit Report\n');
     lines.push(`**Generated At:** ${reportDate}`);
-    lines.push(`**Target Host:** \`${targetUrl}\``);
+    lines.push(`**Target Host:** \`${mdInline(targetUrl)}\``);
     lines.push(`**Testing Methodology:** Resource Graph-Guided Multi-Identity Differential Testing`);
     lines.push(`**Vulnerability Class:** OWASP API Security Top 10 — API1:2023 (Broken Object Level Authorization / BOLA)\n`);
     lines.push('---\n');
@@ -69,26 +89,27 @@ export const AuditReportModal: React.FC<AuditReportModalProps> = ({
       lines.push('The following endpoints were confirmed to return sensitive victim data when probed by an unauthorized attacker identity:\n');
 
       findings.forEach((f, idx) => {
-        lines.push(`### Finding #${idx + 1}: BOLA on \`${f.method} ${f.endpoint}\``);
-        lines.push(`- **Severity:** **${f.severity}** (CVSS: 8.5)`);
-        lines.push(`- **Resource Type:** \`${f.resource_type}\``);
-        lines.push(`- **Victim Identity (Owner):** \`${f.identities.owner}\``);
-        lines.push(`- **Attacker Identity (Probe):** \`${f.identities.probe}\``);
-        lines.push(`- **Leaked Tenant Attributes:** \`${f.diff_fields.length > 0 ? f.diff_fields.join('`, `') : 'Direct Access to Private Resource'}\``);
-        lines.push(`- **Propagation Hypothesis:** ${f.hypothesis.rule.rule_type} on \`${f.hypothesis.operation_id}\` (Confidence: ${(f.hypothesis.confidence * 100).toFixed(0)}%)`);
-        lines.push(`- **Graph Dependency Path:** \`${f.graph_path.join(' ➔ ')}\`\n`);
+        const resId = toIdentifier(f.resource_type);
+        lines.push(`### Finding #${idx + 1}: BOLA on \`${mdInline(f.method)} ${mdInline(f.endpoint)}\``);
+        lines.push(`- **Severity:** **${mdInline(f.severity)}** (CVSS: 8.5)`);
+        lines.push(`- **Resource Type:** \`${mdInline(f.resource_type)}\``);
+        lines.push(`- **Victim Identity (Owner):** \`${mdInline(f.identities.owner)}\``);
+        lines.push(`- **Attacker Identity (Probe):** \`${mdInline(f.identities.probe)}\``);
+        lines.push(`- **Leaked Tenant Attributes:** \`${f.diff_fields.length > 0 ? f.diff_fields.map(mdInline).join('`, `') : 'Direct Access to Private Resource'}\``);
+        lines.push(`- **Propagation Hypothesis:** ${mdInline(f.hypothesis.rule.rule_type)} on \`${mdInline(f.hypothesis.operation_id)}\` (Confidence: ${(f.hypothesis.confidence * 100).toFixed(0)}%)`);
+        lines.push(`- **Graph Dependency Path:** \`${f.graph_path.map(mdInline).join(' ➔ ')}\`\n`);
 
         lines.push('**Reproduction cURL:**');
         lines.push('```bash');
-        lines.push(f.repro_curl);
+        lines.push(mdFenced(f.repro_curl));
         lines.push('```\n');
 
         lines.push('**Surgical Remediation Recommendation:**');
         lines.push('Implement explicit object-level tenant validation in the route handler:');
         lines.push('```python');
         lines.push('# FastAPI Dependency Enforcement');
-        lines.push(`async def verify_${f.resource_type}_owner(${f.resource_type}_id: str, current_user: User = Depends(get_current_user)):`);
-        lines.push(`    item = await db.get_${f.resource_type}(${f.resource_type}_id)`);
+        lines.push(`async def verify_${resId}_owner(${resId}_id: str, current_user: User = Depends(get_current_user)):`);
+        lines.push(`    item = await db.get_${resId}(${resId}_id)`);
         lines.push(`    if not item or item.owner_id != current_user.id:`);
         lines.push(`        raise HTTPException(status_code=403, detail="Access forbidden: Insufficient object permissions")`);
         lines.push('    return item');
@@ -167,7 +188,7 @@ export const AuditReportModal: React.FC<AuditReportModalProps> = ({
       <button class="print-btn no-print" onclick="window.print()">Print / Save as PDF</button>
       <div class="brand">API<span>Guard</span></div>
       <div class="title">BOLA Security Assessment & Pentest Report</div>
-      <div class="meta">Generated: ${reportDate} | Target: ${targetUrl} | Standard: OWASP API Security Top 10 (API #1)</div>
+      <div class="meta">Generated: ${reportDate} | Target: ${escapeHtml(targetUrl)} | Standard: OWASP API Security Top 10 (API #1)</div>
     </div>
 
     <div class="card">
@@ -182,7 +203,7 @@ export const AuditReportModal: React.FC<AuditReportModalProps> = ({
       </div>
       <table>
         <tr><th>Metric</th><th>Observed Value</th></tr>
-        <tr><td>Target Base URL</td><td><code>${targetUrl}</code></td></tr>
+        <tr><td>Target Base URL</td><td><code>${escapeHtml(targetUrl)}</code></td></tr>
         <tr><td>OpenAPI Operations Ingested</td><td>${nodeCount} routes</td></tr>
         <tr><td>Dependency Graph Edges</td><td>${edgeCount} relationships</td></tr>
         <tr><td>Identities Tested</td><td>User A (Owner) vs User B (Unauthorized Attacker)</td></tr>
@@ -202,19 +223,19 @@ export const AuditReportModal: React.FC<AuditReportModalProps> = ({
       <div class="card" style="border-left: 4px solid var(--danger);">
         <div style="display:flex; justify-content:space-between; align-items:center;">
           <h4 style="margin:0; font-size:15px; color:#ffffff;">
-            Finding #${i + 1}: ${f.method} ${f.endpoint}
+            Finding #${i + 1}: ${escapeHtml(f.method)} ${escapeHtml(f.endpoint)}
           </h4>
-          <span class="badge badge-danger">${f.severity}</span>
+          <span class="badge badge-danger">${escapeHtml(f.severity)}</span>
         </div>
         <p style="color:var(--text-muted); font-size:12px; margin:6px 0 12px 0;">
-          Resource: <code>${f.resource_type}</code> | Leaked Attributes: <code>${f.diff_fields.join(', ') || 'Object Leak'}</code>
+          Resource: <code>${escapeHtml(f.resource_type)}</code> | Leaked Attributes: <code>${escapeHtml(f.diff_fields.join(', ') || 'Object Leak')}</code>
         </p>
         <p style="font-size:13px;">
-          <strong>Graph Propagation Path:</strong> <code>${f.graph_path.join(' &rarr; ')}</code>
+          <strong>Graph Propagation Path:</strong> <code>${f.graph_path.map(escapeHtml).join(' &rarr; ')}</code>
         </p>
         <div style="margin-top:12px;">
           <strong style="font-size:12px; color:var(--text-muted);">Proof of Concept Reproduction (cURL):</strong>
-          <pre>${f.repro_curl}</pre>
+          <pre>${escapeHtml(f.repro_curl)}</pre>
         </div>
       </div>
     `).join('')}

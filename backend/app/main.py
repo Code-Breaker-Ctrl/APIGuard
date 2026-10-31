@@ -56,8 +56,11 @@ app = FastAPI(title="APIGuard Platform API", version="1.0.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
+    allow_origins=[
+        "http://127.0.0.1:5173",
+        "http://localhost:5173",
+    ],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -229,6 +232,16 @@ async def _execute_scan_task(scan_id: str, opts: ScanTriggerInput, queue: asynci
             message=f"[ERROR] Scan execution error: {str(e)}"
         )
         await queue.put(ev_err)
+        await save_scan_event(ev_err)
+        await queue.put(ScanEvent(
+            event_id=f"ev_{uuid.uuid4().hex[:6]}",
+            scan_id=scan_id,
+            timestamp=time.time(),
+            event_type="scan_completed",
+            phase="C",
+            message="[DONE] Audit aborted due to an error.",
+            data={"findings_count": 0, "aborted": True}
+        ))
     finally:
         await queue.put(None)  # Sentinel to close SSE stream
 

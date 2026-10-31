@@ -64,7 +64,10 @@ class BaselineScanner:
         harvested_id = setup_res.body.get("id", "proj_42") if isinstance(setup_res.body, dict) else "proj_42"
 
         # 2. Iterate operations endpoint-by-endpoint
-        for op in operations:
+        # DELETE runs last: the owner control would otherwise destroy the harvested
+        # resource and make every later test on it inconclusive.
+        ordered_ops = sorted(operations, key=lambda o: o.method == "DELETE")
+        for op in ordered_ops:
             if not op.path_params:
                 continue
 

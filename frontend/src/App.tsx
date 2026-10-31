@@ -226,7 +226,7 @@ export default function App() {
         <div className="bg-rose-950 border-b-2 border-rose-500 px-5 py-2 flex items-center justify-between text-rose-200">
           <div className="flex items-center gap-2 text-sm">
             <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
-            <span>The Erdtree is silent. Backend unreachable at 127.0.0.1:8000.</span>
+            <span>The Erdtree is silent. Backend unreachable.</span>
           </div>
           <button onClick={checkBackendHealth} className="btn-ghost">
             <RefreshCw className="w-4 h-4" /> Retry
@@ -438,7 +438,7 @@ export default function App() {
         findings={findings}
         operationCount={nodes.filter((n) => n.type === 'operation').length}
         edgeCount={edges.length}
-        targetUrl="http://127.0.0.1:8000/target"
+        targetUrl="https://api.target.internal/v1"
         isTargetPatched={isTargetPatched}
       />
 

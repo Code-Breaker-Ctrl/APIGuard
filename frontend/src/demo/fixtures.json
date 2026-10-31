@@ -336,7 +336,7 @@
  },
  "benchmark": {
   "timestamp": "2026-10-31T10:29:24Z",
-  "target": "http://127.0.0.1:8000/target",
+  "target": "https://api.target.internal/v1",
   "variants_tested": 5,
   "aggregate_metrics": {
    "graph_guided": {
@@ -494,7 +494,7 @@
      "step_id": "step_setup_c8b7d1",
      "operation_id": "createProject",
      "method": "POST",
-     "url": "http://127.0.0.1:8000/target/projects",
+     "url": "https://api.target.internal/v1/projects",
      "identity": "usr_aman_101",
      "purpose": "setup",
      "phase": "A",
@@ -512,7 +512,7 @@
      "step_id": "step_ctrl_543bf6",
      "operation_id": "getProjectById",
      "method": "GET",
-     "url": "http://127.0.0.1:8000/target/projects/{project_id}",
+     "url": "https://api.target.internal/v1/projects/{project_id}",
      "identity": "usr_aman_101",
      "purpose": "control_owner",
      "phase": "A",
@@ -526,7 +526,7 @@
      "step_id": "step_probe_4e2bdf",
      "operation_id": "getProjectById",
      "method": "GET",
-     "url": "http://127.0.0.1:8000/target/projects/{project_id}",
+     "url": "https://api.target.internal/v1/projects/{project_id}",
      "identity": "usr_taaran_202",
      "purpose": "probe_adversary",
      "phase": "B",
@@ -540,7 +540,7 @@
      "step_id": "step_setup_e5b464",
      "operation_id": "createProject",
      "method": "POST",
-     "url": "http://127.0.0.1:8000/target/projects",
+     "url": "https://api.target.internal/v1/projects",
      "identity": "usr_aman_101",
      "purpose": "setup",
      "phase": "A",
@@ -558,7 +558,7 @@
      "step_id": "step_ctrl_399a83",
      "operation_id": "exportProjectBilling",
      "method": "GET",
-     "url": "http://127.0.0.1:8000/target/projects/{project_id}/export",
+     "url": "https://api.target.internal/v1/projects/{project_id}/export",
      "identity": "usr_aman_101",
      "purpose": "control_owner",
      "phase": "A",
@@ -572,7 +572,7 @@
      "step_id": "step_probe_bf376f",
      "operation_id": "exportProjectBilling",
      "method": "GET",
-     "url": "http://127.0.0.1:8000/target/projects/{project_id}/export",
+     "url": "https://api.target.internal/v1/projects/{project_id}/export",
      "identity": "usr_taaran_202",
      "purpose": "probe_adversary",
      "phase": "B",
@@ -586,7 +586,7 @@
      "step_id": "step_setup_771469",
      "operation_id": "createProject",
      "method": "POST",
-     "url": "http://127.0.0.1:8000/target/projects",
+     "url": "https://api.target.internal/v1/projects",
      "identity": "usr_aman_101",
      "purpose": "setup",
      "phase": "A",
@@ -604,7 +604,7 @@
      "step_id": "step_ctrl_c19cb3",
      "operation_id": "getProjectSummary",
      "method": "GET",
-     "url": "http://127.0.0.1:8000/target/projects/{project_id}/summary",
+     "url": "https://api.target.internal/v1/projects/{project_id}/summary",
      "identity": "usr_aman_101",
      "purpose": "control_owner",
      "phase": "A",
@@ -618,7 +618,7 @@
      "step_id": "step_probe_6315f3",
      "operation_id": "getProjectSummary",
      "method": "GET",
-     "url": "http://127.0.0.1:8000/target/projects/{project_id}/summary",
+     "url": "https://api.target.internal/v1/projects/{project_id}/summary",
      "identity": "usr_taaran_202",
      "purpose": "probe_adversary",
      "phase": "B",
@@ -632,7 +632,7 @@
      "step_id": "step_setup_053a7e",
      "operation_id": "createProject",
      "method": "POST",
-     "url": "http://127.0.0.1:8000/target/projects",
+     "url": "https://api.target.internal/v1/projects",
      "identity": "usr_aman_101",
      "purpose": "setup",
      "phase": "A",
@@ -650,7 +650,7 @@
      "step_id": "step_ctrl_d8141b",
      "operation_id": "getProjectMembers",
      "method": "GET",
-     "url": "http://127.0.0.1:8000/target/projects/{project_id}/members",
+     "url": "https://api.target.internal/v1/projects/{project_id}/members",
      "identity": "usr_aman_101",
      "purpose": "control_owner",
      "phase": "A",
@@ -664,7 +664,7 @@
      "step_id": "step_probe_2eb256",
      "operation_id": "getProjectMembers",
      "method": "GET",
-     "url": "http://127.0.0.1:8000/target/projects/{project_id}/members",
+     "url": "https://api.target.internal/v1/projects/{project_id}/members",
      "identity": "usr_taaran_202",
      "purpose": "probe_adversary",
      "phase": "B",
@@ -686,7 +686,7 @@
      "step_id": "step_ctrl_850e97",
      "operation_id": "login",
      "method": "POST",
-     "url": "http://127.0.0.1:8000/target/auth/login",
+     "url": "https://api.target.internal/v1/auth/login",
      "identity": "usr_aman_101",
      "purpose": "control_owner",
      "phase": "A",
@@ -700,7 +700,7 @@
      "step_id": "step_probe_732cde",
      "operation_id": "login",
      "method": "POST",
-     "url": "http://127.0.0.1:8000/target/auth/login",
+     "url": "https://api.target.internal/v1/auth/login",
      "identity": "usr_taaran_202",
      "purpose": "probe_adversary",
      "phase": "B",
@@ -714,7 +714,7 @@
      "step_id": "step_ctrl_385924",
      "operation_id": "createProject",
      "method": "POST",
-     "url": "http://127.0.0.1:8000/target/projects",
+     "url": "https://api.target.internal/v1/projects",
      "identity": "usr_aman_101",
      "purpose": "control_owner",
      "phase": "A",
@@ -728,7 +728,7 @@
      "step_id": "step_probe_73c02f",
      "operation_id": "createProject",
      "method": "POST",
-     "url": "http://127.0.0.1:8000/target/projects",
+     "url": "https://api.target.internal/v1/projects",
      "identity": "usr_taaran_202",
      "purpose": "probe_adversary",
      "phase": "B",
@@ -742,7 +742,7 @@
      "step_id": "step_setup_84d8e3",
      "operation_id": "createProject",
      "method": "POST",
-     "url": "http://127.0.0.1:8000/target/projects",
+     "url": "https://api.target.internal/v1/projects",
      "identity": "usr_aman_101",
      "purpose": "setup",
      "phase": "A",
@@ -760,7 +760,7 @@
      "step_id": "step_ctrl_450452",
      "operation_id": "getProjectById",
      "method": "GET",
-     "url": "http://127.0.0.1:8000/target/projects/{project_id}",
+     "url": "https://api.target.internal/v1/projects/{project_id}",
      "identity": "usr_aman_101",
      "purpose": "control_owner",
      "phase": "A",
@@ -774,7 +774,7 @@
      "step_id": "step_probe_2b4252",
      "operation_id": "getProjectById",
      "method": "GET",
-     "url": "http://127.0.0.1:8000/target/projects/{project_id}",
+     "url": "https://api.target.internal/v1/projects/{project_id}",
      "identity": "usr_taaran_202",
      "purpose": "probe_adversary",
      "phase": "B",
@@ -788,7 +788,7 @@
      "step_id": "step_setup_619db4",
      "operation_id": "createProject",
      "method": "POST",
-     "url": "http://127.0.0.1:8000/target/projects",
+     "url": "https://api.target.internal/v1/projects",
      "identity": "usr_aman_101",
      "purpose": "setup",
      "phase": "A",
@@ -806,7 +806,7 @@
      "step_id": "step_ctrl_f7a3aa",
      "operation_id": "updateProject",
      "method": "PATCH",
-     "url": "http://127.0.0.1:8000/target/projects/{project_id}",
+     "url": "https://api.target.internal/v1/projects/{project_id}",
      "identity": "usr_aman_101",
      "purpose": "control_owner",
      "phase": "A",
@@ -820,7 +820,7 @@
      "step_id": "step_probe_943113",
      "operation_id": "updateProject",
      "method": "PATCH",
-     "url": "http://127.0.0.1:8000/target/projects/{project_id}",
+     "url": "https://api.target.internal/v1/projects/{project_id}",
      "identity": "usr_taaran_202",
      "purpose": "probe_adversary",
      "phase": "B",
@@ -834,7 +834,7 @@
      "step_id": "step_setup_641aa5",
      "operation_id": "createProject",
      "method": "POST",
-     "url": "http://127.0.0.1:8000/target/projects",
+     "url": "https://api.target.internal/v1/projects",
      "identity": "usr_aman_101",
      "purpose": "setup",
      "phase": "A",
@@ -852,7 +852,7 @@
      "step_id": "step_ctrl_b1a33c",
      "operation_id": "deleteProject",
      "method": "DELETE",
-     "url": "http://127.0.0.1:8000/target/projects/{project_id}",
+     "url": "https://api.target.internal/v1/projects/{project_id}",
      "identity": "usr_aman_101",
      "purpose": "control_owner",
      "phase": "A",
@@ -866,7 +866,7 @@
      "step_id": "step_probe_c1d562",
      "operation_id": "deleteProject",
      "method": "DELETE",
-     "url": "http://127.0.0.1:8000/target/projects/{project_id}",
+     "url": "https://api.target.internal/v1/projects/{project_id}",
      "identity": "usr_taaran_202",
      "purpose": "probe_adversary",
      "phase": "B",
@@ -880,7 +880,7 @@
      "step_id": "step_setup_235ed8",
      "operation_id": "createProject",
      "method": "POST",
-     "url": "http://127.0.0.1:8000/target/projects",
+     "url": "https://api.target.internal/v1/projects",
      "identity": "usr_aman_101",
      "purpose": "setup",
      "phase": "A",
@@ -898,7 +898,7 @@
      "step_id": "step_ctrl_2b8076",
      "operation_id": "exportProjectBilling",
      "method": "GET",
-     "url": "http://127.0.0.1:8000/target/projects/{project_id}/export",
+     "url": "https://api.target.internal/v1/projects/{project_id}/export",
      "identity": "usr_aman_101",
      "purpose": "control_owner",
      "phase": "A",
@@ -912,7 +912,7 @@
      "step_id": "step_probe_c52175",
      "operation_id": "exportProjectBilling",
      "method": "GET",
-     "url": "http://127.0.0.1:8000/target/projects/{project_id}/export",
+     "url": "https://api.target.internal/v1/projects/{project_id}/export",
      "identity": "usr_taaran_202",
      "purpose": "probe_adversary",
      "phase": "B",
@@ -926,7 +926,7 @@
      "step_id": "step_setup_2f7954",
      "operation_id": "createProject",
      "method": "POST",
-     "url": "http://127.0.0.1:8000/target/projects",
+     "url": "https://api.target.internal/v1/projects",
      "identity": "usr_aman_101",
      "purpose": "setup",
      "phase": "A",
@@ -944,7 +944,7 @@
      "step_id": "step_ctrl_15ab30",
      "operation_id": "getProjectSummary",
      "method": "GET",
-     "url": "http://127.0.0.1:8000/target/projects/{project_id}/summary",
+     "url": "https://api.target.internal/v1/projects/{project_id}/summary",
      "identity": "usr_aman_101",
      "purpose": "control_owner",
      "phase": "A",
@@ -958,7 +958,7 @@
      "step_id": "step_probe_a031da",
      "operation_id": "getProjectSummary",
      "method": "GET",
-     "url": "http://127.0.0.1:8000/target/projects/{project_id}/summary",
+     "url": "https://api.target.internal/v1/projects/{project_id}/summary",
      "identity": "usr_taaran_202",
      "purpose": "probe_adversary",
      "phase": "B",
@@ -972,7 +972,7 @@
      "step_id": "step_setup_37751d",
      "operation_id": "createProject",
      "method": "POST",
-     "url": "http://127.0.0.1:8000/target/projects",
+     "url": "https://api.target.internal/v1/projects",
      "identity": "usr_aman_101",
      "purpose": "setup",
      "phase": "A",
@@ -990,7 +990,7 @@
      "step_id": "step_ctrl_78fdb7",
      "operation_id": "getProjectMembers",
      "method": "GET",
-     "url": "http://127.0.0.1:8000/target/projects/{project_id}/members",
+     "url": "https://api.target.internal/v1/projects/{project_id}/members",
      "identity": "usr_aman_101",
      "purpose": "control_owner",
      "phase": "A",
@@ -1004,7 +1004,7 @@
      "step_id": "step_probe_4edf47",
      "operation_id": "getProjectMembers",
      "method": "GET",
-     "url": "http://127.0.0.1:8000/target/projects/{project_id}/members",
+     "url": "https://api.target.internal/v1/projects/{project_id}/members",
      "identity": "usr_taaran_202",
      "purpose": "probe_adversary",
      "phase": "B",
@@ -1039,13 +1039,13 @@
      "timestamp": 1793422765.992216,
      "event_type": "request_sent",
      "phase": "A",
-     "message": "[SETUP] Sending POST http://127.0.0.1:8000/target/projects as usr_aman_101",
+     "message": "[SETUP] Sending POST https://api.target.internal/v1/projects as usr_aman_101",
      "data": {
       "step_id": "harvest_createProject",
       "operation_id": "createProject",
       "identity": "usr_aman_101",
       "method": "POST",
-      "url": "http://127.0.0.1:8000/target/projects",
+      "url": "https://api.target.internal/v1/projects",
       "headers": {
        "Authorization": "[REDACTED]"
       }
@@ -1057,7 +1057,7 @@
      "timestamp": 1793422766.0091224,
      "event_type": "response_received",
      "phase": "A",
-     "message": "[SETUP] Received HTTP 201 for POST http://127.0.0.1:8000/target/projects (1.34ms)",
+     "message": "[SETUP] Received HTTP 201 for POST https://api.target.internal/v1/projects (1.34ms)",
      "data": {
       "step_id": "harvest_createProject",
       "operation_id": "createProject",
@@ -1075,13 +1075,13 @@
      "timestamp": 1793422766.0091224,
      "event_type": "request_sent",
      "phase": "A",
-     "message": "[CONTROL_OWNER] Sending GET http://127.0.0.1:8000/target/projects/proj_43 as usr_aman_101",
+     "message": "[CONTROL_OWNER] Sending GET https://api.target.internal/v1/projects/proj_43 as usr_aman_101",
      "data": {
       "step_id": "ctrl_getProjectById",
       "operation_id": "getProjectById",
       "identity": "usr_aman_101",
       "method": "GET",
-      "url": "http://127.0.0.1:8000/target/projects/proj_43",
+      "url": "https://api.target.internal/v1/projects/proj_43",
       "headers": {
        "Authorization": "[REDACTED]"
       }
@@ -1093,7 +1093,7 @@
      "timestamp": 1793422766.0313075,
      "event_type": "response_received",
      "phase": "A",
-     "message": "[CONTROL_OWNER] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43 (1.21ms)",
+     "message": "[CONTROL_OWNER] Received HTTP 200 for GET https://api.target.internal/v1/projects/proj_43 (1.21ms)",
      "data": {
       "step_id": "ctrl_getProjectById",
       "operation_id": "getProjectById",
@@ -1111,13 +1111,13 @@
      "timestamp": 1793422766.0313075,
      "event_type": "request_sent",
      "phase": "B",
-     "message": "[PROBE_ADVERSARY] Sending GET http://127.0.0.1:8000/target/projects/proj_43 as usr_taaran_202",
+     "message": "[PROBE_ADVERSARY] Sending GET https://api.target.internal/v1/projects/proj_43 as usr_taaran_202",
      "data": {
       "step_id": "probe_getProjectById",
       "operation_id": "getProjectById",
       "identity": "usr_taaran_202",
       "method": "GET",
-      "url": "http://127.0.0.1:8000/target/projects/proj_43",
+      "url": "https://api.target.internal/v1/projects/proj_43",
       "headers": {
        "Authorization": "[REDACTED]"
       }
@@ -1129,7 +1129,7 @@
      "timestamp": 1793422766.0505226,
      "event_type": "response_received",
      "phase": "B",
-     "message": "[PROBE_ADVERSARY] Received HTTP 403 for GET http://127.0.0.1:8000/target/projects/proj_43 (1.36ms)",
+     "message": "[PROBE_ADVERSARY] Received HTTP 403 for GET https://api.target.internal/v1/projects/proj_43 (1.36ms)",
      "data": {
       "step_id": "probe_getProjectById",
       "operation_id": "getProjectById",
@@ -1208,13 +1208,13 @@
      "timestamp": 1793422766.1085255,
      "event_type": "request_sent",
      "phase": "A",
-     "message": "[CONTROL_OWNER] Sending GET http://127.0.0.1:8000/target/projects/proj_43/export as usr_aman_101",
+     "message": "[CONTROL_OWNER] Sending GET https://api.target.internal/v1/projects/proj_43/export as usr_aman_101",
      "data": {
       "step_id": "ctrl_exportProjectBilling",
       "operation_id": "exportProjectBilling",
       "identity": "usr_aman_101",
       "method": "GET",
-      "url": "http://127.0.0.1:8000/target/projects/proj_43/export",
+      "url": "https://api.target.internal/v1/projects/proj_43/export",
       "headers": {
        "Authorization": "[REDACTED]"
       }
@@ -1226,7 +1226,7 @@
      "timestamp": 1793422766.1256192,
      "event_type": "response_received",
      "phase": "A",
-     "message": "[CONTROL_OWNER] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43/export (1.82ms)",
+     "message": "[CONTROL_OWNER] Received HTTP 200 for GET https://api.target.internal/v1/projects/proj_43/export (1.82ms)",
      "data": {
       "step_id": "ctrl_exportProjectBilling",
       "operation_id": "exportProjectBilling",
@@ -1244,13 +1244,13 @@
      "timestamp": 1793422766.1271331,
      "event_type": "request_sent",
      "phase": "B",
-     "message": "[PROBE_ADVERSARY] Sending GET http://127.0.0.1:8000/target/projects/proj_43/export as usr_taaran_202",
+     "message": "[PROBE_ADVERSARY] Sending GET https://api.target.internal/v1/projects/proj_43/export as usr_taaran_202",
      "data": {
       "step_id": "probe_exportProjectBilling",
       "operation_id": "exportProjectBilling",
       "identity": "usr_taaran_202",
       "method": "GET",
-      "url": "http://127.0.0.1:8000/target/projects/proj_43/export",
+      "url": "https://api.target.internal/v1/projects/proj_43/export",
       "headers": {
        "Authorization": "[REDACTED]"
       }
@@ -1262,7 +1262,7 @@
      "timestamp": 1793422766.1527185,
      "event_type": "response_received",
      "phase": "B",
-     "message": "[PROBE_ADVERSARY] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43/export (1.32ms)",
+     "message": "[PROBE_ADVERSARY] Received HTTP 200 for GET https://api.target.internal/v1/projects/proj_43/export (1.32ms)",
      "data": {
       "step_id": "probe_exportProjectBilling",
       "operation_id": "exportProjectBilling",
@@ -1344,7 +1344,7 @@
        "financial_payload.budget",
        "financial_payload.billing"
       ],
-      "repro_curl": "curl -X GET 'http://127.0.0.1:8000/target/projects/proj_43/export' -H 'Authorization: Bearer <USER_B_TOKEN>'",
+      "repro_curl": "curl -X GET 'https://api.target.internal/v1/projects/proj_43/export' -H 'Authorization: Bearer <USER_B_TOKEN>'",
       "reproduction_steps": [
        "1. Authenticate as usr_aman_101 to establish resource state.",
        "2. Note generated resource ID from control body.",
@@ -1364,13 +1364,13 @@
      "timestamp": 1793422766.1753192,
      "event_type": "request_sent",
      "phase": "A",
-     "message": "[CONTROL_OWNER] Sending GET http://127.0.0.1:8000/target/projects/proj_43/summary as usr_aman_101",
+     "message": "[CONTROL_OWNER] Sending GET https://api.target.internal/v1/projects/proj_43/summary as usr_aman_101",
      "data": {
       "step_id": "ctrl_getProjectSummary",
       "operation_id": "getProjectSummary",
       "identity": "usr_aman_101",
       "method": "GET",
-      "url": "http://127.0.0.1:8000/target/projects/proj_43/summary",
+      "url": "https://api.target.internal/v1/projects/proj_43/summary",
       "headers": {
        "Authorization": "[REDACTED]"
       }
@@ -1382,7 +1382,7 @@
      "timestamp": 1793422766.1753192,
      "event_type": "response_received",
      "phase": "A",
-     "message": "[CONTROL_OWNER] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43/summary (1.7ms)",
+     "message": "[CONTROL_OWNER] Received HTTP 200 for GET https://api.target.internal/v1/projects/proj_43/summary (1.7ms)",
      "data": {
       "step_id": "ctrl_getProjectSummary",
       "operation_id": "getProjectSummary",
@@ -1400,13 +1400,13 @@
      "timestamp": 1793422766.1919408,
      "event_type": "request_sent",
      "phase": "B",
-     "message": "[PROBE_ADVERSARY] Sending GET http://127.0.0.1:8000/target/projects/proj_43/summary as usr_taaran_202",
+     "message": "[PROBE_ADVERSARY] Sending GET https://api.target.internal/v1/projects/proj_43/summary as usr_taaran_202",
      "data": {
       "step_id": "probe_getProjectSummary",
       "operation_id": "getProjectSummary",
       "identity": "usr_taaran_202",
       "method": "GET",
-      "url": "http://127.0.0.1:8000/target/projects/proj_43/summary",
+      "url": "https://api.target.internal/v1/projects/proj_43/summary",
       "headers": {
        "Authorization": "[REDACTED]"
       }
@@ -1418,7 +1418,7 @@
      "timestamp": 1793422766.2085912,
      "event_type": "response_received",
      "phase": "B",
-     "message": "[PROBE_ADVERSARY] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43/summary (1.53ms)",
+     "message": "[PROBE_ADVERSARY] Received HTTP 200 for GET https://api.target.internal/v1/projects/proj_43/summary (1.53ms)",
      "data": {
       "step_id": "probe_getProjectSummary",
       "operation_id": "getProjectSummary",
@@ -1450,13 +1450,13 @@
      "timestamp": 1793422766.2283094,
      "event_type": "request_sent",
      "phase": "A",
-     "message": "[CONTROL_OWNER] Sending GET http://127.0.0.1:8000/target/projects/proj_43/members as usr_aman_101",
+     "message": "[CONTROL_OWNER] Sending GET https://api.target.internal/v1/projects/proj_43/members as usr_aman_101",
      "data": {
       "step_id": "ctrl_getProjectMembers",
       "operation_id": "getProjectMembers",
       "identity": "usr_aman_101",
       "method": "GET",
-      "url": "http://127.0.0.1:8000/target/projects/proj_43/members",
+      "url": "https://api.target.internal/v1/projects/proj_43/members",
       "headers": {
        "Authorization": "[REDACTED]"
       }
@@ -1468,7 +1468,7 @@
      "timestamp": 1793422766.242118,
      "event_type": "response_received",
      "phase": "A",
-     "message": "[CONTROL_OWNER] Received HTTP 404 for GET http://127.0.0.1:8000/target/projects/proj_43/members (0.93ms)",
+     "message": "[CONTROL_OWNER] Received HTTP 404 for GET https://api.target.internal/v1/projects/proj_43/members (0.93ms)",
      "data": {
       "step_id": "ctrl_getProjectMembers",
       "operation_id": "getProjectMembers",
@@ -1570,7 +1570,7 @@
       "financial_payload.budget",
       "financial_payload.billing"
      ],
-     "repro_curl": "curl -X GET 'http://127.0.0.1:8000/target/projects/proj_43/export' -H 'Authorization: Bearer <USER_B_TOKEN>'",
+     "repro_curl": "curl -X GET 'https://api.target.internal/v1/projects/proj_43/export' -H 'Authorization: Bearer <USER_B_TOKEN>'",
      "reproduction_steps": [
       "1. Authenticate as usr_aman_101 to establish resource state.",
       "2. Note generated resource ID from control body.",
@@ -1602,13 +1602,13 @@
      "timestamp": 1793422766.3639743,
      "event_type": "request_sent",
      "phase": "A",
-     "message": "[SETUP] Sending POST http://127.0.0.1:8000/target/projects as usr_aman_101",
+     "message": "[SETUP] Sending POST https://api.target.internal/v1/projects as usr_aman_101",
      "data": {
       "step_id": "harvest_createProject",
       "operation_id": "createProject",
       "identity": "usr_aman_101",
       "method": "POST",
-      "url": "http://127.0.0.1:8000/target/projects",
+      "url": "https://api.target.internal/v1/projects",
       "headers": {
        "Authorization": "[REDACTED]"
       }
@@ -1620,7 +1620,7 @@
      "timestamp": 1793422766.3758173,
      "event_type": "response_received",
      "phase": "A",
-     "message": "[SETUP] Received HTTP 201 for POST http://127.0.0.1:8000/target/projects (1.19ms)",
+     "message": "[SETUP] Received HTTP 201 for POST https://api.target.internal/v1/projects (1.19ms)",
      "data": {
       "step_id": "harvest_createProject",
       "operation_id": "createProject",
@@ -1638,13 +1638,13 @@
      "timestamp": 1793422766.3758173,
      "event_type": "request_sent",
      "phase": "A",
-     "message": "[CONTROL_OWNER] Sending GET http://127.0.0.1:8000/target/projects/proj_43 as usr_aman_101",
+     "message": "[CONTROL_OWNER] Sending GET https://api.target.internal/v1/projects/proj_43 as usr_aman_101",
      "data": {
       "step_id": "ctrl_getProjectById",
       "operation_id": "getProjectById",
       "identity": "usr_aman_101",
       "method": "GET",
-      "url": "http://127.0.0.1:8000/target/projects/proj_43",
+      "url": "https://api.target.internal/v1/projects/proj_43",
       "headers": {
        "Authorization": "[REDACTED]"
       }
@@ -1656,7 +1656,7 @@
      "timestamp": 1793422766.392093,
      "event_type": "response_received",
      "phase": "A",
-     "message": "[CONTROL_OWNER] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43 (1.16ms)",
+     "message": "[CONTROL_OWNER] Received HTTP 200 for GET https://api.target.internal/v1/projects/proj_43 (1.16ms)",
      "data": {
       "step_id": "ctrl_getProjectById",
       "operation_id": "getProjectById",
@@ -1674,13 +1674,13 @@
      "timestamp": 1793422766.392093,
      "event_type": "request_sent",
      "phase": "B",
-     "message": "[PROBE_ADVERSARY] Sending GET http://127.0.0.1:8000/target/projects/proj_43 as usr_taaran_202",
+     "message": "[PROBE_ADVERSARY] Sending GET https://api.target.internal/v1/projects/proj_43 as usr_taaran_202",
      "data": {
       "step_id": "probe_getProjectById",
       "operation_id": "getProjectById",
       "identity": "usr_taaran_202",
       "method": "GET",
-      "url": "http://127.0.0.1:8000/target/projects/proj_43",
+      "url": "https://api.target.internal/v1/projects/proj_43",
       "headers": {
        "Authorization": "[REDACTED]"
       }
@@ -1692,7 +1692,7 @@
      "timestamp": 1793422766.4087117,
      "event_type": "response_received",
      "phase": "B",
-     "message": "[PROBE_ADVERSARY] Received HTTP 403 for GET http://127.0.0.1:8000/target/projects/proj_43 (1.66ms)",
+     "message": "[PROBE_ADVERSARY] Received HTTP 403 for GET https://api.target.internal/v1/projects/proj_43 (1.66ms)",
      "data": {
       "step_id": "probe_getProjectById",
       "operation_id": "getProjectById",
@@ -1771,13 +1771,13 @@
      "timestamp": 1793422766.4753022,
      "event_type": "request_sent",
      "phase": "A",
-     "message": "[CONTROL_OWNER] Sending GET http://127.0.0.1:8000/target/projects/proj_43/export as usr_aman_101",
+     "message": "[CONTROL_OWNER] Sending GET https://api.target.internal/v1/projects/proj_43/export as usr_aman_101",
      "data": {
       "step_id": "ctrl_exportProjectBilling",
       "operation_id": "exportProjectBilling",
       "identity": "usr_aman_101",
       "method": "GET",
-      "url": "http://127.0.0.1:8000/target/projects/proj_43/export",
+      "url": "https://api.target.internal/v1/projects/proj_43/export",
       "headers": {
        "Authorization": "[REDACTED]"
       }
@@ -1789,7 +1789,7 @@
      "timestamp": 1793422766.4968348,
      "event_type": "response_received",
      "phase": "A",
-     "message": "[CONTROL_OWNER] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43/export (1.58ms)",
+     "message": "[CONTROL_OWNER] Received HTTP 200 for GET https://api.target.internal/v1/projects/proj_43/export (1.58ms)",
      "data": {
       "step_id": "ctrl_exportProjectBilling",
       "operation_id": "exportProjectBilling",
@@ -1807,13 +1807,13 @@
      "timestamp": 1793422766.5091047,
      "event_type": "request_sent",
      "phase": "B",
-     "message": "[PROBE_ADVERSARY] Sending GET http://127.0.0.1:8000/target/projects/proj_43/export as usr_taaran_202",
+     "message": "[PROBE_ADVERSARY] Sending GET https://api.target.internal/v1/projects/proj_43/export as usr_taaran_202",
      "data": {
       "step_id": "probe_exportProjectBilling",
       "operation_id": "exportProjectBilling",
       "identity": "usr_taaran_202",
       "method": "GET",
-      "url": "http://127.0.0.1:8000/target/projects/proj_43/export",
+      "url": "https://api.target.internal/v1/projects/proj_43/export",
       "headers": {
        "Authorization": "[REDACTED]"
       }
@@ -1825,7 +1825,7 @@
      "timestamp": 1793422766.5217326,
      "event_type": "response_received",
      "phase": "B",
-     "message": "[PROBE_ADVERSARY] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43/export (1.36ms)",
+     "message": "[PROBE_ADVERSARY] Received HTTP 200 for GET https://api.target.internal/v1/projects/proj_43/export (1.36ms)",
      "data": {
       "step_id": "probe_exportProjectBilling",
       "operation_id": "exportProjectBilling",
@@ -1907,7 +1907,7 @@
        "financial_payload.budget",
        "financial_payload.billing"
       ],
-      "repro_curl": "curl -X GET 'http://127.0.0.1:8000/target/projects/proj_43/export' -H 'Authorization: Bearer <USER_B_TOKEN>'",
+      "repro_curl": "curl -X GET 'https://api.target.internal/v1/projects/proj_43/export' -H 'Authorization: Bearer <USER_B_TOKEN>'",
       "reproduction_steps": [
        "1. Authenticate as usr_aman_101 to establish resource state.",
        "2. Note generated resource ID from control body.",
@@ -1927,13 +1927,13 @@
      "timestamp": 1793422766.5421066,
      "event_type": "request_sent",
      "phase": "A",
-     "message": "[CONTROL_OWNER] Sending GET http://127.0.0.1:8000/target/projects/proj_43/summary as usr_aman_101",
+     "message": "[CONTROL_OWNER] Sending GET https://api.target.internal/v1/projects/proj_43/summary as usr_aman_101",
      "data": {
       "step_id": "ctrl_getProjectSummary",
       "operation_id": "getProjectSummary",
       "identity": "usr_aman_101",
       "method": "GET",
-      "url": "http://127.0.0.1:8000/target/projects/proj_43/summary",
+      "url": "https://api.target.internal/v1/projects/proj_43/summary",
       "headers": {
        "Authorization": "[REDACTED]"
       }
@@ -1945,7 +1945,7 @@
      "timestamp": 1793422766.5622616,
      "event_type": "response_received",
      "phase": "A",
-     "message": "[CONTROL_OWNER] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43/summary (2.53ms)",
+     "message": "[CONTROL_OWNER] Received HTTP 200 for GET https://api.target.internal/v1/projects/proj_43/summary (2.53ms)",
      "data": {
       "step_id": "ctrl_getProjectSummary",
       "operation_id": "getProjectSummary",
@@ -1963,13 +1963,13 @@
      "timestamp": 1793422766.5749004,
      "event_type": "request_sent",
      "phase": "B",
-     "message": "[PROBE_ADVERSARY] Sending GET http://127.0.0.1:8000/target/projects/proj_43/summary as usr_taaran_202",
+     "message": "[PROBE_ADVERSARY] Sending GET https://api.target.internal/v1/projects/proj_43/summary as usr_taaran_202",
      "data": {
       "step_id": "probe_getProjectSummary",
       "operation_id": "getProjectSummary",
       "identity": "usr_taaran_202",
       "method": "GET",
-      "url": "http://127.0.0.1:8000/target/projects/proj_43/summary",
+      "url": "https://api.target.internal/v1/projects/proj_43/summary",
       "headers": {
        "Authorization": "[REDACTED]"
       }
@@ -1981,7 +1981,7 @@
      "timestamp": 1793422766.579988,
      "event_type": "response_received",
      "phase": "B",
-     "message": "[PROBE_ADVERSARY] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43/summary (2.05ms)",
+     "message": "[PROBE_ADVERSARY] Received HTTP 200 for GET https://api.target.internal/v1/projects/proj_43/summary (2.05ms)",
      "data": {
       "step_id": "probe_getProjectSummary",
       "operation_id": "getProjectSummary",
@@ -2013,13 +2013,13 @@
      "timestamp": 1793422766.6086383,
      "event_type": "request_sent",
      "phase": "A",
-     "message": "[CONTROL_OWNER] Sending GET http://127.0.0.1:8000/target/projects/proj_43/members as usr_aman_101",
+     "message": "[CONTROL_OWNER] Sending GET https://api.target.internal/v1/projects/proj_43/members as usr_aman_101",
      "data": {
       "step_id": "ctrl_getProjectMembers",
       "operation_id": "getProjectMembers",
       "identity": "usr_aman_101",
       "method": "GET",
-      "url": "http://127.0.0.1:8000/target/projects/proj_43/members",
+      "url": "https://api.target.internal/v1/projects/proj_43/members",
       "headers": {
        "Authorization": "[REDACTED]"
       }
@@ -2031,7 +2031,7 @@
      "timestamp": 1793422766.626424,
      "event_type": "response_received",
      "phase": "A",
-     "message": "[CONTROL_OWNER] Received HTTP 404 for GET http://127.0.0.1:8000/target/projects/proj_43/members (1.28ms)",
+     "message": "[CONTROL_OWNER] Received HTTP 404 for GET https://api.target.internal/v1/projects/proj_43/members (1.28ms)",
      "data": {
       "step_id": "ctrl_getProjectMembers",
       "operation_id": "getProjectMembers",
@@ -2063,13 +2063,13 @@
      "timestamp": 1793422766.6444356,
      "event_type": "request_sent",
      "phase": "A",
-     "message": "[CONTROL_OWNER] Sending PATCH http://127.0.0.1:8000/target/projects/proj_43 as usr_aman_101",
+     "message": "[CONTROL_OWNER] Sending PATCH https://api.target.internal/v1/projects/proj_43 as usr_aman_101",
      "data": {
       "step_id": "ctrl_updateProject",
       "operation_id": "updateProject",
       "identity": "usr_aman_101",
       "method": "PATCH",
-      "url": "http://127.0.0.1:8000/target/projects/proj_43",
+      "url": "https://api.target.internal/v1/projects/proj_43",
       "headers": {
        "Authorization": "[REDACTED]"
       }
@@ -2081,7 +2081,7 @@
      "timestamp": 1793422766.6588278,
      "event_type": "response_received",
      "phase": "A",
-     "message": "[CONTROL_OWNER] Received HTTP 200 for PATCH http://127.0.0.1:8000/target/projects/proj_43 (1.83ms)",
+     "message": "[CONTROL_OWNER] Received HTTP 200 for PATCH https://api.target.internal/v1/projects/proj_43 (1.83ms)",
      "data": {
       "step_id": "ctrl_updateProject",
       "operation_id": "updateProject",
@@ -2099,13 +2099,13 @@
      "timestamp": 1793422766.6753078,
      "event_type": "request_sent",
      "phase": "B",
-     "message": "[PROBE_ADVERSARY] Sending PATCH http://127.0.0.1:8000/target/projects/proj_43 as usr_taaran_202",
+     "message": "[PROBE_ADVERSARY] Sending PATCH https://api.target.internal/v1/projects/proj_43 as usr_taaran_202",
      "data": {
       "step_id": "probe_updateProject",
       "operation_id": "updateProject",
       "identity": "usr_taaran_202",
       "method": "PATCH",
-      "url": "http://127.0.0.1:8000/target/projects/proj_43",
+      "url": "https://api.target.internal/v1/projects/proj_43",
       "headers": {
        "Authorization": "[REDACTED]"
       }
@@ -2117,7 +2117,7 @@
      "timestamp": 1793422766.6919754,
      "event_type": "response_received",
      "phase": "B",
-     "message": "[PROBE_ADVERSARY] Received HTTP 403 for PATCH http://127.0.0.1:8000/target/projects/proj_43 (2.05ms)",
+     "message": "[PROBE_ADVERSARY] Received HTTP 403 for PATCH https://api.target.internal/v1/projects/proj_43 (2.05ms)",
      "data": {
       "step_id": "probe_updateProject",
       "operation_id": "updateProject",
@@ -2149,13 +2149,13 @@
      "timestamp": 1793422766.7086954,
      "event_type": "request_sent",
      "phase": "A",
-     "message": "[SETUP] Sending POST http://127.0.0.1:8000/target/projects as usr_aman_101",
+     "message": "[SETUP] Sending POST https://api.target.internal/v1/projects as usr_aman_101",
      "data": {
       "step_id": "disp_del_setup_2ab5",
       "operation_id": "createProject",
       "identity": "usr_aman_101",
       "method": "POST",
-      "url": "http://127.0.0.1:8000/target/projects",
+      "url": "https://api.target.internal/v1/projects",
       "headers": {
        "Authorization": "[REDACTED]"
       }
@@ -2167,7 +2167,7 @@
      "timestamp": 1793422766.7258043,
      "event_type": "response_received",
      "phase": "A",
-     "message": "[SETUP] Received HTTP 201 for POST http://127.0.0.1:8000/target/projects (1.85ms)",
+     "message": "[SETUP] Received HTTP 201 for POST https://api.target.internal/v1/projects (1.85ms)",
      "data": {
       "step_id": "disp_del_setup_2ab5",
       "operation_id": "createProject",
@@ -2185,13 +2185,13 @@
      "timestamp": 1793422766.7309184,
      "event_type": "request_sent",
      "phase": "B",
-     "message": "[PROBE_ADVERSARY] Sending DELETE http://127.0.0.1:8000/target/projects/proj_45 as usr_taaran_202",
+     "message": "[PROBE_ADVERSARY] Sending DELETE https://api.target.internal/v1/projects/proj_45 as usr_taaran_202",
      "data": {
       "step_id": "probe_del_proj_45",
       "operation_id": "deleteProject",
       "identity": "usr_taaran_202",
       "method": "DELETE",
-      "url": "http://127.0.0.1:8000/target/projects/proj_45",
+      "url": "https://api.target.internal/v1/projects/proj_45",
       "headers": {
        "Authorization": "[REDACTED]"
       }
@@ -2203,7 +2203,7 @@
      "timestamp": 1793422766.7438667,
      "event_type": "response_received",
      "phase": "B",
-     "message": "[PROBE_ADVERSARY] Received HTTP 403 for DELETE http://127.0.0.1:8000/target/projects/proj_45 (1.13ms)",
+     "message": "[PROBE_ADVERSARY] Received HTTP 403 for DELETE https://api.target.internal/v1/projects/proj_45 (1.13ms)",
      "data": {
       "step_id": "probe_del_proj_45",
       "operation_id": "deleteProject",
@@ -2221,13 +2221,13 @@
      "timestamp": 1793422766.7605505,
      "event_type": "request_sent",
      "phase": "A",
-     "message": "[CONTROL_OWNER] Sending DELETE http://127.0.0.1:8000/target/projects/proj_45 as usr_aman_101",
+     "message": "[CONTROL_OWNER] Sending DELETE https://api.target.internal/v1/projects/proj_45 as usr_aman_101",
      "data": {
       "step_id": "ctrl_del_proj_45",
       "operation_id": "deleteProject",
       "identity": "usr_aman_101",
       "method": "DELETE",
-      "url": "http://127.0.0.1:8000/target/projects/proj_45",
+      "url": "https://api.target.internal/v1/projects/proj_45",
       "headers": {
        "Authorization": "[REDACTED]"
       }
@@ -2239,7 +2239,7 @@
      "timestamp": 1793422766.7747881,
      "event_type": "response_received",
      "phase": "A",
-     "message": "[CONTROL_OWNER] Received HTTP 200 for DELETE http://127.0.0.1:8000/target/projects/proj_45 (1.77ms)",
+     "message": "[CONTROL_OWNER] Received HTTP 200 for DELETE https://api.target.internal/v1/projects/proj_45 (1.77ms)",
      "data": {
       "step_id": "ctrl_del_proj_45",
       "operation_id": "deleteProject",
@@ -2340,7 +2340,7 @@
       "financial_payload.budget",
       "financial_payload.billing"
      ],
-     "repro_curl": "curl -X GET 'http://127.0.0.1:8000/target/projects/proj_43/export' -H 'Authorization: Bearer <USER_B_TOKEN>'",
+     "repro_curl": "curl -X GET 'https://api.target.internal/v1/projects/proj_43/export' -H 'Authorization: Bearer <USER_B_TOKEN>'",
      "reproduction_steps": [
       "1. Authenticate as usr_aman_101 to establish resource state.",
       "2. Note generated resource ID from control body.",
@@ -2372,13 +2372,13 @@
      "timestamp": 1793422766.9086301,
      "event_type": "request_sent",
      "phase": "A",
-     "message": "[SETUP] Sending POST http://127.0.0.1:8000/target/projects as usr_aman_101",
+     "message": "[SETUP] Sending POST https://api.target.internal/v1/projects as usr_aman_101",
      "data": {
       "step_id": "harvest_createProject",
       "operation_id": "createProject",
       "identity": "usr_aman_101",
       "method": "POST",
-      "url": "http://127.0.0.1:8000/target/projects",
+      "url": "https://api.target.internal/v1/projects",
       "headers": {
        "Authorization": "[REDACTED]"
       }
@@ -2390,7 +2390,7 @@
      "timestamp": 1793422766.9255404,
      "event_type": "response_received",
      "phase": "A",
-     "message": "[SETUP] Received HTTP 201 for POST http://127.0.0.1:8000/target/projects (2.68ms)",
+     "message": "[SETUP] Received HTTP 201 for POST https://api.target.internal/v1/projects (2.68ms)",
      "data": {
       "step_id": "harvest_createProject",
       "operation_id": "createProject",
@@ -2408,13 +2408,13 @@
      "timestamp": 1793422766.930938,
      "event_type": "request_sent",
      "phase": "A",
-     "message": "[CONTROL_OWNER] Sending GET http://127.0.0.1:8000/target/projects/proj_43 as usr_aman_101",
+     "message": "[CONTROL_OWNER] Sending GET https://api.target.internal/v1/projects/proj_43 as usr_aman_101",
      "data": {
       "step_id": "ctrl_getProjectById",
       "operation_id": "getProjectById",
       "identity": "usr_aman_101",
       "method": "GET",
-      "url": "http://127.0.0.1:8000/target/projects/proj_43",
+      "url": "https://api.target.internal/v1/projects/proj_43",
       "headers": {
        "Authorization": "[REDACTED]"
       }
@@ -2426,7 +2426,7 @@
      "timestamp": 1793422766.9501498,
      "event_type": "response_received",
      "phase": "A",
-     "message": "[CONTROL_OWNER] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43 (1.75ms)",
+     "message": "[CONTROL_OWNER] Received HTTP 200 for GET https://api.target.internal/v1/projects/proj_43 (1.75ms)",
      "data": {
       "step_id": "ctrl_getProjectById",
       "operation_id": "getProjectById",
@@ -2444,13 +2444,13 @@
      "timestamp": 1793422766.959674,
      "event_type": "request_sent",
      "phase": "B",
-     "message": "[PROBE_ADVERSARY] Sending GET http://127.0.0.1:8000/target/projects/proj_43 as usr_taaran_202",
+     "message": "[PROBE_ADVERSARY] Sending GET https://api.target.internal/v1/projects/proj_43 as usr_taaran_202",
      "data": {
       "step_id": "probe_getProjectById",
       "operation_id": "getProjectById",
       "identity": "usr_taaran_202",
       "method": "GET",
-      "url": "http://127.0.0.1:8000/target/projects/proj_43",
+      "url": "https://api.target.internal/v1/projects/proj_43",
       "headers": {
        "Authorization": "[REDACTED]"
       }
@@ -2462,7 +2462,7 @@
      "timestamp": 1793422766.97482,
      "event_type": "response_received",
      "phase": "B",
-     "message": "[PROBE_ADVERSARY] Received HTTP 403 for GET http://127.0.0.1:8000/target/projects/proj_43 (1.78ms)",
+     "message": "[PROBE_ADVERSARY] Received HTTP 403 for GET https://api.target.internal/v1/projects/proj_43 (1.78ms)",
      "data": {
       "step_id": "probe_getProjectById",
       "operation_id": "getProjectById",
@@ -2541,13 +2541,13 @@
      "timestamp": 1793422767.0421486,
      "event_type": "request_sent",
      "phase": "A",
-     "message": "[CONTROL_OWNER] Sending GET http://127.0.0.1:8000/target/projects/proj_43/export as usr_aman_101",
+     "message": "[CONTROL_OWNER] Sending GET https://api.target.internal/v1/projects/proj_43/export as usr_aman_101",
      "data": {
       "step_id": "ctrl_exportProjectBilling",
       "operation_id": "exportProjectBilling",
       "identity": "usr_aman_101",
       "method": "GET",
-      "url": "http://127.0.0.1:8000/target/projects/proj_43/export",
+      "url": "https://api.target.internal/v1/projects/proj_43/export",
       "headers": {
        "Authorization": "[REDACTED]"
       }
@@ -2559,7 +2559,7 @@
      "timestamp": 1793422767.058851,
      "event_type": "response_received",
      "phase": "A",
-     "message": "[CONTROL_OWNER] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43/export (1.45ms)",
+     "message": "[CONTROL_OWNER] Received HTTP 200 for GET https://api.target.internal/v1/projects/proj_43/export (1.45ms)",
      "data": {
       "step_id": "ctrl_exportProjectBilling",
       "operation_id": "exportProjectBilling",
@@ -2577,13 +2577,13 @@
      "timestamp": 1793422767.058851,
      "event_type": "request_sent",
      "phase": "B",
-     "message": "[PROBE_ADVERSARY] Sending GET http://127.0.0.1:8000/target/projects/proj_43/export as usr_taaran_202",
+     "message": "[PROBE_ADVERSARY] Sending GET https://api.target.internal/v1/projects/proj_43/export as usr_taaran_202",
      "data": {
       "step_id": "probe_exportProjectBilling",
       "operation_id": "exportProjectBilling",
       "identity": "usr_taaran_202",
       "method": "GET",
-      "url": "http://127.0.0.1:8000/target/projects/proj_43/export",
+      "url": "https://api.target.internal/v1/projects/proj_43/export",
       "headers": {
        "Authorization": "[REDACTED]"
       }
@@ -2595,7 +2595,7 @@
      "timestamp": 1793422767.0881476,
      "event_type": "response_received",
      "phase": "B",
-     "message": "[PROBE_ADVERSARY] Received HTTP 403 for GET http://127.0.0.1:8000/target/projects/proj_43/export (1.54ms)",
+     "message": "[PROBE_ADVERSARY] Received HTTP 403 for GET https://api.target.internal/v1/projects/proj_43/export (1.54ms)",
      "data": {
       "step_id": "probe_exportProjectBilling",
       "operation_id": "exportProjectBilling",
@@ -2627,13 +2627,13 @@
      "timestamp": 1793422767.1089458,
      "event_type": "request_sent",
      "phase": "A",
-     "message": "[CONTROL_OWNER] Sending GET http://127.0.0.1:8000/target/projects/proj_43/summary as usr_aman_101",
+     "message": "[CONTROL_OWNER] Sending GET https://api.target.internal/v1/projects/proj_43/summary as usr_aman_101",
      "data": {
       "step_id": "ctrl_getProjectSummary",
       "operation_id": "getProjectSummary",
       "identity": "usr_aman_101",
       "method": "GET",
-      "url": "http://127.0.0.1:8000/target/projects/proj_43/summary",
+      "url": "https://api.target.internal/v1/projects/proj_43/summary",
       "headers": {
        "Authorization": "[REDACTED]"
       }
@@ -2645,7 +2645,7 @@
      "timestamp": 1793422767.1255991,
      "event_type": "response_received",
      "phase": "A",
-     "message": "[CONTROL_OWNER] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43/summary (3.07ms)",
+     "message": "[CONTROL_OWNER] Received HTTP 200 for GET https://api.target.internal/v1/projects/proj_43/summary (3.07ms)",
      "data": {
       "step_id": "ctrl_getProjectSummary",
       "operation_id": "getProjectSummary",
@@ -2663,13 +2663,13 @@
      "timestamp": 1793422767.1364486,
      "event_type": "request_sent",
      "phase": "B",
-     "message": "[PROBE_ADVERSARY] Sending GET http://127.0.0.1:8000/target/projects/proj_43/summary as usr_taaran_202",
+     "message": "[PROBE_ADVERSARY] Sending GET https://api.target.internal/v1/projects/proj_43/summary as usr_taaran_202",
      "data": {
       "step_id": "probe_getProjectSummary",
       "operation_id": "getProjectSummary",
       "identity": "usr_taaran_202",
       "method": "GET",
-      "url": "http://127.0.0.1:8000/target/projects/proj_43/summary",
+      "url": "https://api.target.internal/v1/projects/proj_43/summary",
       "headers": {
        "Authorization": "[REDACTED]"
       }
@@ -2681,7 +2681,7 @@
      "timestamp": 1793422767.1418824,
      "event_type": "response_received",
      "phase": "B",
-     "message": "[PROBE_ADVERSARY] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43/summary (1.54ms)",
+     "message": "[PROBE_ADVERSARY] Received HTTP 200 for GET https://api.target.internal/v1/projects/proj_43/summary (1.54ms)",
      "data": {
       "step_id": "probe_getProjectSummary",
       "operation_id": "getProjectSummary",
@@ -2713,13 +2713,13 @@
      "timestamp": 1793422767.1587093,
      "event_type": "request_sent",
      "phase": "A",
-     "message": "[CONTROL_OWNER] Sending GET http://127.0.0.1:8000/target/projects/proj_43/members as usr_aman_101",
+     "message": "[CONTROL_OWNER] Sending GET https://api.target.internal/v1/projects/proj_43/members as usr_aman_101",
      "data": {
       "step_id": "ctrl_getProjectMembers",
       "operation_id": "getProjectMembers",
       "identity": "usr_aman_101",
       "method": "GET",
-      "url": "http://127.0.0.1:8000/target/projects/proj_43/members",
+      "url": "https://api.target.internal/v1/projects/proj_43/members",
       "headers": {
        "Authorization": "[REDACTED]"
       }
@@ -2731,7 +2731,7 @@
      "timestamp": 1793422767.1846647,
      "event_type": "response_received",
      "phase": "A",
-     "message": "[CONTROL_OWNER] Received HTTP 404 for GET http://127.0.0.1:8000/target/projects/proj_43/members (0.96ms)",
+     "message": "[CONTROL_OWNER] Received HTTP 404 for GET https://api.target.internal/v1/projects/proj_43/members (0.96ms)",
      "data": {
       "step_id": "ctrl_getProjectMembers",
       "operation_id": "getProjectMembers",
@@ -2788,13 +2788,13 @@
      "timestamp": 1793422767.3099315,
      "event_type": "request_sent",
      "phase": "A",
-     "message": "[SETUP] Sending POST http://127.0.0.1:8000/target/projects as usr_aman_101",
+     "message": "[SETUP] Sending POST https://api.target.internal/v1/projects as usr_aman_101",
      "data": {
       "step_id": "harvest_createProject",
       "operation_id": "createProject",
       "identity": "usr_aman_101",
       "method": "POST",
-      "url": "http://127.0.0.1:8000/target/projects",
+      "url": "https://api.target.internal/v1/projects",
       "headers": {
        "Authorization": "[REDACTED]"
       }
@@ -2806,7 +2806,7 @@
      "timestamp": 1793422767.3200753,
      "event_type": "response_received",
      "phase": "A",
-     "message": "[SETUP] Received HTTP 201 for POST http://127.0.0.1:8000/target/projects (1.3ms)",
+     "message": "[SETUP] Received HTTP 201 for POST https://api.target.internal/v1/projects (1.3ms)",
      "data": {
       "step_id": "harvest_createProject",
       "operation_id": "createProject",
@@ -2824,13 +2824,13 @@
      "timestamp": 1793422767.3267365,
      "event_type": "request_sent",
      "phase": "A",
-     "message": "[CONTROL_OWNER] Sending GET http://127.0.0.1:8000/target/projects/proj_43 as usr_aman_101",
+     "message": "[CONTROL_OWNER] Sending GET https://api.target.internal/v1/projects/proj_43 as usr_aman_101",
      "data": {
       "step_id": "ctrl_getProjectById",
       "operation_id": "getProjectById",
       "identity": "usr_aman_101",
       "method": "GET",
-      "url": "http://127.0.0.1:8000/target/projects/proj_43",
+      "url": "https://api.target.internal/v1/projects/proj_43",
       "headers": {
        "Authorization": "[REDACTED]"
       }
@@ -2842,7 +2842,7 @@
      "timestamp": 1793422767.3412993,
      "event_type": "response_received",
      "phase": "A",
-     "message": "[CONTROL_OWNER] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43 (1.52ms)",
+     "message": "[CONTROL_OWNER] Received HTTP 200 for GET https://api.target.internal/v1/projects/proj_43 (1.52ms)",
      "data": {
       "step_id": "ctrl_getProjectById",
       "operation_id": "getProjectById",
@@ -2860,13 +2860,13 @@
      "timestamp": 1793422767.344721,
      "event_type": "request_sent",
      "phase": "B",
-     "message": "[PROBE_ADVERSARY] Sending GET http://127.0.0.1:8000/target/projects/proj_43 as usr_taaran_202",
+     "message": "[PROBE_ADVERSARY] Sending GET https://api.target.internal/v1/projects/proj_43 as usr_taaran_202",
      "data": {
       "step_id": "probe_getProjectById",
       "operation_id": "getProjectById",
       "identity": "usr_taaran_202",
       "method": "GET",
-      "url": "http://127.0.0.1:8000/target/projects/proj_43",
+      "url": "https://api.target.internal/v1/projects/proj_43",
       "headers": {
        "Authorization": "[REDACTED]"
       }
@@ -2878,7 +2878,7 @@
      "timestamp": 1793422767.36228,
      "event_type": "response_received",
      "phase": "B",
-     "message": "[PROBE_ADVERSARY] Received HTTP 403 for GET http://127.0.0.1:8000/target/projects/proj_43 (1.49ms)",
+     "message": "[PROBE_ADVERSARY] Received HTTP 403 for GET https://api.target.internal/v1/projects/proj_43 (1.49ms)",
      "data": {
       "step_id": "probe_getProjectById",
       "operation_id": "getProjectById",
@@ -2957,13 +2957,13 @@
      "timestamp": 1793422767.425202,
      "event_type": "request_sent",
      "phase": "A",
-     "message": "[CONTROL_OWNER] Sending GET http://127.0.0.1:8000/target/projects/proj_43/export as usr_aman_101",
+     "message": "[CONTROL_OWNER] Sending GET https://api.target.internal/v1/projects/proj_43/export as usr_aman_101",
      "data": {
       "step_id": "ctrl_exportProjectBilling",
       "operation_id": "exportProjectBilling",
       "identity": "usr_aman_101",
       "method": "GET",
-      "url": "http://127.0.0.1:8000/target/projects/proj_43/export",
+      "url": "https://api.target.internal/v1/projects/proj_43/export",
       "headers": {
        "Authorization": "[REDACTED]"
       }
@@ -2975,7 +2975,7 @@
      "timestamp": 1793422767.4423873,
      "event_type": "response_received",
      "phase": "A",
-     "message": "[CONTROL_OWNER] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43/export (2.7ms)",
+     "message": "[CONTROL_OWNER] Received HTTP 200 for GET https://api.target.internal/v1/projects/proj_43/export (2.7ms)",
      "data": {
       "step_id": "ctrl_exportProjectBilling",
       "operation_id": "exportProjectBilling",
@@ -2993,13 +2993,13 @@
      "timestamp": 1793422767.4423873,
      "event_type": "request_sent",
      "phase": "B",
-     "message": "[PROBE_ADVERSARY] Sending GET http://127.0.0.1:8000/target/projects/proj_43/export as usr_taaran_202",
+     "message": "[PROBE_ADVERSARY] Sending GET https://api.target.internal/v1/projects/proj_43/export as usr_taaran_202",
      "data": {
       "step_id": "probe_exportProjectBilling",
       "operation_id": "exportProjectBilling",
       "identity": "usr_taaran_202",
       "method": "GET",
-      "url": "http://127.0.0.1:8000/target/projects/proj_43/export",
+      "url": "https://api.target.internal/v1/projects/proj_43/export",
       "headers": {
        "Authorization": "[REDACTED]"
       }
@@ -3011,7 +3011,7 @@
      "timestamp": 1793422767.4587104,
      "event_type": "response_received",
      "phase": "B",
-     "message": "[PROBE_ADVERSARY] Received HTTP 403 for GET http://127.0.0.1:8000/target/projects/proj_43/export (1.78ms)",
+     "message": "[PROBE_ADVERSARY] Received HTTP 403 for GET https://api.target.internal/v1/projects/proj_43/export (1.78ms)",
      "data": {
       "step_id": "probe_exportProjectBilling",
       "operation_id": "exportProjectBilling",
@@ -3043,13 +3043,13 @@
      "timestamp": 1793422767.494194,
      "event_type": "request_sent",
      "phase": "A",
-     "message": "[CONTROL_OWNER] Sending GET http://127.0.0.1:8000/target/projects/proj_43/summary as usr_aman_101",
+     "message": "[CONTROL_OWNER] Sending GET https://api.target.internal/v1/projects/proj_43/summary as usr_aman_101",
      "data": {
       "step_id": "ctrl_getProjectSummary",
       "operation_id": "getProjectSummary",
       "identity": "usr_aman_101",
       "method": "GET",
-      "url": "http://127.0.0.1:8000/target/projects/proj_43/summary",
+      "url": "https://api.target.internal/v1/projects/proj_43/summary",
       "headers": {
        "Authorization": "[REDACTED]"
       }
@@ -3061,7 +3061,7 @@
      "timestamp": 1793422767.498203,
      "event_type": "response_received",
      "phase": "A",
-     "message": "[CONTROL_OWNER] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43/summary (1.47ms)",
+     "message": "[CONTROL_OWNER] Received HTTP 200 for GET https://api.target.internal/v1/projects/proj_43/summary (1.47ms)",
      "data": {
       "step_id": "ctrl_getProjectSummary",
       "operation_id": "getProjectSummary",
@@ -3079,13 +3079,13 @@
      "timestamp": 1793422767.5107558,
      "event_type": "request_sent",
      "phase": "B",
-     "message": "[PROBE_ADVERSARY] Sending GET http://127.0.0.1:8000/target/projects/proj_43/summary as usr_taaran_202",
+     "message": "[PROBE_ADVERSARY] Sending GET https://api.target.internal/v1/projects/proj_43/summary as usr_taaran_202",
      "data": {
       "step_id": "probe_getProjectSummary",
       "operation_id": "getProjectSummary",
       "identity": "usr_taaran_202",
       "method": "GET",
-      "url": "http://127.0.0.1:8000/target/projects/proj_43/summary",
+      "url": "https://api.target.internal/v1/projects/proj_43/summary",
       "headers": {
        "Authorization": "[REDACTED]"
       }
@@ -3097,7 +3097,7 @@
      "timestamp": 1793422767.531687,
      "event_type": "response_received",
      "phase": "B",
-     "message": "[PROBE_ADVERSARY] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43/summary (1.33ms)",
+     "message": "[PROBE_ADVERSARY] Received HTTP 200 for GET https://api.target.internal/v1/projects/proj_43/summary (1.33ms)",
      "data": {
       "step_id": "probe_getProjectSummary",
       "operation_id": "getProjectSummary",
@@ -3129,13 +3129,13 @@
      "timestamp": 1793422767.544803,
      "event_type": "request_sent",
      "phase": "A",
-     "message": "[CONTROL_OWNER] Sending GET http://127.0.0.1:8000/target/projects/proj_43/members as usr_aman_101",
+     "message": "[CONTROL_OWNER] Sending GET https://api.target.internal/v1/projects/proj_43/members as usr_aman_101",
      "data": {
       "step_id": "ctrl_getProjectMembers",
       "operation_id": "getProjectMembers",
       "identity": "usr_aman_101",
       "method": "GET",
-      "url": "http://127.0.0.1:8000/target/projects/proj_43/members",
+      "url": "https://api.target.internal/v1/projects/proj_43/members",
       "headers": {
        "Authorization": "[REDACTED]"
       }
@@ -3147,7 +3147,7 @@
      "timestamp": 1793422767.5586948,
      "event_type": "response_received",
      "phase": "A",
-     "message": "[CONTROL_OWNER] Received HTTP 404 for GET http://127.0.0.1:8000/target/projects/proj_43/members (1.04ms)",
+     "message": "[CONTROL_OWNER] Received HTTP 404 for GET https://api.target.internal/v1/projects/proj_43/members (1.04ms)",
      "data": {
       "step_id": "ctrl_getProjectMembers",
       "operation_id": "getProjectMembers",
@@ -3179,13 +3179,13 @@
      "timestamp": 1793422767.5914307,
      "event_type": "request_sent",
      "phase": "A",
-     "message": "[CONTROL_OWNER] Sending PATCH http://127.0.0.1:8000/target/projects/proj_43 as usr_aman_101",
+     "message": "[CONTROL_OWNER] Sending PATCH https://api.target.internal/v1/projects/proj_43 as usr_aman_101",
      "data": {
       "step_id": "ctrl_updateProject",
       "operation_id": "updateProject",
       "identity": "usr_aman_101",
       "method": "PATCH",
-      "url": "http://127.0.0.1:8000/target/projects/proj_43",
+      "url": "https://api.target.internal/v1/projects/proj_43",
       "headers": {
        "Authorization": "[REDACTED]"
       }
@@ -3197,7 +3197,7 @@
      "timestamp": 1793422767.603912,
      "event_type": "response_received",
      "phase": "A",
-     "message": "[CONTROL_OWNER] Received HTTP 200 for PATCH http://127.0.0.1:8000/target/projects/proj_43 (1.77ms)",
+     "message": "[CONTROL_OWNER] Received HTTP 200 for PATCH https://api.target.internal/v1/projects/proj_43 (1.77ms)",
      "data": {
       "step_id": "ctrl_updateProject",
       "operation_id": "updateProject",
@@ -3215,13 +3215,13 @@
      "timestamp": 1793422767.6086354,
      "event_type": "request_sent",
      "phase": "B",
-     "message": "[PROBE_ADVERSARY] Sending PATCH http://127.0.0.1:8000/target/projects/proj_43 as usr_taaran_202",
+     "message": "[PROBE_ADVERSARY] Sending PATCH https://api.target.internal/v1/projects/proj_43 as usr_taaran_202",
      "data": {
       "step_id": "probe_updateProject",
       "operation_id": "updateProject",
       "identity": "usr_taaran_202",
       "method": "PATCH",
-      "url": "http://127.0.0.1:8000/target/projects/proj_43",
+      "url": "https://api.target.internal/v1/projects/proj_43",
       "headers": {
        "Authorization": "[REDACTED]"
       }
@@ -3233,7 +3233,7 @@
      "timestamp": 1793422767.6283224,
      "event_type": "response_received",
      "phase": "B",
-     "message": "[PROBE_ADVERSARY] Received HTTP 403 for PATCH http://127.0.0.1:8000/target/projects/proj_43 (1.82ms)",
+     "message": "[PROBE_ADVERSARY] Received HTTP 403 for PATCH https://api.target.internal/v1/projects/proj_43 (1.82ms)",
      "data": {
       "step_id": "probe_updateProject",
       "operation_id": "updateProject",
@@ -3265,13 +3265,13 @@
      "timestamp": 1793422767.648196,
      "event_type": "request_sent",
      "phase": "A",
-     "message": "[SETUP] Sending POST http://127.0.0.1:8000/target/projects as usr_aman_101",
+     "message": "[SETUP] Sending POST https://api.target.internal/v1/projects as usr_aman_101",
      "data": {
       "step_id": "disp_del_setup_788f",
       "operation_id": "createProject",
       "identity": "usr_aman_101",
       "method": "POST",
-      "url": "http://127.0.0.1:8000/target/projects",
+      "url": "https://api.target.internal/v1/projects",
       "headers": {
        "Authorization": "[REDACTED]"
       }
@@ -3283,7 +3283,7 @@
      "timestamp": 1793422767.6585543,
      "event_type": "response_received",
      "phase": "A",
-     "message": "[SETUP] Received HTTP 201 for POST http://127.0.0.1:8000/target/projects (1.68ms)",
+     "message": "[SETUP] Received HTTP 201 for POST https://api.target.internal/v1/projects (1.68ms)",
      "data": {
       "step_id": "disp_del_setup_788f",
       "operation_id": "createProject",
@@ -3301,13 +3301,13 @@
      "timestamp": 1793422767.6752102,
      "event_type": "request_sent",
      "phase": "B",
-     "message": "[PROBE_ADVERSARY] Sending DELETE http://127.0.0.1:8000/target/projects/proj_44 as usr_taaran_202",
+     "message": "[PROBE_ADVERSARY] Sending DELETE https://api.target.internal/v1/projects/proj_44 as usr_taaran_202",
      "data": {
       "step_id": "probe_del_proj_44",
       "operation_id": "deleteProject",
       "identity": "usr_taaran_202",
       "method": "DELETE",
-      "url": "http://127.0.0.1:8000/target/projects/proj_44",
+      "url": "https://api.target.internal/v1/projects/proj_44",
       "headers": {
        "Authorization": "[REDACTED]"
       }
@@ -3319,7 +3319,7 @@
      "timestamp": 1793422767.6752102,
      "event_type": "response_received",
      "phase": "B",
-     "message": "[PROBE_ADVERSARY] Received HTTP 403 for DELETE http://127.0.0.1:8000/target/projects/proj_44 (1.59ms)",
+     "message": "[PROBE_ADVERSARY] Received HTTP 403 for DELETE https://api.target.internal/v1/projects/proj_44 (1.59ms)",
      "data": {
       "step_id": "probe_del_proj_44",
       "operation_id": "deleteProject",
@@ -3337,13 +3337,13 @@
      "timestamp": 1793422767.6921966,
      "event_type": "request_sent",
      "phase": "A",
-     "message": "[CONTROL_OWNER] Sending DELETE http://127.0.0.1:8000/target/projects/proj_44 as usr_aman_101",
+     "message": "[CONTROL_OWNER] Sending DELETE https://api.target.internal/v1/projects/proj_44 as usr_aman_101",
      "data": {
       "step_id": "ctrl_del_proj_44",
       "operation_id": "deleteProject",
       "identity": "usr_aman_101",
       "method": "DELETE",
-      "url": "http://127.0.0.1:8000/target/projects/proj_44",
+      "url": "https://api.target.internal/v1/projects/proj_44",
       "headers": {
        "Authorization": "[REDACTED]"
       }
@@ -3355,7 +3355,7 @@
      "timestamp": 1793422767.7105274,
      "event_type": "response_received",
      "phase": "A",
-     "message": "[CONTROL_OWNER] Received HTTP 200 for DELETE http://127.0.0.1:8000/target/projects/proj_44 (1.67ms)",
+     "message": "[CONTROL_OWNER] Received HTTP 200 for DELETE https://api.target.internal/v1/projects/proj_44 (1.67ms)",
      "data": {
       "step_id": "ctrl_del_proj_44",
       "operation_id": "deleteProject",

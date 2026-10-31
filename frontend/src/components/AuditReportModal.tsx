@@ -49,7 +49,7 @@ export const AuditReportModal: React.FC<AuditReportModalProps> = ({
   findings,
   operationCount,
   edgeCount,
-  targetUrl = 'http://127.0.0.1:8000/target',
+  targetUrl = 'https://api.target.internal/v1',
   isTargetPatched = false,
 }) => {
   const [activeTab, setActiveTab] = useState<'preview' | 'markdown'>('preview');

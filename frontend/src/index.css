@@ -108,9 +108,7 @@
   --gold-deep: #a8873a;
   --moss: #5d7a14;
   --blood: #b3342b;
-  --hero-px: 4px;
 }
-@media (max-height: 860px) { :root { --hero-px: 3px; } }
 
 @layer base {
   html { font-size: 18px; }
@@ -211,58 +209,120 @@ input[type="checkbox"]:checked::after { content: ""; width: 8px; height: 8px; ba
 .react-flow__node [class*="text-[9"],
 .react-flow__node [class*="text-[10"] { font-size: 14px !important; }
 
+/* The page scrolls over the graph (zoom needs Ctrl); this says so when the wheel is used on it. */
+.graph-hint {
+  position: absolute; left: 50%; bottom: 14px; z-index: 10; transform: translateX(-50%);
+  padding: 8px 12px; background: var(--ink); color: var(--paper); border: 2px solid var(--ink);
+  font-family: var(--font-display); font-size: 9px; letter-spacing: .08em; white-space: nowrap;
+  opacity: 0; transition: opacity .18s ease; pointer-events: none;
+}
+.graph-hint.is-on { opacity: .92; }
+/* fingers scroll the page; they do not pan the graph */
+@media (pointer: coarse) {
+  .react-flow__pane { touch-action: pan-y !important; }
+  .graph-hint { display: none; }
+}
+
 ::selection { background: var(--lime); color: var(--ink); }
 
 /* ============================================================
    HERO BANNER: the only place with scenery
-   Everything is sized in "art pixels" (--hero-px) so the pixel art
-   always lands on whole screen pixels.
+   The scenery is fine pixel art (1600 x 533 reference pixels). Everything
+   is placed in units of --u, the screen pixels per reference pixel, so the
+   banner scales with its height and every layer stays lined up.
    ============================================================ */
 .hero {
-  position: relative; flex: none; overflow: hidden;
-  height: calc(50 * var(--hero-px));
+  --h: clamp(220px, 20vw, 360px);
+  --u: calc(var(--h) / 533);
+  position: relative; flex: none; overflow: hidden; isolation: isolate;
+  height: var(--h);
 }
-.hero-scene {
-  position: absolute; bottom: 0; height: calc(50 * var(--hero-px));
-  pointer-events: none; user-select: none;
+.hero > * { pointer-events: none; user-select: none; }
+
+/* water and mist drift sideways by exactly one tile, so the loop never shows a seam */
+.hero-water, .hero-fog { position: absolute; left: 0; right: 0; overflow: hidden; }
+.hero-water { z-index: 0; bottom: 0; height: calc(var(--u) * 105); --tile: calc(var(--u) * 300); }
+.hero-fog { height: calc(var(--u) * 176); --tile: calc(var(--u) * 1024); }
+.hero-water i, .hero-fog i {
+  position: absolute; left: 0; bottom: 0; height: 100%; width: calc(100% + var(--tile));
+  background-repeat: repeat-x; background-size: var(--tile) 100%; background-position: left bottom;
+  will-change: transform; animation: hero-drift var(--drift, 160s) linear infinite;
 }
-.hero-scene img { display: block; height: 100%; width: auto; }
-/* a faint cell grid over the art, one line per art pixel */
-.hero-scene::after {
-  content: ""; position: absolute; inset: 0;
-  background-image:
-    linear-gradient(rgba(255, 252, 241, .16) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 252, 241, .16) 1px, transparent 1px);
-  background-size: var(--hero-px) var(--hero-px);
+.hero-water i { --drift: 150s; }
+.hero-fog--far { z-index: 1; bottom: calc(var(--u) * 34); opacity: .8; }
+.hero-fog--far i { --drift: 220s; }
+.hero-fog--near { z-index: 3; bottom: calc(var(--u) * -12); opacity: .7; }
+.hero-fog--near i { --drift: 140s; animation-direction: reverse; background-position: 38% bottom; }
+@keyframes hero-drift { to { transform: translate3d(calc(var(--tile) * -1), 0, 0); } }
+
+.hero-scene { position: absolute; z-index: 2; bottom: 0; height: 100%; }
+.hero-scene--left { left: 0; width: calc(var(--u) * 556); }
+.hero-scene--right { right: 0; width: calc(var(--u) * 552); }
+.hero-art { display: block; width: 100%; height: 100%; }
+
+/* the small floating islands bob on their own rhythm */
+.hero-island { position: absolute; will-change: transform; animation: hero-bob var(--bob, 7s) ease-in-out var(--delay, 0s) infinite alternate; }
+.hero-island img { display: block; width: 100%; height: 100%; }
+@keyframes hero-bob {
+  from { transform: translate3d(0, calc(var(--u) * -4), 0); }
+  to { transform: translate3d(0, calc(var(--u) * 4), 0); }
 }
-.hero-scene--left { left: 0; }
-.hero-scene--right { right: 0; }
-.hero-scene--right::after { background-position: right bottom; }
-.hero-emblem {
-  position: absolute; left: 50%; top: calc(1 * var(--hero-px)); height: calc(30 * var(--hero-px));
-  transform: translateX(-50%); pointer-events: none; user-select: none;
-  animation: ring-glow 5s steps(5) infinite;
+
+/* light, leaves, birds: drawn by heroLights.ts */
+.hero-lights { position: absolute; z-index: 4; inset: 0; width: 100%; height: 100%; }
+
+/* the golden ring breathes; it quickens while an audit runs */
+.hero-ring {
+  position: absolute; z-index: 5; left: 50%; top: calc(var(--u) * 12);
+  width: calc(var(--u) * 216); height: calc(var(--u) * 194); transform: translateX(-50%);
 }
+.hero-ring::before {
+  content: ""; position: absolute; inset: -16% -22%;
+  background: radial-gradient(closest-side, rgba(240, 200, 90, .34), rgba(240, 200, 90, .12) 58%, transparent 100%);
+  animation: ring-breathe 6s ease-in-out infinite;
+}
+.hero-ring img { position: relative; display: block; width: 100%; height: 100%; animation: ring-glow 6s ease-in-out infinite; }
+.hero--active .hero-ring::before, .hero--active .hero-ring img { animation-duration: 2.2s; }
+@keyframes ring-breathe { 0%, 100% { opacity: .3; transform: scale(.95); } 50% { opacity: 1; transform: scale(1.05); } }
 @keyframes ring-glow { 0%, 100% { opacity: .8; } 50% { opacity: 1; } }
+
+/* the wordmark: letters from the first row of the title block, subtitle tucked under their lime shadow */
 .hero-stack {
-  position: absolute; left: 50%; top: calc(12 * var(--hero-px)); transform: translateX(-50%);
+  position: absolute; z-index: 6; left: 50%; top: calc(var(--u) * 129); transform: translateX(-50%);
   display: flex; flex-direction: column; align-items: center;
 }
-.hero-title { display: block; height: calc(24 * var(--hero-px)); width: auto; }
+.hero-title { display: block; height: calc(var(--u) * 242.5); width: auto; overflow: visible; }
 .hero-sub {
-  margin-top: calc(2 * var(--hero-px)); display: flex; align-items: center; gap: 12px;
-  font-family: var(--font-display); font-size: 10px; letter-spacing: .32em; color: var(--ink); white-space: nowrap;
+  margin-top: calc(var(--u) * -17); display: flex; align-items: center; gap: calc(var(--u) * 18);
+  font-family: var(--font-display); font-size: max(9px, calc(var(--u) * 19)); letter-spacing: .32em;
+  color: var(--ink); white-space: nowrap;
 }
 .hero-tag {
-  margin-top: calc(1.5 * var(--hero-px)); font-family: var(--font-display); font-size: 8px; letter-spacing: .14em;
-  color: var(--ink-soft); white-space: nowrap;
+  margin-top: calc(var(--u) * 12); font-family: var(--font-display); font-size: max(7px, calc(var(--u) * 13));
+  letter-spacing: .14em; color: var(--ink-soft); white-space: nowrap;
 }
 .orn { display: inline-flex; align-items: center; gap: 6px; }
-.orn i { display: block; width: 26px; height: 2px; background: var(--gold); }
-@media (max-height: 860px) { .hero-sub { font-size: 9px; } }
-@media (max-width: 1180px) { .hero-scene { opacity: .4; } }
-@media (max-width: 900px) { .hero-scene, .hero-emblem { display: none; } }
-@media (prefers-reduced-motion: reduce) { .hero-emblem { animation: none; } }
+.orn i { display: block; width: max(16px, calc(var(--u) * 46)); height: 2px; background: var(--gold); }
+
+/* vines sway half a letter-cell at a time, out of step with each other */
+.vine { animation: vine-sway 3.6s steps(1, end) infinite; }
+.vine-1 { animation-duration: 4.7s; animation-delay: -1.4s; }
+.vine-2 { animation-duration: 5.6s; animation-delay: -2.9s; }
+@keyframes vine-sway { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(.5px); } }
+
+@media (max-width: 1180px) { .hero-scene { opacity: .5; } }
+@media (max-width: 900px) {
+  .hero { --h: 190px; }
+  .hero-scene, .hero-ring, .hero-lights { display: none; }
+}
+@media (max-width: 640px) {
+  .hero-sub .orn { display: none; }
+  .hero-sub { letter-spacing: .18em; gap: 8px; font-size: 8px; }
+  .hero-tag { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-water i, .hero-fog i, .hero-island, .hero-ring::before, .hero-ring img, .vine { animation: none; }
+}
 
 /* ---------- Toolbar under the hero ---------- */
 .toolbar {

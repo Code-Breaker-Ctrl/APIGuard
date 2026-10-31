@@ -2,9 +2,11 @@ import React from 'react';
 
 /*
  * The APIGuard wordmark, drawn as an SVG of square "art pixels": chunky black letters with a
- * faint cell grid, a lime drop shadow, and (in the hero) moss and small flowers growing over
- * the letters. Everything is generated from the glyph bitmaps below with a fixed seed, so the
- * result is identical on every render and stays crisp at any zoom.
+ * faint cell grid, a lime drop shadow, and (in the hero) moss, hanging vines and small flowers
+ * growing over the letters. The letters are built from the glyph bitmaps below; the growth is
+ * drawn at half a letter-cell, so it reads as fine detail next to the big letter blocks. A fixed
+ * seed makes the result identical on every render, and it stays crisp at any zoom. The vines
+ * sway one half-cell at a time (see .vine in index.css).
  */
 
 const INK = '#181a14';
@@ -14,6 +16,7 @@ const MOSS_D = '#34400f';
 const MOSS = '#5d7a14';
 const MOSS_L = '#93a42c';
 const GOLD = '#e8c060';
+const GOLD_L = '#f6dc88';
 
 const GLYPHS: Record<string, string[]> = {
   A: [
@@ -49,6 +52,7 @@ const GLYPHS: Record<string, string[]> = {
 const WORD = 'APIGUARD';
 const LETTER_GAP = 2;
 const PAD_X = 2;
+const VINE_GROUPS = 3;
 
 const mulberry32 = (seed: number) => () => {
   seed |= 0;
@@ -59,18 +63,26 @@ const mulberry32 = (seed: number) => () => {
 };
 
 const cell = (x: number, y: number) => `M${x} ${y}h1v1h-1z`;
+/** a half-cell square at fine coordinates (two per cell) */
+const half = (fx: number, fy: number) => `M${fx / 2} ${fy / 2}h.5v.5h-.5z`;
+
+interface Growth {
+  /** -1 stays still; 0..2 sway out of step with each other */
+  group: number;
+  paths: [colour: string, d: string][];
+}
 
 interface Built {
   width: number;
   height: number;
   letters: string;
   grid: string;
-  growth: [string, string][];
+  growth: Growth[];
 }
 
 const build = (overgrowth: boolean): Built => {
   const padTop = overgrowth ? 7 : 1;
-  const padBottom = overgrowth ? 3 : 2;
+  const padBottom = overgrowth ? 4 : 2;
   const filled = new Set<string>();
   const centres: number[] = [];
   let x0 = PAD_X;
@@ -97,58 +109,98 @@ const build = (overgrowth: boolean): Built => {
     if (has(x, y + 1)) grid += `M${x} ${y + 1}h1`;
   });
 
-  const growth = new Map<string, string>();
+  // fine-grained growth: key "fx,fy" -> colour, per sway group
+  const groups = new Map<number, Map<string, string>>();
   if (overgrowth) {
     const rand = mulberry32(2025);
-    const put = (x: number, y: number, colour: string) => {
-      if (!has(x, y)) growth.set(`${x},${y}`, colour);
+    const put = (group: number, fx: number, fy: number, colour: string) => {
+      if (has(Math.floor(fx / 2), Math.floor(fy / 2))) return;
+      let g = groups.get(group);
+      if (!g) groups.set(group, (g = new Map()));
+      g.set(`${fx},${fy}`, colour);
     };
+    const side = () => (rand() < 0.5 ? -1 : 1);
+
     [...filled]
       .map((k) => k.split(',').map(Number))
       .sort((a, b) => a[1] - b[1] || a[0] - b[0])
-      .forEach(([x, y]) => {
-        if (!has(x, y - 1)) {
-          if (rand() < 0.2) {
-            const h = 1 + Math.floor(rand() * 3);
-            for (let i = 1; i <= h; i++) put(x, y - i, i === h && rand() < 0.5 ? MOSS_L : i === 1 ? MOSS_D : MOSS);
-            if (rand() < 0.5) put(x + (rand() < 0.5 ? -1 : 1), y - h, MOSS);
-          } else if (rand() < 0.1) {
-            put(x, y - 1, MOSS_D);
+      .forEach(([cx, cy]) => {
+        for (let s = 0; s < 2; s++) {
+          const fx = cx * 2 + s;
+          const group = (cx + s) % VINE_GROUPS;
+
+          if (!has(cx, cy - 1)) {
+            const r = rand();
+            if (r < 0.3) {
+              // a vine climbing up from the top edge
+              const len = 2 + Math.floor(rand() * 6);
+              let x = fx;
+              const y0 = cy * 2 - 1;
+              for (let i = 0; i < len; i++) {
+                put(group, x, y0 - i, i === 0 ? MOSS_D : i === len - 1 ? MOSS_L : MOSS);
+                if (rand() < 0.28) x += side();
+              }
+              if (len > 3 && rand() < 0.6) put(group, x + side(), y0 - Math.floor(len / 2), MOSS_L);
+            } else if (r < 0.66) {
+              // moss capping the edge
+              put(-1, fx, cy * 2 - 1, MOSS_D);
+              if (rand() < 0.4) put(-1, fx, cy * 2 - 2, MOSS);
+            }
+          }
+
+          if (!has(cx, cy + 1) && rand() < 0.13) {
+            // a vine hanging from the bottom edge
+            const len = 2 + Math.floor(rand() * 7);
+            let x = fx;
+            const y0 = cy * 2 + 2;
+            for (let i = 0; i < len; i++) {
+              put(group, x, y0 + i, i === 0 ? MOSS_D : i === len - 1 ? MOSS_L : MOSS);
+              if (rand() < 0.25) x += side();
+            }
+            if (len > 3 && rand() < 0.5) put(group, x + side(), y0 + Math.floor(len / 2), MOSS_L);
           }
         }
-        if (!has(x, y + 1) && rand() < 0.06) {
-          put(x, y + 1, MOSS);
-          if (rand() < 0.5) put(x, y + 2, MOSS_D);
-        }
-        if (!has(x - 1, y) && rand() < 0.05) put(x - 1, y, MOSS);
+        if (!has(cx - 1, cy) && rand() < 0.05) put(-1, cx * 2 - 1, cy * 2 + (rand() < 0.5 ? 0 : 1), MOSS);
+        if (!has(cx + 1, cy) && rand() < 0.05) put(-1, cx * 2 + 2, cy * 2 + (rand() < 0.5 ? 0 : 1), MOSS);
       });
 
     // small flowers standing on the A, I, second A and D
-    [0, 2, 5, 7].forEach((letter) => {
+    [0, 2, 5, 7].forEach((letter, n) => {
       const cx = centres[letter];
       let top = padTop;
       while (!has(cx, top)) top++;
-      for (let y = top - 3; y < top; y++) growth.set(`${cx},${y}`, MOSS_D);
-      const fy = top - 4;
-      [[0, -1], [-1, 0], [1, 0], [0, 1]].forEach(([dx, dy]) => growth.set(`${cx + dx},${fy + dy}`, GOLD));
-      growth.set(`${cx},${fy}`, INK);
+      const group = n % VINE_GROUPS;
+      const fx = cx * 2;
+      const base = top * 2 - 1;
+      for (let i = 0; i < 6; i++) put(group, fx, base - i, i % 2 ? MOSS : MOSS_D);
+      put(group, fx - 1, base - 3, MOSS_L);
+      put(group, fx + 1, base - 4, MOSS_L);
+      const fy = base - 7;
+      [[0, -1], [-1, 0], [1, 0], [0, 1]].forEach(([dx, dy]) => put(group, fx + dx, fy + dy, GOLD));
+      [[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(([dx, dy]) => put(group, fx + dx, fy + dy, GOLD_L));
+      put(group, fx, fy, INK);
     });
   }
 
-  const byColour: Record<string, string> = {};
-  growth.forEach((colour, key) => {
-    const [x, y] = key.split(',').map(Number);
-    byColour[colour] = (byColour[colour] || '') + cell(x, y);
-  });
+  const growth: Growth[] = [...groups.entries()]
+    .sort((a, b) => a[0] - b[0])
+    .map(([group, cellsByKey]) => {
+      const byColour: Record<string, string> = {};
+      cellsByKey.forEach((colour, key) => {
+        const [fx, fy] = key.split(',').map(Number);
+        byColour[colour] = (byColour[colour] || '') + half(fx, fy);
+      });
+      return { group, paths: Object.entries(byColour) };
+    });
 
-  return { width, height, letters, grid, growth: Object.entries(byColour) };
+  return { width, height, letters, grid, growth };
 };
 
 const HERO = build(true);
 const MINI = build(false);
 
 interface PixelTitleProps {
-  /** "hero" adds moss and flowers; "mini" is the plain wordmark used in the collapsed toolbar. */
+  /** "hero" adds moss, vines and flowers; "mini" is the plain wordmark used in the collapsed toolbar. */
   variant?: 'hero' | 'mini';
   className?: string;
   style?: React.CSSProperties;
@@ -171,8 +223,12 @@ export const PixelTitle: React.FC<PixelTitleProps> = ({ variant = 'hero', classN
       </g>
       <path d={t.letters} fill={INK} />
       <path d={t.grid} fill="none" stroke={GRID} strokeWidth="1" vectorEffect="non-scaling-stroke" />
-      {t.growth.map(([colour, d]) => (
-        <path key={colour} d={d} fill={colour} />
+      {t.growth.map((g) => (
+        <g key={g.group} className={g.group >= 0 ? `vine vine-${g.group}` : undefined}>
+          {g.paths.map(([colour, d]) => (
+            <path key={colour} d={d} fill={colour} />
+          ))}
+        </g>
       ))}
     </svg>
   );

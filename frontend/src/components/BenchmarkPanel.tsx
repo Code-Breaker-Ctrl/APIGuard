@@ -67,7 +67,7 @@ export const BenchmarkPanel: React.FC<BenchmarkPanelProps> = ({ onClose }) => {
   return (
     <div className="flex flex-col h-full bg-slate-950 text-xs font-mono select-none">
       {/* Header */}
-      <div className="h-12 px-5 bg-slate-900 border-b border-slate-700 flex items-center justify-between shrink-0">
+      <div className="min-h-12 py-2 gap-2 px-5 bg-slate-900 border-b border-slate-700 flex flex-wrap items-center justify-between shrink-0">
         <div className="flex items-center gap-2.5">
           <BarChart3 className="w-4 h-4 text-cyan-400" />
           <span className="font-bold text-slate-100 text-sm">Empirical Benchmark & Controlled Ablation</span>

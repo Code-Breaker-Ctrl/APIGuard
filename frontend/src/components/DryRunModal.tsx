@@ -22,7 +22,7 @@ export const DryRunModal: React.FC<DryRunModalProps> = ({
   return (
     <div className="flex flex-col h-full bg-slate-950 text-xs font-mono select-none">
       {/* Header */}
-      <div className="h-12 px-5 bg-slate-900 border-b border-slate-700 flex items-center justify-between shrink-0">
+      <div className="min-h-12 py-2 gap-2 px-5 bg-slate-900 border-b border-slate-700 flex flex-wrap items-center justify-between shrink-0">
         <div className="flex items-center gap-2.5">
           <Cpu className="w-4 h-4 text-amber-400" />
           <span className="font-bold text-slate-100 text-sm">Dry-Run Execution Plan Preview</span>
@@ -172,7 +172,7 @@ export const DryRunModal: React.FC<DryRunModalProps> = ({
       </div>
 
       {/* Footer */}
-      <div className="h-14 px-5 bg-slate-900 border-t border-slate-700 flex items-center justify-between shrink-0">
+      <div className="min-h-14 py-2 gap-2 px-5 bg-slate-900 border-t border-slate-700 flex flex-wrap items-center justify-between shrink-0">
         {onClose ? (
           <button
             onClick={onClose}

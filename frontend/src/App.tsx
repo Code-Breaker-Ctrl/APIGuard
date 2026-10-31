@@ -282,11 +282,11 @@ export default function App() {
       )}
 
       {/* MASTHEAD: scenery and wordmark (collapsible) */}
-      {!bannerCollapsed && <HeroBanner />}
+      {!bannerCollapsed && <HeroBanner active={isScanning} />}
 
       {/* TOOLBAR */}
       <div className="toolbar sticky top-0 z-40">
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           {bannerCollapsed && <MiniBrand />}
           <button className="btn-ghost" aria-pressed={dryRun} onClick={() => setDryRun(!dryRun)} title="When on, the main button previews the plan instead of sending traffic">
             Dry run

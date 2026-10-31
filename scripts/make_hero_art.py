@@ -1,20 +1,30 @@
 """
-Generates the pixel-art scenery for the dashboard's hero banner.
+Builds the hero banner's art from a reference banner image.
 
-Output (native resolution; the UI scales it up 4x with `image-rendering: pixelated`):
-    frontend/src/assets/hero/hero-left.png    misty ruins, floating islands, a seated knight and a planted sword
-    frontend/src/assets/hero/hero-right.png   a golden tree over a ruined fortress, water and rocks
-    frontend/src/assets/hero/emblem.png       a thin golden ring sigil
+The scenery (ruins, a resting knight, a golden tree over a fortress, the thin golden ring, the
+water) is cut from the reference at its own resolution instead of being redrawn, so the banner keeps
+the fine pixel grain of the original. The reference's title, subtitle and ornaments are erased (the
+page draws its own), the paper colour is converted to transparency so the art sits on the page's
+own background, and the small floating islands are cut into separate sprites so the page can make
+them bob. The mist and the repeating water strip are generated.
 
-Everything is drawn procedurally with a fixed seed, so re-running gives identical files.
+Output (frontend/src/assets/hero/):
+    hero-left.webp, hero-right.webp   the two scenes
+    island-*.webp                    floating islands, animated by the page
+    emblem.webp                      the golden ring
+    hero-water.webp                  seamless horizontal water strip
+    hero-fog.webp                    seamless horizontal mist strip
+    hero-meta.json                  where everything sits in the reference's pixel coordinates
 
 Usage (from the repo root):
     pip install -r scripts/requirements.txt          # Pillow and numpy, only needed to regenerate the art
-    python scripts/make_hero_art.py                  # write the assets
-    python scripts/make_hero_art.py --preview DIR    # also write 4x previews on the cream paper colour
+    python scripts/make_hero_art.py --src path/to/reference-banner.webp
+    python scripts/make_hero_art.py --src ... --preview DIR    # also write a preview on the paper colour
+
+The reference is not stored in the repo; pass it with --src. Everything is deterministic.
 """
 import argparse
-import math
+import json
 from pathlib import Path
 
 import numpy as np
@@ -23,531 +33,199 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / 'frontend' / 'src' / 'assets' / 'hero'
 
-# ---------------------------------------------------------------- palette
-PAPER = (255, 252, 241)
-INK = (24, 26, 20)
-INK2 = (46, 50, 38)
-STONE_XL = (198, 196, 174)
-STONE_L = (162, 160, 140)
-STONE_M = (120, 120, 104)
-STONE_D = (86, 88, 74)
-MIST = (232, 224, 190)
-MOSS_D = (52, 58, 18)
-MOSS = (98, 112, 34)
-MOSS_L = (146, 164, 44)
-LIME = (216, 232, 32)
-GOLD_D = (176, 140, 56)
-GOLD = (232, 192, 96)
-GOLD_L = (244, 218, 132)
-GOLD_XL = (252, 240, 186)
-CAPE = (158, 120, 38)
-CAPE_D = (100, 74, 26)
-STEEL = (214, 216, 200)
-STEEL_D = (136, 140, 124)
+PAPER = (255, 252, 241)          # the page background (--paper)
+CLEAN = 0.035                    # darkness below this is the reference's faint grid dots, not art
+
+# --- where things are in the reference (1600 x 533), in its pixels
+LEFT = (0, 556)                  # x range of the left scene
+RIGHT = (1048, 1600)             # x range of the right scene
+LEFT_FADE = (470, 556)           # the scene thins out into the page towards the middle
+RIGHT_FADE = (1048, 1112)
+EMBLEM = (696, 12, 912, 206)     # x0, y0, x1, y1
+EMBLEM_FADE_FROM = 182           # the ring melts away before it meets the title
+WATER = (640, 428, 940, 533)
+
+# parts of the reference's own title block, erased from the scenes: (x0, y0, x1, y1)
+ERASE = [
+    (402, 168, 560, 347),        # left: first letter, vines, flower
+    (1048, 168, 1196, 347),      # right: last letter, vines, flower
+    (495, 342, 560, 362),        # ornament lines under the title
+    (1048, 342, 1118, 362),
+]
+# the three birds are redrawn by the page so they can fly
+BIRDS = [(244, 168, 260, 181), (330, 168, 350, 181), (290, 188, 308, 202)]
+# floating islands cut into sprites: (id, scene, x0, y0, x1, y1)
+ISLANDS = [
+    ('island-a', 'left', 52, 162, 96, 248),
+    ('island-b', 'left', 15, 219, 49, 292),
+    ('island-c', 'left', 38, 260, 78, 346),
+    ('island-d', 'right', 1136, 350, 1165, 408),
+]
 
 
-def bayer(n):
-    m = np.array([[0]])
-    while m.shape[0] < n:
-        m = np.block([[4 * m, 4 * m + 2], [4 * m + 3, 4 * m + 1]])
-    return (m + 0.5) / (n * n)
-
-
-B8 = bayer(8)
-STIPPLE = np.random.default_rng(99).random((64, 64))
-
-
-def smoothstep(t):
-    t = max(0.0, min(1.0, t))
+def smoothstep(e0, e1, x):
+    t = np.clip((x - e0) / (e1 - e0), 0.0, 1.0)
     return t * t * (3 - 2 * t)
 
 
-class Canvas:
-    """An RGBA pixel canvas where every pixel is either fully opaque or fully transparent."""
-
-    def __init__(self, w, h):
-        self.w, self.h = w, h
-        self.a = np.zeros((h, w, 4), dtype=np.uint8)
-
-    def inside(self, x, y):
-        return 0 <= x < self.w and 0 <= y < self.h
-
-    def px(self, x, y, c):
-        x, y = int(x), int(y)
-        if self.inside(x, y):
-            self.a[y, x] = (*c, 255)
-
-    def clear(self, x, y):
-        x, y = int(x), int(y)
-        if self.inside(x, y):
-            self.a[y, x] = (0, 0, 0, 0)
-
-    def opaque(self, x, y):
-        return self.inside(x, y) and self.a[y, x, 3] > 0
-
-    def rect(self, x0, y0, x1, y1, c):
-        for y in range(int(y0), int(y1)):
-            for x in range(int(x0), int(x1)):
-                self.px(x, y, c)
-
-    def line(self, x0, y0, x1, y1, c):
-        x0, y0, x1, y1 = int(round(x0)), int(round(y0)), int(round(x1)), int(round(y1))
-        dx, dy = abs(x1 - x0), -abs(y1 - y0)
-        sx, sy = (1 if x0 < x1 else -1), (1 if y0 < y1 else -1)
-        err = dx + dy
-        while True:
-            self.px(x0, y0, c)
-            if x0 == x1 and y0 == y1:
-                break
-            e2 = 2 * err
-            if e2 >= dy:
-                err += dy
-                x0 += sx
-            if e2 <= dx:
-                err += dx
-                y0 += sy
-
-    def poly(self, pts, c):
-        ys = [p[1] for p in pts]
-        for y in range(int(math.floor(min(ys))), int(math.ceil(max(ys))) + 1):
-            xs = []
-            n = len(pts)
-            for i in range(n):
-                (xa, ya), (xb, yb) = pts[i], pts[(i + 1) % n]
-                if ya == yb:
-                    continue
-                if min(ya, yb) <= y + 0.5 < max(ya, yb):
-                    xs.append(xa + (y + 0.5 - ya) * (xb - xa) / (yb - ya))
-            xs.sort()
-            for i in range(0, len(xs) - 1, 2):
-                for x in range(int(round(xs[i])), int(round(xs[i + 1]))):
-                    self.px(x, y, c)
-
-    def ellipse(self, cx, cy, rx, ry, c):
-        for y in range(int(cy - ry) - 1, int(cy + ry) + 2):
-            for x in range(int(cx - rx) - 1, int(cx + rx) + 2):
-                if ((x + 0.5 - cx) / rx) ** 2 + ((y + 0.5 - cy) / ry) ** 2 <= 1:
-                    self.px(x, y, c)
-
-    def over(self, other, dx=0, dy=0):
-        """Paint the opaque pixels of `other` on top of this canvas."""
-        ys, xs = np.nonzero(other.a[:, :, 3])
-        for y, x in zip(ys, xs):
-            self.px(x + dx, y + dy, tuple(other.a[y, x, :3]))
-
-    def mask_by(self, fn):
-        """Remove pixels where fn(x, y) returns a removal probability above the dither threshold."""
-        ys, xs = np.nonzero(self.a[:, :, 3])
-        for y, x in zip(ys, xs):
-            if 0.45 * B8[y % 8, x % 8] + 0.55 * STIPPLE[y % 64, x % 64] < fn(x, y):
-                self.clear(x, y)
-
-    def save(self, path, scale=1, bg=None):
-        im = Image.fromarray(self.a, 'RGBA')
-        if bg is not None:
-            base = Image.new('RGBA', im.size, (*bg, 255))
-            base.alpha_composite(im)
-            im = base
-        if scale != 1:
-            im = im.resize((im.width * scale, im.height * scale), Image.NEAREST)
-        im.save(path)
+def paper_to_alpha(rgb, bg):
+    """Colour-to-alpha: keeps the ink, makes the paper transparent (compositing back gives the original)."""
+    p = rgb.astype(np.float32)
+    b = np.array(bg, np.float32)
+    a = np.clip((b - p) / b, 0.0, 1.0).max(axis=2)
+    col = (p - b * (1 - a)[..., None]) / np.maximum(a, 1e-4)[..., None]
+    col = np.clip(col, 0, 255)
+    a = np.clip((a - CLEAN) / (1 - CLEAN), 0.0, 1.0)
+    return np.dstack([col, a * 255.0])
 
 
-def circle_pts(cx, cy, r):
-    pts = set()
-    x, y, d = r, 0, 1 - r
-    while x >= y:
-        for sx, sy in ((x, y), (y, x), (-y, x), (-x, y), (-x, -y), (-y, -x), (y, -x), (x, -y)):
-            pts.add((int(round(cx + sx)), int(round(cy + sy))))
-        y += 1
-        if d < 0:
-            d += 2 * y + 1
-        else:
-            x -= 1
-            d += 2 * (y - x) + 1
-    return pts
+def feather_box(alpha, x0, y0, x1, y1):
+    alpha[max(y0, 0):y1, max(x0, 0):x1] = 0.0
 
 
-def fbm(w, h, rng, cells=(12, 6, 3), weights=(0.5, 0.3, 0.2)):
-    ys, xs = np.mgrid[0:h, 0:w]
-    out = np.zeros((h, w))
-    for cell, wt in zip(cells, weights):
-        gw, gh = w // cell + 3, h // cell + 3
-        g = rng.random((gh, gw))
-        fx, fy = xs / cell, ys / cell
-        x0, y0 = fx.astype(int), fy.astype(int)
-        tx, ty = fx - x0, fy - y0
-        tx, ty = tx * tx * (3 - 2 * tx), ty * ty * (3 - 2 * ty)
-        n = (g[y0, x0] * (1 - tx) + g[y0, x0 + 1] * tx) * (1 - ty) + (g[y0 + 1, x0] * (1 - tx) + g[y0 + 1, x0 + 1] * tx) * ty
-        out += n * wt
+def save(arr, name):
+    img = Image.fromarray(np.clip(np.rint(arr), 0, 255).astype(np.uint8), 'RGBA')
+    img.save(OUT / name, lossless=True, quality=100, method=6)
+    return img
+
+
+def periodic_noise(h, w, sx, sy, rng):
+    """Gaussian-filtered noise that wraps in both directions (so strips tile)."""
+    n = rng.standard_normal((h, w))
+    fy = np.fft.fftfreq(h)[:, None]
+    fx = np.fft.fftfreq(w)[None, :]
+    g = np.exp(-2 * np.pi ** 2 * ((sx * fx) ** 2 + (sy * fy) ** 2))
+    out = np.fft.ifft2(np.fft.fft2(n) * g).real
+    return (out - out.min()) / (out.max() - out.min())
+
+
+BAYER4 = (np.array([[0, 8, 2, 10], [12, 4, 14, 6], [3, 11, 1, 9], [15, 7, 13, 5]]) + 0.5) / 16.0
+
+
+def make_fog(cells_w=256, cells_h=44, cell=4, seed=7):
+    """Pixel-dithered mist that is thick near the bottom and wraps horizontally."""
+    rng = np.random.default_rng(seed)
+    broad = periodic_noise(cells_h, cells_w, 11.0, 3.0, rng)
+    fine = periodic_noise(cells_h, cells_w, 4.0, 1.5, rng)
+    v = 0.62 * broad + 0.38 * fine
+    v = np.clip((v - 0.40) * 3.3, 0.0, 1.0)
+    y = (np.arange(cells_h)[:, None] + 0.5) / cells_h
+    v = v * smoothstep(0.0, 0.62, y) * (1.0 - 0.35 * smoothstep(0.86, 1.0, y))
+    levels = np.array([0.0, 0.16, 0.30, 0.46])
+    t = v * (len(levels) - 1)
+    base = np.floor(t)
+    thr = np.tile(BAYER4, (cells_h // 4 + 1, cells_w // 4 + 1))[:cells_h, :cells_w]
+    idx = np.clip(base + ((t - base) > thr), 0, len(levels) - 1).astype(int)
+    alpha = levels[idx]
+    warm = periodic_noise(cells_h, cells_w, 6.0, 2.0, rng) > 0.62
+    rgb = np.where(warm[..., None], np.array([233, 212, 150.0]), np.array([232, 226, 200.0]))
+    cells = np.dstack([rgb, alpha * 255.0])
+    return np.repeat(np.repeat(cells, cell, axis=0), cell, axis=1)
+
+
+def make_water_tile(rgba, box, cross=70):
+    """Cuts a strip and cross-fades it with itself shifted by half, so it repeats seamlessly."""
+    x0, y0, x1, y1 = box
+    strip = rgba[y0:y1, x0:x1].copy()
+    strip[..., :3] *= (strip[..., 3:4] / 255.0)              # premultiply so the blend does not smear colour
+    w = strip.shape[1]
+    shifted = np.roll(strip, w // 2, axis=1)
+    xs = np.arange(w)
+    weight = np.clip(1.0 - np.abs(xs - w / 2) / (w / 2 - 1e-6), 0, 1) ** 0.8
+    weight = np.clip(weight * 1.8, 0, 1)[None, :, None]
+    tile = strip * weight + shifted * (1 - weight)
+    a = np.maximum(tile[..., 3:4], 1e-3)
+    out = np.dstack([np.clip(tile[..., :3] * 255.0 / a, 0, 255), tile[..., 3]])
+    out[tile[..., 3] < 1.0, :3] = 0
     return out
 
 
-# ---------------------------------------------------------------- shared pieces
-def spire_tower(c, x, base, w, h, roof, body, shade, rng, windows=True):
-    """A tower with a pointed roof; `shade` darkens the right edge for a bit of volume."""
-    c.rect(x, base - h, x + w, base, body)
-    c.rect(x + w - 1, base - h, x + w, base, shade)
-    cx = x + w / 2
-    c.poly([(x - 1, base - h), (x + w + 1, base - h), (cx, base - h - roof)], body)
-    c.line(cx, base - h - roof, x + w, base - h, shade)
-    # ledge
-    c.rect(x - 1, base - h, x + w + 1, base - h + 1, shade)
-    if windows and h > 8:
-        for wy in range(base - h + 3, base - 3, 5):
-            c.px(x + w // 2, wy, shade)
-
-
-def gothic_tower(c, x, base, w, h, spire, body, shade, rng, ruined=False, glow=None):
-    """A slender tower: banded shaft, window slits and either a stepped spire or ragged battlements."""
-    top = base - h
-    c.rect(x, top, x + w, base, body)
-    c.rect(x + w - 1, top, x + w, base, shade)
-    c.rect(x, top + max(3, h // 3), x + w, top + max(3, h // 3) + 1, shade)
-    if spire > 0:
-        cx = x + w / 2.0
-        for k in range(spire):
-            half = (w / 2.0 + 0.7) * (1 - k / spire)
-            c.rect(cx - half, top - 1 - k, cx + half, top - k, body)
-            c.px(int(cx + half) - 1, top - 1 - k, shade)
-    else:
-        for bx in range(x, x + w, 2):
-            if not ruined or rng.random() < 0.6:
-                c.px(bx, top - 1, body)
-        if ruined:
-            for i in range(int(rng.integers(1, 3))):
-                c.clear(x + w - 1 - i, top)
-    for wy in (top + 3, top + h // 2 + 3):
-        if wy < base - 2:
-            lit = glow if (glow is not None and rng.random() < 0.7) else shade
-            c.px(x + w // 2, wy, lit)
-            c.px(x + w // 2, wy + 1, lit)
-
-
-def castle(c, x0, base, specs, body, shade, rng, wall=7, glow=None):
-    """A cluster of towers joined by a battlemented wall. specs = (dx, w, h, spire)."""
-    xs = [x0 + dx for dx, _, _, _ in specs]
-    xe = [x0 + dx + w for dx, w, _, _ in specs]
-    c.rect(min(xs), base - wall, max(xe), base, body)
-    for bx in range(min(xs), max(xe), 2):
-        c.px(bx, base - wall - 1, body)
-    for dx, w, h, spire in sorted(specs, key=lambda t: -t[2]):
-        gothic_tower(c, x0 + dx, base, w, h, spire, body, shade, rng, ruined=(spire == 0), glow=glow)
-
-
-def island(c, cx, top, width, depth, body, shade, rng, tower=True):
-    """A floating rock: a stone ledge, a body that stays wide before tapering, spikes below and a ruined gate on top."""
-    hw = width / 2
-    c.rect(cx - hw, top, cx + hw, top + 2, shade)
-    for k in range(2, depth + 3):
-        t = (k - 2) / (depth + 1)
-        half = hw * (1 - t ** 2.0) * 0.95 + rng.uniform(-0.6, 0.6)
-        if half < 0.8:
-            break
-        c.rect(cx - half, top + k, cx + half, top + k + 1, body if k % 2 == 0 else shade)
-    for _ in range(3):
-        sx = cx + int(rng.integers(-int(hw / 2), int(hw / 2) + 1))
-        c.line(sx, top + depth, sx, top + depth + int(rng.integers(2, 5)), shade)
-    if tower:
-        c.rect(cx - 2, top - 5, cx - 1, top, shade)
-        c.rect(cx + 1, top - 3, cx + 2, top, shade)
-        c.rect(cx - 2, top - 6, cx + 2, top - 5, shade)
-
-
-def bird(c, x, y, col):
-    c.px(x, y, col)
-    c.px(x + 1, y + 1, col)
-    c.px(x + 2, y, col)
-
-
-def flecks(c, rng, n, color, region):
-    x0, y0, x1, y1 = region
-    for _ in range(n):
-        x, y = int(rng.integers(x0, x1)), int(rng.integers(y0, y1))
-        if not c.opaque(x, y):
-            c.px(x, y, color)
-
-
-def arches(c, x0, x1, top, bottom, step, body, shade, pier=2, glow=None):
-    """A row of arches (an aqueduct / ruined walkway)."""
-    c.rect(x0, top, x1, top + 2, shade)
-    c.rect(x0, top + 2, x1, bottom, body)
-    x = x0
-    while x + step <= x1:
-        ox0, ox1 = x + pier, x + step
-        cx = (ox0 + ox1) / 2
-        r = (ox1 - ox0) / 2
-        arch_h = max(r + 2, int((bottom - top - 2) * 0.68))
-        for xx in range(int(ox0), int(ox1)):
-            top_y = (bottom - 1) - int(round(math.sqrt(max(0.0, r * r - (xx + 0.5 - cx) ** 2)) + (arch_h - r)))
-            for yy in range(max(top + 2, top_y + 1), bottom):
-                if glow is None:
-                    c.clear(xx, yy)
-                else:
-                    c.px(xx, yy, glow if (xx + yy) % 3 else GOLD_L)
-        x += step
-
-
-# ---------------------------------------------------------------- left scene
-def flower(c, x, y):
-    """A tiny four-petal flower on a stem."""
-    c.line(x, y + 1, x, y + 4, MOSS)
-    for dx, dy in ((0, -1), (-1, 0), (1, 0), (0, 1)):
-        c.px(x + dx, y + dy, GOLD)
-    c.px(x, y, INK)
-
-
-def left_scene():
-    W, H = 120, 50
-    rng = np.random.default_rng(7)
-    far = Canvas(W, H)
-
-    # floating islands, kept clear of the sword
-    island(far, 12, 14, 12, 6, STONE_XL, STONE_L, rng)
-    island(far, 26, 22, 10, 5, STONE_XL, STONE_L, rng)
-
-    # ruined skyline: pale towers at the back, darker ones in front
-    castle(far, 32, 42, [(0, 4, 17, 8), (6, 3, 12, 6), (11, 5, 23, 10), (18, 4, 14, 0), (24, 3, 19, 7)], STONE_L, STONE_M, rng, wall=8)
-    castle(far, 44, 43, [(0, 4, 13, 6), (5, 7, 26, 11), (14, 4, 16, 7), (20, 5, 11, 0), (27, 3, 18, 8)], STONE_M, STONE_D, rng, wall=9)
-    arches(far, 76, 120, 19, 34, 8, STONE_M, STONE_D, pier=3)
-
-    # drifting fog swallows the bases of the ruins
-    fog = fbm(W, H, rng, cells=(10, 5, 2), weights=(0.5, 0.3, 0.2))
-    far.mask_by(lambda x, y: smoothstep((y - 30 + (fog[y, x] - 0.5) * 11) / 14) ** 0.9)
-
-    c = Canvas(W, H)
-    c.over(far)
-    for _ in range(190):
-        x, y = int(rng.integers(0, W)), int(rng.integers(26, 46))
-        if not c.opaque(x, y) and rng.random() < smoothstep((y - 26) / 16):
-            c.px(x, y, MIST)
-
-    # foreground cliff
-    prof = []
-    for x in range(0, 80):
-        base = 32 + max(0, x - 20) * 0.34
-        prof.append(int(round(base + 1.6 * math.sin(x * 0.55) + rng.uniform(-0.8, 0.8))))
-    for x, top in enumerate(prof):
-        for y in range(top, H):
-            c.px(x, y, INK if (x * 7 + y * 3) % 11 else INK2)
-        c.px(x, top, MOSS_D)
-        if rng.random() < 0.55:
-            c.px(x, top, MOSS)
-        if rng.random() < 0.10:
-            c.px(x, top, LIME)
-        if rng.random() < 0.35:
-            c.px(x, top + 1, GOLD_D)
-        if rng.random() < 0.22:
-            c.px(x, top - 1, MOSS_D)
-            if rng.random() < 0.5:
-                c.px(x, top - 2, MOSS)
-    for _ in range(26):
-        x = int(rng.integers(2, 72))
-        y = int(prof[min(x, len(prof) - 1)] + rng.integers(3, 12))
-        for i in range(int(rng.integers(3, 8))):
-            c.px(x + i, y, STONE_D if rng.random() < 0.7 else GOLD_D)
-    for _ in range(40):
-        x = int(rng.integers(0, 72))
-        c.px(x, int(prof[min(x, len(prof) - 1)] + rng.integers(2, 14)), MOSS_D)
-
-    # the knight: hooded, hunched, cloak pooled on the rock
-    gy = prof[24]
-    body = [(22, gy - 16), (26, gy - 15), (30, gy - 13), (33, gy - 10), (37, gy - 8), (41, gy - 5), (42, gy), (12, gy), (14, gy - 5), (17, gy - 10), (20, gy - 14)]
-    c.poly(body, INK)
-    c.ellipse(26.5, gy - 19, 3.8, 4.4, INK)
-    c.line(23, gy - 22, 26, gy - 24, GOLD_D)          # rim light on the hood
-    c.line(26, gy - 24, 29, gy - 22, GOLD)
-    c.px(29, gy - 21, GOLD_D); c.px(30, gy - 20, GOLD_D)
-    c.px(29, gy - 18, STONE_D); c.px(30, gy - 18, STONE_D)  # shadowed face
-    c.px(21, gy - 15, GOLD_D); c.px(22, gy - 16, GOLD)       # shoulder highlight
-    for i, (sx, ex) in enumerate([(25, 9), (26, 11), (27, 14), (28, 17), (29, 20), (30, 23)]):
-        c.line(sx, gy - 14 + i, ex, gy - 1, CAPE if i % 2 == 0 else CAPE_D)
-        if i % 2 == 0:
-            c.line(sx + 1, gy - 14 + i, ex + 1, gy - 2, GOLD_D)
-    c.ellipse(37, gy - 5, 4.5, 3.2, INK2)               # raised knee
-    c.line(33, gy - 7, 40, gy - 8, GOLD_D)
-    c.line(30, gy - 12, 34, gy - 8, GOLD_D)
-
-    # sword planted in the rock beside him
-    sx = 9
-    c.line(sx, gy + 2, sx, gy - 16, STEEL_D)
-    c.line(sx - 1, gy, sx - 1, gy - 14, STEEL)
-    c.rect(sx - 4, gy - 14, sx + 5, gy - 13, INK2)
-    c.px(sx - 4, gy - 14, GOLD); c.px(sx + 4, gy - 14, GOLD)
-    c.rect(sx - 1, gy - 19, sx + 2, gy - 17, GOLD_D)
-    c.px(sx, gy - 20, GOLD)
-
-    for fx in (15, 37, 52, 66):
-        flower(c, fx, prof[fx] - 5)
-
-    for bx, by in [(58, 6), (64, 11), (52, 12), (74, 7)]:
-        bird(c, bx, by, STONE_D)
-    flecks(c, rng, 9, GOLD_L, (34, 2, 104, 26))
-    flecks(c, rng, 6, LIME, (34, 2, 104, 24))
-
-    c.mask_by(lambda x, y: smoothstep((x - 92) / 27) ** 1.2)
-    return c
-
-
-# ---------------------------------------------------------------- right scene
-def grow(c, rng, x, y, ang, length, depth, thick, thin):
-    if depth == 0 or length < 2:
-        return
-    x2, y2 = x + math.cos(ang) * length, y + math.sin(ang) * length
-    col = thick if depth > 3 else thin
-    c.line(x, y, x2, y2, col)
-    if depth > 3:
-        c.line(x + 1, y, x2 + 1, y2, col)
-    for da in (-0.5, 0.45):
-        grow(c, rng, x2, y2, ang + da + rng.uniform(-0.15, 0.15), length * rng.uniform(0.62, 0.78), depth - 1, thick, thin)
-
-
-def right_scene():
-    W, H = 130, 50
-    rng = np.random.default_rng(11)
-    c = Canvas(W, H)
-    WATER = 43
-
-    # far, pale ruins on the left
-    far = Canvas(W, H)
-    castle(far, 6, 41, [(0, 3, 12, 5), (5, 4, 19, 8), (11, 3, 10, 0), (16, 5, 23, 9), (24, 3, 14, 6)], STONE_XL, STONE_L, rng, wall=7)
-    arches(far, 28, 58, 31, 41, 7, STONE_L, STONE_XL, pier=2)
-    far.mask_by(lambda x, y: smoothstep((y - 28) / 13))
-    c.over(far)
-
-    # trunk, behind the fortress
-    for y in range(19, 42):
-        t = (y - 19) / 22
-        half = 3 + 3.5 * t ** 1.8
-        for x in range(int(97 - half), int(97 + half) + 1):
-            col = GOLD_L if abs(x - 97) < half * 0.45 else GOLD
-            if x > 97 + half * 0.55:
-                col = GOLD_D
-            c.px(x, y, col)
-
-    # canopy: a rich golden mass, lit from above, cropped by the top and right edges
-    noise = fbm(W, H, rng, cells=(14, 7, 3), weights=(0.45, 0.35, 0.2))
-    lobes = [(100, 8, 44, 14), (66, 12, 20, 8), (84, 3, 26, 9)]
-    canopy = Canvas(W, H)
-    for y in range(0, 28):
-        for x in range(36, W):
-            d = min(((x - cx) / rx) ** 2 + ((y - cy) / ry) ** 2 for cx, cy, rx, ry in lobes)
-            d += (noise[y, x] - 0.5) * 0.55
-            if d > 1:
-                continue
-            if d > 0.78 and B8[y % 8, x % 8] < (d - 0.78) / 0.22 * 1.1:
-                continue
-            n = noise[y, x] * 0.7 + (1 - y / 28) * 0.35 - d * 0.2
-            col = GOLD_L if n > 0.72 else GOLD if n > 0.44 else GOLD_D
-            if rng.random() < 0.08:
-                continue
-            canopy.px(x, y, col)
-    c.over(canopy)
-    for ang, ln in [(-2.45, 17), (-2.05, 19), (-1.7, 20), (-1.35, 20), (-0.95, 19), (-0.55, 17), (-3.0, 12), (-0.15, 11)]:
-        grow(c, rng, 97, 24, ang, ln, 5, (255, 248, 214), GOLD_XL)
-    for _ in range(26):
-        x, y = int(rng.integers(40, W)), int(rng.integers(0, 24))
-        if c.opaque(x, y):
-            c.px(x, y, GOLD_XL)
-    for x in range(52, 126, 3):
-        if rng.random() < 0.65:
-            top = next((y for y in range(27, 0, -1) if canopy.opaque(x, y)), None)
-            if top is None:
-                continue
-            ln = int(rng.integers(3, 15))
-            for i in range(ln):
-                if i < ln - 3 or i % 2 == 0:
-                    c.px(x + (i // 6) * int(rng.integers(-1, 2)), top + 1 + i, GOLD if i % 3 else GOLD_L)
-
-    # the ruined fortress, two clusters with a lit walkway between them
-    fort = Canvas(W, H)
-    castle(fort, 56, 42, [(0, 5, 12, 6), (4, 6, 19, 9), (11, 4, 10, 0), (15, 5, 15, 7), (21, 4, 9, 0), (25, 5, 13, 6)], STONE_D, INK2, rng, wall=7, glow=GOLD)
-    castle(fort, 106, 42, [(0, 4, 11, 0), (3, 6, 17, 8), (10, 5, 21, 10), (16, 4, 12, 0), (19, 5, 15, 7)], STONE_D, INK2, rng, wall=7, glow=GOLD)
-    arches(fort, 60, 130, 35, 42, 10, STONE_D, INK2, pier=3, glow=GOLD)
-    fort.mask_by(lambda x, y: smoothstep((y - 33) / 10) * 0.8)
-    c.over(fort)
-    for x in range(58, W):
-        top = 38 + int(2 * math.sin(x * 0.4) + rng.uniform(-1, 1))
-        for y in range(top, WATER):
-            c.px(x, y, INK if (x + y) % 5 else MOSS_D)
-        c.px(x, top, MOSS)
-        if rng.random() < 0.3:
-            c.px(x, top - 1, MOSS_D)
-    for cx, w in [(28, 14), (47, 10), (8, 8)]:
-        for i in range(w):
-            h = int(round(math.sin(math.pi * (i + 0.5) / w) * 4))
-            for y in range(WATER - h, WATER):
-                c.px(cx - w // 2 + i, y, INK if y > WATER - h else MOSS_D)
-            c.px(cx - w // 2 + i, WATER - h, MOSS)
-    c.poly([(116, WATER + 6), (119, 34), (124, 31), (130, 29), (130, WATER + 6)], INK)
-    for i in range(14):
-        c.px(119 + i // 2 + (i % 3), 33 - i // 5 + (i // 4), MOSS if i % 2 else MOSS_L)
-    c.poly([(121, 36), (126, 33), (130, 33), (130, 37), (124, 39)], MOSS_D)
-
-    for k in range(1, 7):
-        sy, dy = WATER - k, WATER + k
-        for x in range(W):
-            if c.opaque(x, sy) and STIPPLE[dy % 64, x % 64] < 0.42 - k * 0.05 and not c.opaque(x, dy):
-                col = tuple(int(0.55 * a + 0.45 * b) for a, b in zip(tuple(c.a[sy, x, :3]), PAPER))
-                c.px(x, dy, col)
-    for _ in range(26):
-        x, y = int(rng.integers(20, W - 10)), int(rng.integers(WATER + 1, H))
-        for i in range(int(rng.integers(3, 12))):
-            if not c.opaque(x + i, y):
-                c.px(x + i, y, STONE_XL if rng.random() < 0.7 else GOLD_L)
-
-    for bx, by in [(34, 6), (28, 11), (20, 8)]:
-        bird(c, bx, by, STONE_D)
-    flecks(c, rng, 8, LIME, (14, 2, 70, 30))
-    flecks(c, rng, 8, GOLD_L, (14, 2, 70, 30))
-
-    c.mask_by(lambda x, y: (1 - smoothstep((x - 4) / 26)) ** 1.1)
-    return c
-
-
-# ---------------------------------------------------------------- ring emblem
-def emblem():
-    """A thin, delicate sigil: overlapping golden rings pierced by a blade."""
-    W, H = 40, 30
-    rng = np.random.default_rng(3)
-    c = Canvas(W, H)
-    for ox, oy, r, col in [(0, 0, 12, GOLD), (-6, 2, 8, GOLD_L), (6, -2, 7, GOLD), (1, 1, 4, GOLD_L)]:
-        for x, y in circle_pts(20 + ox, 17 + oy, r):
-            if rng.random() > 0.12:
-                c.px(x, y, col)
-    for y in range(0, H):
-        c.px(20, y, GOLD if y % 2 == 0 else GOLD_L)
-    c.rect(17, 3, 24, 4, GOLD)
-    c.px(16, 3, GOLD_D); c.px(24, 3, GOLD_D)
-    c.px(20, 0, GOLD_XL); c.px(20, 1, GOLD_XL)
-    for _ in range(10):
-        x, y = int(rng.integers(2, 38)), int(rng.integers(2, 28))
-        if not c.opaque(x, y):
-            c.px(x, y, GOLD_XL)
-    return c
-
-
 def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument('--preview', help='also write 4x previews composited on the paper colour into this directory')
-    ap.add_argument('--mock-width', type=int, default=360, help='width in art pixels of the mock hero strip written with --preview')
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument('--src', required=True, help='reference banner image (1600 x 533)')
+    ap.add_argument('--preview', help='write previews on the paper colour into this folder')
     args = ap.parse_args()
 
+    ref = Image.open(args.src).convert('RGB')
+    if ref.size != (1600, 533):
+        raise SystemExit(f'expected a 1600x533 reference, got {ref.size}')
     OUT.mkdir(parents=True, exist_ok=True)
-    scenes = {'hero-left': left_scene(), 'hero-right': right_scene(), 'emblem': emblem()}
-    for name, canvas in scenes.items():
-        canvas.save(OUT / f'{name}.png')
-        print(f'wrote {OUT / (name + ".png")} ({canvas.w}x{canvas.h})')
-        if args.preview:
-            d = Path(args.preview)
-            d.mkdir(parents=True, exist_ok=True)
-            canvas.save(d / f'{name}-preview.png', scale=4, bg=PAPER)
+
+    rgba = paper_to_alpha(np.asarray(ref), PAPER)
+
+    # erase the reference's own title block and the birds (the page redraws the birds)
+    for box in ERASE + BIRDS:
+        feather_box(rgba[..., 3], *box)
+
+    # floating islands become sprites; their place in the scene is cleared
+    meta_islands = []
+    for name, scene, x0, y0, x1, y1 in ISLANDS:
+        sprite = rgba[y0:y1, x0:x1].copy()
+        if name == 'island-c':                               # its tail runs into the ground mist
+            sprite[..., 3] *= (1.0 - smoothstep(0.80, 1.0, (np.arange(y1 - y0)[:, None] / (y1 - y0))))
+        save(sprite, f'{name}.webp')
+        feather_box(rgba[..., 3], x0, y0, x1, y1)
+        meta_islands.append({'id': name, 'scene': scene, 'x': x0, 'y': y0, 'w': x1 - x0, 'h': y1 - y0})
+
+    def scene(xr, fade, name, fade_in):
+        x0, x1 = xr
+        part = rgba[:, x0:x1].copy()
+        xs = np.arange(x0, x1)[None, :]
+        k = smoothstep(fade[0], fade[1], xs)
+        part[..., 3] *= (k if fade_in else (1.0 - k))
+        save(part, name)
+
+    scene(LEFT, LEFT_FADE, 'hero-left.webp', fade_in=False)
+    scene(RIGHT, RIGHT_FADE, 'hero-right.webp', fade_in=True)
+
+    ex0, ey0, ex1, ey1 = EMBLEM
+    ring = rgba[ey0:ey1, ex0:ex1].copy()
+    ring[..., 3] *= 1.0 - smoothstep(EMBLEM_FADE_FROM - ey0, ey1 - ey0, np.arange(ey1 - ey0)[:, None])
+    save(ring, 'emblem.webp')
+
+    # a stray gold glint sits in the reference's water
+    water_src = rgba.copy()
+    feather_box(water_src[..., 3], 698, 490, 716, 506)
+    water = make_water_tile(water_src, WATER)
+    save(water, 'hero-water.webp')
+
+    fog = make_fog()
+    save(fog, 'hero-fog.webp')
+
+    meta = {
+        'ref': {'w': 1600, 'h': 533},
+        'left': {'x0': LEFT[0], 'w': LEFT[1] - LEFT[0]},
+        'right': {'x0': RIGHT[0], 'w': RIGHT[1] - RIGHT[0]},
+        'emblem': {'x': ex0, 'y': ey0, 'w': ex1 - ex0, 'h': ey1 - ey0},
+        'water': {'y': WATER[1], 'h': WATER[3] - WATER[1], 'tileW': WATER[2] - WATER[0]},
+        'fog': {'w': int(fog.shape[1]), 'h': int(fog.shape[0])},
+        'islands': meta_islands,
+    }
+    (OUT / 'hero-meta.json').write_text(json.dumps(meta, indent=2) + '\n', encoding='utf-8')
+
     if args.preview:
-        mock = Canvas(args.mock_width, 50)
-        mock.over(scenes['hero-left'])
-        mock.over(scenes['hero-right'], args.mock_width - scenes['hero-right'].w)
-        mock.over(scenes['emblem'], (args.mock_width - 40) // 2, 2)
-        mock.save(Path(args.preview) / 'hero-mock.png', scale=4, bg=PAPER)
+        prev = Path(args.preview)
+        prev.mkdir(parents=True, exist_ok=True)
+        canvas = Image.new('RGBA', (1600, 533), PAPER + (255,))
+        layout = [
+            ('hero-water.webp', None),
+            ('hero-left.webp', (LEFT[0], 0)),
+            ('hero-right.webp', (RIGHT[0], 0)),
+            ('emblem.webp', (ex0, ey0)),
+        ]
+        wt = Image.open(OUT / 'hero-water.webp')
+        for x in range(0, 1600, wt.width):
+            canvas.alpha_composite(wt, (x, WATER[1]))
+        for name, pos in layout[1:]:
+            canvas.alpha_composite(Image.open(OUT / name), pos)
+        for isl in meta_islands:
+            canvas.alpha_composite(Image.open(OUT / f"{isl['id']}.webp"), (isl['x'], isl['y']))
+        canvas.convert('RGB').save(prev / 'hero-preview.png')
+        fog_prev = Image.new('RGBA', (fog.shape[1], fog.shape[0]), PAPER + (255,))
+        fog_prev.alpha_composite(Image.open(OUT / 'hero-fog.webp'))
+        fog_prev.convert('RGB').save(prev / 'fog-preview.png')
+
+    print('wrote', ', '.join(sorted(p.name for p in OUT.iterdir())))
 
 
 if __name__ == '__main__':

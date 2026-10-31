@@ -146,8 +146,12 @@ Every metric below was measured by running both scanners against the bundled dem
 
 The dashboard uses a light pixel theme: cream paper with a faint grid, chunky black pixel type with a lime shadow, and gold and moss accents. All the scenery (ruins, a resting knight, a golden tree, a thin golden ring) lives in the banner at the top, so the working panels stay plain and easy to read. The chevron in the toolbar hides the banner to give the panels more room (it starts hidden on short screens).
 
-- The wordmark is an SVG drawn from code: [`PixelTitle.tsx`](frontend/src/components/PixelTitle.tsx).
-- The scenery is generated, not hand-edited: `pip install -r scripts/requirements.txt`, then `python scripts/make_hero_art.py` rewrites `frontend/src/assets/hero/*.png` (add `--preview DIR` for 4x previews).
+The banner is alive: mist drifts over the ruins and water, the floating islands bob, motes of light rise from the spires, golden leaves fall from the tree, birds circle the ruins, arch lights flicker, and the ring quickens while an audit runs. None of it animates when the visitor prefers reduced motion, and the light and birds pause while the banner is off screen.
+
+- The wordmark is an SVG drawn from code, with moss, vines (that sway) and flowers: [`PixelTitle.tsx`](frontend/src/components/PixelTitle.tsx).
+- The scenery is cut from fine pixel art, not redrawn: `pip install -r scripts/requirements.txt`, then `python scripts/make_hero_art.py --src <reference-banner>` rebuilds `frontend/src/assets/hero/` (add `--preview DIR` to check the result on the paper colour). The reference image is not stored in the repo.
+- The light, leaves and birds are drawn on a canvas by [`heroLights.ts`](frontend/src/components/heroLights.ts); where things sit is in [`heroScene.ts`](frontend/src/components/heroScene.ts).
+- The page scrolls over the graph and the report: the graph zooms with Ctrl + scroll (or the +/- buttons), and the report grows instead of scrolling inside itself.
 - Colours are Tailwind tokens re-mapped in [`index.css`](frontend/src/index.css), so existing utility classes keep their meaning on the light background.
 
 ---
@@ -178,7 +182,7 @@ APIGuard/
 │   │   ├── components/            # HeroBanner, PixelTitle, GraphView, AuditReportModal, FindingDetail, Modals
 │   │   ├── hooks/                 # useGraph, useScan (real-time SSE streaming)
 │   │   ├── demo/                  # Demo-mode client + recorded fixtures (hosted replay)
-│   │   ├── assets/hero/           # Generated pixel-art scenery for the banner
+│   │   ├── assets/hero/           # Pixel-art scenery, floating islands, mist and water for the banner
 │   │   └── App.tsx                # Main security dashboard
 │   ├── package.json
 │   └── vite.config.ts

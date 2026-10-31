@@ -301,10 +301,10 @@ export const AuditReportModal: React.FC<AuditReportModalProps> = ({
 
   return (
     <div className={inline ? 'font-mono select-none' : 'fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 font-mono select-none'}>
-      <div className={inline ? 'w-full h-[calc(100vh-120px)] min-h-[420px] bg-slate-950 overflow-hidden border-2 border-slate-700 flex flex-col text-xs' : 'w-full max-w-4xl h-[88vh] bg-slate-950 rounded-2xl overflow-hidden border border-slate-600 shadow-2xl flex flex-col text-xs'}>
+      <div className={inline ? 'w-full min-h-[calc(100vh-120px)] bg-slate-950 border-2 border-slate-700 flex flex-col text-xs' : 'w-full max-w-4xl h-[88vh] bg-slate-950 rounded-2xl overflow-hidden border border-slate-600 shadow-2xl flex flex-col text-xs'}>
         
         {/* Header */}
-        <div className="h-14 px-6 bg-slate-900 border-b border-slate-700 flex items-center justify-between shrink-0">
+        <div className="min-h-14 py-2 gap-2 px-6 bg-slate-900 border-b border-slate-700 flex flex-wrap items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
               <FileText className="w-4 h-4" />
@@ -360,7 +360,8 @@ export const AuditReportModal: React.FC<AuditReportModalProps> = ({
         </div>
 
         {/* Content area */}
-        <div className="flex-1 overflow-y-auto p-6 bg-slate-950">
+        {/* On the page the report simply grows, so the wheel always scrolls the page; the pop-up scrolls inside */}
+        <div className={inline ? 'flex-1 p-6 bg-slate-950' : 'flex-1 overflow-y-auto p-6 bg-slate-950'}>
           {activeTab === 'preview' ? (
             <div className="space-y-6 max-w-3xl mx-auto">
               {/* Executive Summary Card */}
@@ -479,23 +480,25 @@ export const AuditReportModal: React.FC<AuditReportModalProps> = ({
               </div>
             </div>
           ) : (
-            <div className="h-full">
+            <div className={inline ? undefined : 'h-full'}>
               <textarea
                 readOnly
                 value={markdownContent}
-                className="w-full h-full p-4 rounded-xl bg-slate-950 border border-slate-700 text-slate-300 font-mono text-xs resize-none focus:outline-none"
+                rows={inline ? markdownContent.split('\n').length + 1 : undefined}
+                style={inline ? { overflow: 'hidden' } : undefined}
+                className={`w-full ${inline ? '' : 'h-full'} p-4 rounded-xl bg-slate-950 border border-slate-700 text-slate-300 font-mono text-xs resize-none focus:outline-none`}
               />
             </div>
           )}
         </div>
 
         {/* Footer Actions */}
-        <div className="h-14 px-6 bg-slate-900 border-t border-slate-700 flex items-center justify-between shrink-0">
+        <div className="min-h-14 py-2 gap-2 px-6 bg-slate-900 border-t border-slate-700 flex flex-wrap items-center justify-between shrink-0">
           <div className="flex items-center gap-2 text-slate-400 text-xs">
             <span>Export formats available: Markdown (.md) and Printable HTML</span>
           </div>
 
-          <div className="flex items-center gap-2.5">
+          <div className="flex flex-wrap items-center gap-2.5">
             <button
               onClick={handleCopyMarkdown}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200 transition font-bold"

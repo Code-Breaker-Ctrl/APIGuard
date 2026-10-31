@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   ReactFlow,
   Background,
@@ -13,7 +13,7 @@ import {
 import type { Node, Edge, ReactFlowInstance } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import dagre from 'dagre';
-import { ShieldAlert, ShieldCheck, Activity, Sparkles, Key, Maximize2, HelpCircle } from 'lucide-react';
+import { ShieldAlert, ShieldCheck, Activity, Sparkles, Key, Maximize2, HelpCircle, Plus, Minus } from 'lucide-react';
 import type { BackendNode, BackendEdge, NodeState } from '../types';
 
 interface GraphViewProps {
@@ -160,6 +160,19 @@ export const GraphView: React.FC<GraphViewProps> = ({
   const rfInstanceRef = useRef<ReactFlowInstance | null>(null);
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
+
+  // The page scrolls over the graph; zooming needs Ctrl (or a pinch). A touch screen cannot pan it
+  // with a finger either, because that finger is scrolling the page.
+  const [touchOnly] = useState(() => window.matchMedia('(pointer: coarse)').matches);
+  const [wheelHint, setWheelHint] = useState(false);
+  const hintTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const handleWheel = (e: React.WheelEvent) => {
+    if (e.ctrlKey) return;
+    setWheelHint(true);
+    clearTimeout(hintTimer.current);
+    hintTimer.current = setTimeout(() => setWheelHint(false), 1300);
+  };
+  useEffect(() => () => clearTimeout(hintTimer.current), []);
 
   const nodeStatesRef = useRef(nodeStates);
   useEffect(() => {
@@ -369,9 +382,28 @@ export const GraphView: React.FC<GraphViewProps> = ({
       ref={containerRef}
       className="w-full h-full relative bg-slate-950 min-h-0"
       style={{ width: '100%', height: '100%' }}
+      onWheel={handleWheel}
     >
-      {/* Fit view button overlay */}
+      {/* Zoom and fit buttons overlay */}
       <div className="absolute top-3 right-3 z-10 flex items-center gap-2">
+        <button
+          type="button"
+          onClick={() => rfInstanceRef.current?.zoomOut({ duration: 150 })}
+          className="btn-ghost"
+          title="Zoom out"
+          aria-label="Zoom out"
+        >
+          <Minus className="w-3.5 h-3.5 text-cyan-400" />
+        </button>
+        <button
+          type="button"
+          onClick={() => rfInstanceRef.current?.zoomIn({ duration: 150 })}
+          className="btn-ghost"
+          title="Zoom in"
+          aria-label="Zoom in"
+        >
+          <Plus className="w-3.5 h-3.5 text-cyan-400" />
+        </button>
         <button
           type="button"
           onClick={handleFitView}
@@ -405,11 +437,20 @@ export const GraphView: React.FC<GraphViewProps> = ({
         }}
         fitView
         fitViewOptions={{ padding: 0.06 }}
+        preventScrolling={false}
+        zoomOnDoubleClick={false}
+        panOnDrag={!touchOnly}
+        nodesDraggable={false}
+        nodesConnectable={false}
         className="bg-slate-950"
       >
         <FitViewInternal dep={backendNodes} />
         <Background variant={BackgroundVariant.Dots} gap={18} size={1} color="#d9d2ae" />
       </ReactFlow>
+
+      <div className={`graph-hint${wheelHint ? ' is-on' : ''}`} aria-hidden="true">
+        Ctrl + scroll to zoom
+      </div>
     </div>
   );
 };

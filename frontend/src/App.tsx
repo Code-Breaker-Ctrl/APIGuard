@@ -49,6 +49,7 @@ export default function App() {
   const [backendOffline, setBackendOffline] = useState(false);
   const [enableMutations, setEnableMutations] = useState(false);
   const [dryRun, setDryRun] = useState(false);
+  const [requestBudget, setRequestBudget] = useState<number>(30);
   // The scenic banner is optional: remembered per browser, and closed by default on short screens
   const [bannerCollapsed, setBannerCollapsed] = useState<boolean>(() => {
     try {
@@ -139,7 +140,7 @@ export default function App() {
   const runLiveScan = async () => {
     await startScan({
       dry_run: false,
-      budget: 30,
+      budget: requestBudget,
       enable_mutations: enableMutations,
     });
   };
@@ -169,7 +170,7 @@ export default function App() {
     setShowRemediationFinding(null);
     await apiClient.applyTargetPatch(true);
     setIsTargetPatched(true);
-    await startScan({ dry_run: false, budget: 30, enable_mutations: enableMutations });
+    await startScan({ dry_run: false, budget: requestBudget, enable_mutations: enableMutations });
     setVerificationBanner({ before: beforeCount, after: 0 });
     await loadGraph();
     checkTargetStatus();
@@ -182,16 +183,27 @@ export default function App() {
     await handleReset();
   };
 
-  const handleOpenDryRun = async () => {
-    setShowDryRunModal(true);
+  const fetchDryRun = async (budget: number, mutations: boolean) => {
     setIsDryRunLoading(true);
     try {
-      const res = await apiClient.getDryRun({ budget: 30, enable_mutations: enableMutations });
+      const res = await apiClient.getDryRun({ budget, enable_mutations: mutations });
       setDryRunData(res);
     } catch (err) {
       console.error('Failed to preview dry-run:', err);
     } finally {
       setIsDryRunLoading(false);
+    }
+  };
+
+  const handleOpenDryRun = async () => {
+    setShowDryRunModal(true);
+    await fetchDryRun(requestBudget, enableMutations);
+  };
+
+  const handleUpdateBudget = async (newBudget: number) => {
+    setRequestBudget(newBudget);
+    if (showDryRunModal) {
+      await fetchDryRun(newBudget, enableMutations);
     }
   };
 
@@ -248,6 +260,41 @@ export default function App() {
             Mutations
           </button>
 
+          <div className="flex items-center gap-2 pl-3 border-l-2 border-slate-700">
+            <span className="text-xs uppercase text-slate-400">Requests:</span>
+            <div className="flex items-center bg-slate-900 border-2 border-slate-700 shadow-[2px_2px_0_var(--line)]">
+              <button
+                type="button"
+                className="px-2 py-0.5 hover:bg-slate-800 text-slate-300 text-sm border-r border-slate-700 select-none"
+                onClick={() => handleUpdateBudget(Math.max(5, requestBudget - 5))}
+                title="Decrease request limit by 5"
+              >
+                -
+              </button>
+              <input
+                type="number"
+                min={5}
+                max={500}
+                step={5}
+                value={requestBudget}
+                onChange={(e) => {
+                  const val = parseInt(e.target.value, 10);
+                  if (!isNaN(val)) handleUpdateBudget(Math.max(1, Math.min(val, 500)));
+                }}
+                className="w-14 text-center bg-transparent text-emerald-400 font-mono text-base focus:outline-none py-0.5"
+                title="Maximum HTTP requests allowed for scan (request budget)"
+              />
+              <button
+                type="button"
+                className="px-2 py-0.5 hover:bg-slate-800 text-slate-300 text-sm border-l border-slate-700 select-none"
+                onClick={() => handleUpdateBudget(Math.min(500, requestBudget + 5))}
+                title="Increase request limit by 5"
+              >
+                +
+              </button>
+            </div>
+            <span className="text-xs text-slate-500">cap</span>
+          </div>
         </div>
 
         <div className="flex items-center gap-2">
@@ -384,6 +431,8 @@ export default function App() {
             <DryRunModal
               data={dryRunData}
               isLoading={isDryRunLoading}
+              budget={requestBudget}
+              onBudgetChange={handleUpdateBudget}
               onClose={() => setShowDryRunModal(false)}
               onExecuteLive={() => {
                 setShowDryRunModal(false);

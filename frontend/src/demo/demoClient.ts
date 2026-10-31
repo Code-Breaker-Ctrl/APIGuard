@@ -110,7 +110,16 @@ export const demoClient = {
   },
 
   async getDryRun(options: { budget?: number; enable_mutations?: boolean }): Promise<DryRunResponse> {
-    return data.dryRun[options.enable_mutations ? 'true' : 'false'];
+    const raw = data.dryRun[options.enable_mutations ? 'true' : 'false'];
+    const totalBudget = options.budget ?? raw.total_budget;
+    const plannedSteps = raw.planned_steps.slice(0, totalBudget);
+    return {
+      ...raw,
+      planned_steps: plannedSteps,
+      total_planned: plannedSteps.length,
+      total_budget: totalBudget,
+      budget_remaining: Math.max(0, totalBudget - plannedSteps.length),
+    };
   },
 
   async remediate(finding: Finding): Promise<RemediationResponse> {

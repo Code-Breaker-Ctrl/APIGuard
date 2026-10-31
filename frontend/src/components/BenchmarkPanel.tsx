@@ -25,7 +25,7 @@ const tradeOffNote = (variants: Variants) => {
 };
 
 interface BenchmarkPanelProps {
-  onClose: () => void;
+  onClose?: () => void;
 }
 
 export const BenchmarkPanel: React.FC<BenchmarkPanelProps> = ({ onClose }) => {
@@ -84,12 +84,14 @@ export const BenchmarkPanel: React.FC<BenchmarkPanelProps> = ({ onClose }) => {
             <RefreshCw className={`w-3.5 h-3.5 ${isRunning ? 'animate-spin' : ''}`} />
             {isRunning ? 'Benchmarking 5 Variants...' : 'Run Live Benchmark'}
           </button>
-          <button
-            onClick={onClose}
-            className="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition"
-          >
-            <X className="w-4 h-4" />
-          </button>
+          {onClose && (
+            <button
+              onClick={onClose}
+              className="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
         </div>
       </div>
 

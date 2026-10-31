@@ -16,6 +16,8 @@ import type { Finding } from '../types';
 interface AuditReportModalProps {
   isOpen: boolean;
   onClose: () => void;
+  /** Render as a normal page section instead of a full-screen overlay */
+  inline?: boolean;
   findings: Finding[];
   operationCount: number;
   edgeCount: number;
@@ -46,6 +48,7 @@ const toIdentifier = (value: unknown): string =>
 export const AuditReportModal: React.FC<AuditReportModalProps> = ({
   isOpen,
   onClose,
+  inline = false,
   findings,
   operationCount,
   edgeCount,
@@ -252,7 +255,7 @@ export const AuditReportModal: React.FC<AuditReportModalProps> = ({
 </html>`;
   }, [findings, operationCount, edgeCount, targetUrl, reportDate]);
 
-  if (!isOpen) return null;
+  if (!isOpen && !inline) return null;
 
   const handleDownloadMarkdown = () => {
     const blob = new Blob([markdownContent], { type: 'text/markdown;charset=utf-8' });
@@ -297,8 +300,8 @@ export const AuditReportModal: React.FC<AuditReportModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 font-mono select-none">
-      <div className="w-full max-w-4xl h-[88vh] bg-slate-950 rounded-2xl overflow-hidden border border-slate-600 shadow-2xl flex flex-col text-xs">
+    <div className={inline ? 'font-mono select-none' : 'fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 font-mono select-none'}>
+      <div className={inline ? 'w-full h-[calc(100vh-120px)] min-h-[420px] bg-slate-950 overflow-hidden border-2 border-slate-700 flex flex-col text-xs' : 'w-full max-w-4xl h-[88vh] bg-slate-950 rounded-2xl overflow-hidden border border-slate-600 shadow-2xl flex flex-col text-xs'}>
         
         {/* Header */}
         <div className="h-14 px-6 bg-slate-900 border-b border-slate-700 flex items-center justify-between shrink-0">
@@ -344,13 +347,15 @@ export const AuditReportModal: React.FC<AuditReportModalProps> = ({
               </button>
             </div>
 
-            <button
-              onClick={onClose}
-              className="p-1.5 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition"
-              title="Close modal"
-            >
-              <X className="w-4 h-4" />
-            </button>
+            {!inline && (
+              <button
+                onClick={onClose}
+                className="p-1.5 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition"
+                title="Close modal"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
           </div>
         </div>
 

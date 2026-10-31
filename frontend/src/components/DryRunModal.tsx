@@ -5,7 +5,7 @@ import type { DryRunResponse } from '../types';
 interface DryRunModalProps {
   data: DryRunResponse | null;
   isLoading: boolean;
-  onClose: () => void;
+  onClose?: () => void;
   onExecuteLive: () => void;
   budget?: number;
   onBudgetChange?: (newBudget: number) => void;
@@ -30,12 +30,14 @@ export const DryRunModal: React.FC<DryRunModalProps> = ({
             SAFE MODE · 0 REQUESTS SENT
           </span>
         </div>
-        <button
-          onClick={onClose}
-          className="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition"
-        >
-          <X className="w-4 h-4" />
-        </button>
+        {onClose && (
+          <button
+            onClick={onClose}
+            className="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        )}
       </div>
 
       {/* Content */}
@@ -171,15 +173,19 @@ export const DryRunModal: React.FC<DryRunModalProps> = ({
 
       {/* Footer */}
       <div className="h-14 px-5 bg-slate-900 border-t border-slate-700 flex items-center justify-between shrink-0">
-        <button
-          onClick={onClose}
-          className="px-4 py-1.5 rounded-lg border border-slate-600 text-slate-300 hover:bg-slate-800 transition"
-        >
-          Cancel
-        </button>
+        {onClose ? (
+          <button
+            onClick={onClose}
+            className="px-4 py-1.5 rounded-lg border border-slate-600 text-slate-300 hover:bg-slate-800 transition"
+          >
+            Cancel
+          </button>
+        ) : (
+          <span className="text-slate-500">Sends real requests, up to the cap above</span>
+        )}
         <button
           onClick={() => {
-            onClose();
+            onClose?.();
             onExecuteLive();
           }}
           className="flex items-center gap-2 px-5 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-black font-bold transition shadow-lg shadow-emerald-500/20"

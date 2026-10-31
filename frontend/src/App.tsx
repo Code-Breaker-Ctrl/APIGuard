@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   Play,
   RotateCcw,
@@ -11,7 +11,8 @@ import {
   HelpCircle,
   FileText,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  LayoutDashboard
 } from 'lucide-react';
 import { useGraph } from './hooks/useGraph';
 import { useScan } from './hooks/useScan';
@@ -30,6 +31,17 @@ import type { Finding, DryRunResponse } from './types';
 import { apiClient, IS_DEMO } from './api/client';
 
 
+
+
+
+// One long page: the toolbar buttons jump between these sections
+const SECTION_IDS = ['audit', 'benchmark', 'plan', 'report'] as const;
+type SectionId = (typeof SECTION_IDS)[number];
+
+const scrollToSection = (id: SectionId) => {
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  document.getElementById(id)?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+};
 
 export default function App() {
   const { nodes, edges, isLoading: isGraphLoading, importSpec, loadGraph } = useGraph();
@@ -74,13 +86,11 @@ export default function App() {
   const [isTargetPatched, setIsTargetPatched] = useState(false);
 
   // Modals state
-  const [showDryRunModal, setShowDryRunModal] = useState(false);
+  const [activeSection, setActiveSection] = useState<SectionId>('audit');
   const [dryRunData, setDryRunData] = useState<DryRunResponse | null>(null);
   const [isDryRunLoading, setIsDryRunLoading] = useState(false);
-  const [showBenchmarkModal, setShowBenchmarkModal] = useState(false);
   const [showRemediationFinding, setShowRemediationFinding] = useState<Finding | null>(null);
   const [showGuidedDemo, setShowGuidedDemo] = useState(false);
-  const [showReportModal, setShowReportModal] = useState(false);
   const [modelStatusText, setModelStatusText] = useState<string>('model call: offline template only');
 
   const refreshModelStatus = useCallback(() => {
@@ -196,13 +206,13 @@ export default function App() {
   };
 
   const handleOpenDryRun = async () => {
-    setShowDryRunModal(true);
+    scrollToSection('plan');
     await fetchDryRun(requestBudget, enableMutations);
   };
 
   const handleUpdateBudget = async (newBudget: number) => {
     setRequestBudget(newBudget);
-    if (showDryRunModal) {
+    if (dryRunData) {
       await fetchDryRun(newBudget, enableMutations);
     }
   };
@@ -215,8 +225,6 @@ export default function App() {
         setShowGuidedDemo((prev) => !prev);
       } else if (e.key === 'Escape') {
         setShowGuidedDemo(false);
-        setShowBenchmarkModal(false);
-        setShowDryRunModal(false);
         setShowRemediationFinding(null);
         setSelectedFinding(null);
       }
@@ -225,13 +233,40 @@ export default function App() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
+  // Highlight the toolbar button of the section on screen
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) setActiveSection(entry.target.id as SectionId);
+        }
+      },
+      { rootMargin: '-30% 0px -60% 0px' }
+    );
+    SECTION_IDS.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+    return () => observer.disconnect();
+  }, []);
+
+  // The plan is loaded the first time its section is reached, by button or by scrolling
+  const planRequested = useRef(false);
+  useEffect(() => {
+    if (activeSection === 'plan' && !planRequested.current && !backendOffline) {
+      planRequested.current = true;
+      fetchDryRun(requestBudget, enableMutations);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeSection, backendOffline]);
+
   const selectedNodeObj = nodes.find((n) => n.id === selectedNodeId);
 
   const modelOk = modelStatusText.startsWith('model call: tested');
   const modelWarn = modelStatusText.includes('configured');
 
   return (
-    <div className="h-screen w-screen text-slate-200 flex flex-col overflow-hidden">
+    <div className="min-h-screen w-full text-slate-200 flex flex-col">
 
       {/* BACKEND OFFLINE BANNER */}
       {backendOffline && (
@@ -250,7 +285,7 @@ export default function App() {
       {!bannerCollapsed && <HeroBanner />}
 
       {/* TOOLBAR */}
-      <div className="toolbar z-20">
+      <div className="toolbar sticky top-0 z-40">
         <div className="flex items-center gap-3">
           {bannerCollapsed && <MiniBrand />}
           <button className="btn-ghost" aria-pressed={dryRun} onClick={() => setDryRun(!dryRun)} title="When on, the main button previews the plan instead of sending traffic">
@@ -297,11 +332,12 @@ export default function App() {
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <button className="btn-ghost" onClick={() => setShowGuidedDemo(true)} title="Guided demo [D]"><HelpCircle className="w-4 h-4" /></button>
-          <button className="btn-ghost" onClick={() => setShowBenchmarkModal(true)} title="Benchmarks"><BarChart3 className="w-4 h-4" /></button>
-          <button className="btn-ghost" onClick={handleOpenDryRun} title="Preview planned requests"><Cpu className="w-4 h-4" /></button>
-          <button className="btn-ghost" onClick={() => setShowReportModal(true)} title="Export audit report"><FileText className="w-4 h-4" /></button>
+          <button className="btn-ghost" aria-pressed={activeSection === 'audit'} onClick={() => scrollToSection('audit')} title="Audit workspace" aria-label="Go to the audit workspace"><LayoutDashboard className="w-4 h-4" /></button>
+          <button className="btn-ghost" aria-pressed={activeSection === 'benchmark'} onClick={() => scrollToSection('benchmark')} title="Benchmarks" aria-label="Go to benchmarks"><BarChart3 className="w-4 h-4" /></button>
+          <button className="btn-ghost" aria-pressed={activeSection === 'plan'} onClick={handleOpenDryRun} title="Preview planned requests" aria-label="Go to the planned requests"><Cpu className="w-4 h-4" /></button>
+          <button className="btn-ghost" aria-pressed={activeSection === 'report'} onClick={() => scrollToSection('report')} title="Audit report" aria-label="Go to the audit report"><FileText className="w-4 h-4" /></button>
           <button className="btn-ghost" onClick={handleReset} title="Reset target state"><RotateCcw className="w-4 h-4" /></button>
           <button className="btn-ghost" onClick={toggleBanner} title={bannerCollapsed ? 'Show the banner' : 'Hide the banner'} aria-label={bannerCollapsed ? 'Show the banner' : 'Hide the banner'}>
             {bannerCollapsed ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
@@ -339,13 +375,13 @@ export default function App() {
       )}
 
       {/* WORKSPACE */}
-      <main className="flex-1 p-4 grid grid-cols-1 lg:grid-cols-12 gap-4 overflow-hidden">
+      <main id="audit" className="scroll-mt-20 p-4 grid grid-cols-1 lg:grid-cols-12 gap-4 lg:h-[calc(100vh-72px)] lg:min-h-[560px]">
 
-        <section className="lg:col-span-3 h-full overflow-hidden">
+        <section className="lg:col-span-3 h-[420px] lg:h-full overflow-hidden">
           <SpecPanel nodes={nodes} onImportSpec={importSpec} isLoading={isGraphLoading} />
         </section>
 
-        <section className="lg:col-span-5 h-full panel overflow-hidden relative flex flex-col">
+        <section className="lg:col-span-5 h-[480px] lg:h-full panel overflow-hidden relative flex flex-col">
           <div className="h-11 px-4 bg-slate-900 border-b-2 border-slate-700 flex items-center justify-between shrink-0">
             <div className="flex items-center gap-2">
               <GitBranch className="w-4 h-4 text-emerald-400" />
@@ -392,7 +428,7 @@ export default function App() {
           </div>
         </section>
 
-        <section className="lg:col-span-4 h-full flex flex-col gap-4 overflow-hidden">
+        <section className="lg:col-span-4 h-[560px] lg:h-full flex flex-col gap-4 overflow-hidden">
           <div className="flex-1 min-h-0">
             <ScanConsole events={events} isScanning={isScanning} />
           </div>
@@ -408,6 +444,39 @@ export default function App() {
         </section>
       </main>
 
+      {/* LOWER SECTIONS: reached from the toolbar or by scrolling */}
+      <div className="px-4 pb-6 space-y-6">
+        <section id="benchmark" className="scroll-mt-20 border-2 border-slate-700 overflow-hidden">
+          <BenchmarkPanel />
+        </section>
+
+        <section id="plan" className="scroll-mt-20 border-2 border-slate-700 overflow-hidden">
+          <DryRunModal
+            data={dryRunData}
+            isLoading={isDryRunLoading}
+            budget={requestBudget}
+            onBudgetChange={handleUpdateBudget}
+            onExecuteLive={() => {
+              scrollToSection('audit');
+              runLiveScan();
+            }}
+          />
+        </section>
+
+        <section id="report" className="scroll-mt-20">
+          <AuditReportModal
+            inline
+            isOpen
+            onClose={() => scrollToSection('audit')}
+            findings={findings}
+            operationCount={nodes.filter((n) => n.type === 'operation').length}
+            edgeCount={edges.length}
+            targetUrl="https://api.target.internal/v1"
+            isTargetPatched={isTargetPatched}
+          />
+        </section>
+      </div>
+
       {/* MODALS */}
       {selectedFinding && (
         <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-6">
@@ -421,32 +490,6 @@ export default function App() {
               }}
               onApplyReferenceFixAndRescan={handleApplyReferenceFixAndRescan}
             />
-          </div>
-        </div>
-      )}
-
-      {showDryRunModal && (
-        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-6">
-          <div className="w-full max-w-5xl h-[85vh] bg-slate-950 overflow-hidden border-2 border-emerald-400 shadow-2xl">
-            <DryRunModal
-              data={dryRunData}
-              isLoading={isDryRunLoading}
-              budget={requestBudget}
-              onBudgetChange={handleUpdateBudget}
-              onClose={() => setShowDryRunModal(false)}
-              onExecuteLive={() => {
-                setShowDryRunModal(false);
-                runLiveScan();
-              }}
-            />
-          </div>
-        </div>
-      )}
-
-      {showBenchmarkModal && (
-        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-6">
-          <div className="w-full max-w-5xl h-[85vh] bg-slate-950 overflow-hidden border-2 border-emerald-400 shadow-2xl">
-            <BenchmarkPanel onClose={() => setShowBenchmarkModal(false)} />
           </div>
         </div>
       )}
@@ -473,26 +516,22 @@ export default function App() {
                 importSpec();
                 handleReset();
               }}
-              onOpenDryRun={() => handleOpenDryRun()}
+              onOpenDryRun={() => {
+                setShowGuidedDemo(false);
+                handleOpenDryRun();
+              }}
               onRunAudit={() => runLiveScan()}
-              onOpenBenchmark={() => setShowBenchmarkModal(true)}
+              onOpenBenchmark={() => {
+                setShowGuidedDemo(false);
+                scrollToSection('benchmark');
+              }}
             />
           </div>
         </div>
       )}
 
-      <AuditReportModal
-        isOpen={showReportModal}
-        onClose={() => setShowReportModal(false)}
-        findings={findings}
-        operationCount={nodes.filter((n) => n.type === 'operation').length}
-        edgeCount={edges.length}
-        targetUrl="https://api.target.internal/v1"
-        isTargetPatched={isTargetPatched}
-      />
-
       {/* FOOTER: one quiet line */}
-      <footer className="h-8 border-t-2 border-slate-700 bg-slate-900 px-5 flex items-center justify-between text-sm text-slate-500 shrink-0">
+      <footer className="h-8 mt-auto border-t-2 border-slate-700 bg-slate-900 px-5 flex items-center justify-between text-sm text-slate-500 shrink-0">
         <span className="flex items-center gap-2">
           <span className={`w-2 h-2 ${modelOk ? 'bg-emerald-400' : modelWarn ? 'bg-amber-400' : 'bg-slate-500'}`} />
           <span className={modelOk ? 'text-emerald-400' : modelWarn ? 'text-amber-400' : ''}>{modelStatusText}</span>

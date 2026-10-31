@@ -12,7 +12,6 @@ interface SpecPanelProps {
 export const SpecPanel: React.FC<SpecPanelProps> = ({ nodes, onImportSpec, isLoading }) => {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
-  const [loadedFileName, setLoadedFileName] = useState<string>('demo_spec.yaml');
   const [identities, setIdentities] = useState<IdentityInfo[]>([]);
 
   useEffect(() => {
@@ -26,7 +25,6 @@ export const SpecPanel: React.FC<SpecPanelProps> = ({ nodes, onImportSpec, isLoa
     setSuccessMsg(null);
     try {
       await onImportSpec(file);
-      setLoadedFileName(file.name);
       setSuccessMsg(`Loaded ${file.name} successfully! (8 endpoints mapped into DAG)`);
       setTimeout(() => setSuccessMsg(null), 4000);
     } catch (err: any) {
@@ -39,7 +37,6 @@ export const SpecPanel: React.FC<SpecPanelProps> = ({ nodes, onImportSpec, isLoa
     setSuccessMsg(null);
     try {
       await onImportSpec();
-      setLoadedFileName('demo_spec.yaml');
       setSuccessMsg('Demo spec reloaded successfully');
       setTimeout(() => setSuccessMsg(null), 3000);
     } catch (err: any) {
@@ -66,9 +63,6 @@ export const SpecPanel: React.FC<SpecPanelProps> = ({ nodes, onImportSpec, isLoa
         <div className="flex items-center gap-2">
           <FileCode className="w-4 h-4 text-emerald-400" />
           <span className="panel-title">Spec</span>
-          <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-950/80 border border-emerald-700/60 text-emerald-300 font-mono truncate max-w-[120px]" title={loadedFileName}>
-            {loadedFileName}
-          </span>
         </div>
         <div className="flex items-center gap-2">
           <button onClick={pickFile} className="btn-ghost" title="Import an OpenAPI 3.x file (JSON / YAML)">

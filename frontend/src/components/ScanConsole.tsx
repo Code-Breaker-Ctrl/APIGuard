@@ -20,22 +20,16 @@ export const ScanConsole: React.FC<ScanConsoleProps> = ({ events, isScanning }) 
   const handleScroll = () => {
     if (!scrollRef.current) return;
     const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
-    const isAtBottom = scrollHeight - scrollTop - clientHeight < 40;
-    setAutoScroll(isAtBottom);
+    setAutoScroll(scrollHeight - scrollTop - clientHeight < 40);
   };
 
   return (
-    <div className="flex flex-col h-full bg-[#07090e] border border-[#1d2536] rounded-xl overflow-hidden shadow-lg">
-      {/* Console Header */}
-      <div className="h-10 px-4 bg-[#0d121c] border-b border-[#1c2434] flex items-center justify-between text-xs font-mono">
+    <div className="flex flex-col h-full bg-slate-950 border border-slate-700 rounded-xl overflow-hidden">
+      <div className="h-11 px-4 bg-slate-900 border-b-2 border-slate-700 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-2">
-          <Terminal className="w-3.5 h-3.5 text-emerald-400" />
-          <span className="font-semibold text-slate-200">Execution Stream</span>
-          {isScanning && (
-            <span className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[10px] font-bold animate-pulse">
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span> LIVE SSE
-            </span>
-          )}
+          <Terminal className="w-4 h-4 text-emerald-400" />
+          <span className="panel-title">Event Stream</span>
+          {isScanning && <span className="text-sm text-amber-400 animate-pulse">● live</span>}
         </div>
         {!autoScroll && (
           <button
@@ -43,80 +37,50 @@ export const ScanConsole: React.FC<ScanConsoleProps> = ({ events, isScanning }) 
               setAutoScroll(true);
               if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
             }}
-            className="flex items-center gap-1 text-[10px] text-cyan-400 hover:text-cyan-300 bg-cyan-950/40 px-2 py-0.5 rounded border border-cyan-800/40"
+            className="btn-ghost"
+            title="Resume auto-scroll"
           >
-            <ArrowDownCircle className="w-3 h-3" /> Resume Auto-scroll
+            <ArrowDownCircle className="w-4 h-4" />
           </button>
         )}
       </div>
 
-      {/* Terminal Lines Container */}
-      <div
-        ref={scrollRef}
-        onScroll={handleScroll}
-        className="flex-1 p-3 overflow-y-auto font-mono text-[11px] space-y-1.5 scrollbar-thin"
-      >
+      <div ref={scrollRef} onScroll={handleScroll} className="flex-1 p-3 overflow-y-auto space-y-1">
         {events.length === 0 ? (
-          <div className="text-slate-600 italic py-4 text-center">
-            Awaiting scan initiation. Click "Run Execution Audit" to stream live events.
+          <div className="text-slate-500 py-6 text-center text-base">
+            Rest at a site of grace.<br />Begin the audit to stream events.
           </div>
         ) : (
           events.map((ev, index) => {
             const isAlert = ev.event_type === 'finding_confirmed';
             const isInconclusive = ev.event_type === 'test_inconclusive' || ev.message?.includes('test inconclusive');
-            const isReq = ev.event_type === 'request_sent';
-            const isRes = ev.event_type === 'response_received';
+            const status = ev.data?.status_code;
 
-            let lineBg = '';
-            let textColor = 'text-slate-300';
-
+            let tone = 'text-slate-300';
+            let frame = '';
             if (isAlert) {
-              lineBg = 'bg-rose-950/40 border-l-2 border-rose-500 p-1.5 rounded';
-              textColor = 'text-rose-300 font-semibold';
+              tone = 'text-rose-300';
+              frame = 'bg-rose-950 border-l-4 border-rose-500 pl-2 py-1';
             } else if (isInconclusive) {
-              lineBg = 'bg-slate-900/60 border-l-2 border-slate-500 p-1.5 rounded';
-              textColor = 'text-slate-400 font-mono';
-            } else if (isReq) {
-              textColor = 'text-slate-400';
-            } else if (isRes) {
-              const status = ev.data?.status_code;
-              textColor = status === 200 ? 'text-amber-300' : status === 403 ? 'text-emerald-400' : 'text-slate-300';
+              tone = 'text-slate-500';
+            } else if (ev.event_type === 'request_sent') {
+              tone = 'text-slate-400';
+            } else if (ev.event_type === 'response_received') {
+              tone = status === 200 ? 'text-amber-300' : status === 403 ? 'text-emerald-400' : 'text-slate-300';
             }
 
             return (
-              <div key={index} className={`flex items-start gap-2 ${lineBg}`}>
-                {/* Phase Chip */}
-                {ev.phase && (
-                  <span className={`text-[9px] px-1.5 py-0.2 rounded font-bold uppercase shrink-0 ${
-                    ev.phase === 'A' ? 'bg-cyan-950 text-cyan-300 border border-cyan-800' :
-                    ev.phase === 'B' ? 'bg-amber-950 text-amber-300 border border-amber-800' :
-                    'bg-rose-950 text-rose-300 border border-rose-800'
+              <div key={index} className={`flex items-start gap-2 text-base leading-tight ${frame}`}>
+                {status !== undefined && (
+                  <span className={`shrink-0 w-9 text-center text-sm ${
+                    status === 200 ? 'bg-amber-400 text-slate-950' :
+                    status === 403 ? 'bg-emerald-400 text-slate-950' :
+                    'bg-slate-700 text-slate-200'
                   }`}>
-                    Phase {ev.phase}
+                    {status}
                   </span>
                 )}
-
-                {/* Identity Chip */}
-                {ev.data?.identity && (
-                  <span className="text-[9px] px-1 py-0.2 rounded bg-slate-800 text-slate-300 font-mono shrink-0">
-                    {ev.data.identity.includes('aman') || ev.data.identity.includes('alice') ? 'Aman' : 'Taaran'}
-                  </span>
-                )}
-
-                {/* Status code chip */}
-                {ev.data?.status_code !== undefined && (
-                  <span className={`text-[9px] px-1.5 py-0.2 rounded font-bold shrink-0 ${
-                    ev.data.status_code === 200 ? 'bg-amber-500/20 text-amber-300' :
-                    ev.data.status_code === 403 ? 'bg-emerald-500/20 text-emerald-300' :
-                    'bg-slate-800 text-slate-400'
-                  }`}>
-                    {ev.data.status_code}
-                  </span>
-                )}
-
-                <div className={`flex-1 break-all leading-relaxed ${textColor}`}>
-                  {ev.message}
-                </div>
+                <div className={`flex-1 break-all ${tone}`}>{ev.message}</div>
               </div>
             );
           })

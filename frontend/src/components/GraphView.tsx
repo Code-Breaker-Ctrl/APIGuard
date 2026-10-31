@@ -1,7 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import {
   ReactFlow,
-  MiniMap,
   Controls,
   Background,
   BackgroundVariant,
@@ -36,8 +35,8 @@ const OperationNode = ({ data, selected }: any) => {
     data.id === 'createProject' ||
     (data.metadata?.method === 'POST' && (!data.metadata?.path_params || data.metadata?.path_params.length === 0));
 
-  let borderColor = 'border-[#263043]';
-  let bgColor = 'bg-[#10141e]';
+  let borderColor = 'border-[#3f3428]';
+  let bgColor = 'bg-[#1d1711]';
   let statusBadge = null;
 
   if (status === 'probing') {
@@ -97,8 +96,8 @@ const OperationNode = ({ data, selected }: any) => {
       </span>
     );
   } else {
-    borderColor = 'border-[#263043]';
-    bgColor = 'bg-[#10141e]';
+    borderColor = 'border-[#3f3428]';
+    bgColor = 'bg-[#1d1711]';
     statusBadge = (
       <span className="flex items-center gap-1 text-[8.5px] text-slate-400 font-medium px-1.5 py-0.5 rounded bg-slate-900/80 border border-slate-700/60">
         NOT TESTED
@@ -142,7 +141,7 @@ const OperationNode = ({ data, selected }: any) => {
 // Custom Node for Resource Collections
 const ResourceNode = ({ data, selected }: any) => (
   <div
-    className={`px-2 py-1.5 rounded-lg border border-emerald-500/40 bg-[#091a18] text-left shadow-md w-[110px] h-[36px] box-border ${
+    className={`px-2 py-1.5 rounded-lg border border-emerald-500/40 bg-[#1a150f] text-left shadow-md w-[110px] h-[36px] box-border ${
       selected ? 'ring-2 ring-emerald-400' : ''
     }`}
     style={{ width: 110, height: 36, boxSizing: 'border-box' }}
@@ -160,7 +159,7 @@ const ResourceNode = ({ data, selected }: any) => (
 // Custom Node for Identifiers
 const IdentifierNode = ({ data, selected }: any) => (
   <div
-    className={`px-2 py-1.5 rounded-md border border-amber-500/40 bg-[#16120b] text-left shadow-sm w-[110px] h-[36px] box-border ${
+    className={`px-2 py-1.5 rounded-md border border-amber-500/40 bg-[#17120d] text-left shadow-sm w-[110px] h-[36px] box-border ${
       selected ? 'ring-2 ring-amber-400' : ''
     }`}
     style={{ width: 110, height: 36, boxSizing: 'border-box' }}
@@ -289,8 +288,8 @@ export const GraphView: React.FC<GraphViewProps> = ({
       const isVulnerableEdge =
         nodeStatesRef.current[edge.to_node] === 'vulnerable' || nodeStatesRef.current[edge.from_node] === 'vulnerable';
 
-      let strokeColor = isPropagated ? '#38bdf8' : '#64748b';
-      if (isVulnerableEdge) strokeColor = '#f43f5e';
+      let strokeColor = isPropagated ? '#8fb3c4' : '#8a7d60';
+      if (isVulnerableEdge) strokeColor = '#c8453b';
 
       const isOperatesOn = edge.type === 'OPERATES_ON';
       const edgeLabel = isOperatesOn ? undefined : edge.type.replace('_', ' ').toLowerCase();
@@ -312,8 +311,8 @@ export const GraphView: React.FC<GraphViewProps> = ({
           height: 14,
         },
         label: edgeLabel,
-        labelStyle: edgeLabel ? { fill: '#f1f5f9', fontSize: 10, fontFamily: 'monospace', fontWeight: 700 } : undefined,
-        labelBgStyle: edgeLabel ? { fill: '#0d131f', fillOpacity: 0.98 } : undefined,
+        labelStyle: edgeLabel ? { fill: '#efe3c4', fontSize: 10, fontFamily: 'monospace', fontWeight: 700 } : undefined,
+        labelBgStyle: edgeLabel ? { fill: '#1c1610', fillOpacity: 0.98 } : undefined,
         labelBgPadding: edgeLabel ? [6, 3] as [number, number] : undefined,
         labelBgBorderRadius: edgeLabel ? 4 : undefined,
       };
@@ -358,8 +357,8 @@ export const GraphView: React.FC<GraphViewProps> = ({
         );
         const isPropagated =
           edgeDef?.provenance === 'propagated' || edgeDef?.provenance === 'heuristic';
-        let strokeColor = isPropagated ? '#38bdf8' : '#64748b';
-        if (isVulnerableEdge) strokeColor = '#f43f5e';
+        let strokeColor = isPropagated ? '#8fb3c4' : '#8a7d60';
+        if (isVulnerableEdge) strokeColor = '#c8453b';
 
         const shouldAnimate = edgeDef?.type === 'NESTED_UNDER' || isVulnerableEdge;
         if (e.style?.stroke === strokeColor && e.animated === shouldAnimate) {
@@ -427,7 +426,7 @@ export const GraphView: React.FC<GraphViewProps> = ({
   return (
     <div
       ref={containerRef}
-      className="w-full h-full relative bg-[#090b10] min-h-0"
+      className="w-full h-full relative bg-[#110d09] min-h-0"
       style={{ width: '100%', height: '100%' }}
     >
       {/* Fit view button overlay */}
@@ -435,7 +434,7 @@ export const GraphView: React.FC<GraphViewProps> = ({
         <button
           type="button"
           onClick={handleFitView}
-          className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-mono bg-[#0d131f]/90 hover:bg-[#162033] text-slate-300 hover:text-white border border-[#232f48] rounded-md shadow-md transition cursor-pointer"
+          className="btn-ghost"
           title="Fit view to all nodes (Padding: 0.15)"
         >
           <Maximize2 className="w-3.5 h-3.5 text-cyan-400" />
@@ -465,46 +464,23 @@ export const GraphView: React.FC<GraphViewProps> = ({
         }}
         fitView
         fitViewOptions={{ padding: 0.15 }}
-        className="bg-[#090b10]"
+        className="bg-[#110d09]"
       >
         <FitViewInternal dep={backendNodes} />
-        <Background variant={BackgroundVariant.Dots} gap={18} size={1} color="#1c2433" />
+        <Background variant={BackgroundVariant.Dots} gap={18} size={1} color="#30271e" />
         <Controls
-          showFitView={true}
+          showFitView={false}
+          showInteractive={false}
           fitViewOptions={{ padding: 0.15 }}
-          className="!bg-[#0d121c] !border !border-[#20293d] !rounded-lg text-slate-300 [&>button]:!bg-[#0d121c] [&>button]:!border-b [&>button]:!border-[#1f283d] [&>button]:!fill-slate-300 [&>button:hover]:!bg-[#1a2336]"
-        />
-        <MiniMap
-          nodeColor={(n) => {
-            if (nodeStates[n.id] === 'vulnerable') return '#f43f5e';
-            if (nodeStates[n.id] === 'secure' || nodeStates[n.id] === 'secure_empty') return '#10b981';
-            if (nodeStates[n.id] === 'setup' || n.id === 'login' || n.id === 'createProject') return '#3b82f6';
-            if (nodeStates[n.id] === 'inconclusive') return '#64748b';
-            if (nodeStates[n.id] === 'probing') return '#f59e0b';
-            return '#1e293b';
-          }}
-          maskColor="rgba(9, 11, 16, 0.75)"
-          className="!bg-[#0c0f17] !border !border-[#202738] rounded-lg overflow-hidden shadow-xl"
+          className="!bg-[#1a150f] !border !border-[#382e23] !rounded-lg text-slate-300 [&>button]:!bg-[#1a150f] [&>button]:!border-b [&>button]:!border-[#372d22] [&>button]:!fill-slate-300 [&>button:hover]:!bg-[#30271e]"
         />
       </ReactFlow>
 
       {/* Legend strip */}
-      <div className="absolute bottom-4 left-4 z-10 flex items-center gap-4 text-xs font-mono bg-[#0c1017]/90 backdrop-blur px-3.5 py-2 rounded-lg border border-[#1f2738]">
-        <span className="flex items-center gap-1.5 text-slate-300">
-          <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Resource
-        </span>
-        <span className="flex items-center gap-1.5 text-slate-300">
-          <span className="w-2.5 h-2.5 rounded-full bg-blue-500"></span> Operation
-        </span>
-        <span className="flex items-center gap-1.5 text-slate-300">
-          <span className="w-2.5 h-2.5 rounded-full bg-amber-500"></span> Identifier
-        </span>
-        <span className="flex items-center gap-1.5 text-slate-300">
-          <span className="w-2.5 h-2.5 rounded-full bg-rose-500"></span> BOLA Leak
-        </span>
-        <span className="flex items-center gap-1.5 text-slate-300">
-          <span className="w-2.5 h-2.5 rounded-full bg-slate-500"></span> Inconclusive
-        </span>
+      <div className="absolute bottom-3 left-3 z-10 flex items-center gap-4 text-sm bg-slate-900 px-3 py-1.5 border-2 border-slate-700">
+        <span className="flex items-center gap-1.5 text-slate-300"><span className="w-2.5 h-2.5 bg-emerald-500"></span> Resource</span>
+        <span className="flex items-center gap-1.5 text-slate-300"><span className="w-2.5 h-2.5 bg-blue-500"></span> Operation</span>
+        <span className="flex items-center gap-1.5 text-slate-300"><span className="w-2.5 h-2.5 bg-rose-500"></span> Leak</span>
       </div>
     </div>
   );

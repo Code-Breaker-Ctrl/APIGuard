@@ -4,8 +4,8 @@ import {
   RotateCcw, 
   Layers, 
   AlertTriangle, 
-  Server, 
-  RefreshCw, 
+  X,
+  RefreshCw,
   GitBranch,
   BarChart3,
   Cpu,
@@ -26,6 +26,8 @@ import { GuidedDemoModal } from './components/GuidedDemoModal';
 import { AuditReportModal } from './components/AuditReportModal';
 import type { Finding, DryRunResponse } from './types';
 import { apiClient } from './api/client';
+
+const TARGET_LABEL = '127.0.0.1:8000';
 
 export default function App() {
   const { nodes, edges, isLoading: isGraphLoading, importSpec, loadGraph } = useGraph();
@@ -181,197 +183,98 @@ export default function App() {
 
   const selectedNodeObj = nodes.find((n) => n.id === selectedNodeId);
 
+  const modelOk = modelStatusText.startsWith('model call: tested');
+  const modelWarn = modelStatusText.includes('configured');
+
   return (
-    <div className="h-screen w-screen bg-[#090b10] text-[#e2e8f0] flex flex-col font-sans antialiased overflow-hidden selection:bg-emerald-500/20 selection:text-emerald-300">
-      
+    <div className="h-screen w-screen text-slate-200 flex flex-col overflow-hidden">
+
       {/* BACKEND OFFLINE BANNER */}
       {backendOffline && (
-        <div className="bg-rose-950 border-b border-rose-800 px-6 py-2 flex items-center justify-between text-xs text-rose-200 font-mono">
-          <div className="flex items-center gap-2">
+        <div className="bg-rose-950 border-b-2 border-rose-500 px-5 py-2 flex items-center justify-between text-rose-200">
+          <div className="flex items-center gap-2 text-sm">
             <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
-            <span>Backend service is offline. Unable to reach <strong>127.0.0.1:8000</strong>.</span>
+            <span>The Erdtree is silent. Backend unreachable at 127.0.0.1:8000.</span>
           </div>
-          <button
-            onClick={checkBackendHealth}
-            className="flex items-center gap-1.5 px-3 py-1 rounded bg-rose-800 hover:bg-rose-700 text-white font-semibold transition"
-          >
-            <RefreshCw className="w-3.5 h-3.5" /> Retry Connection
+          <button onClick={checkBackendHealth} className="btn-ghost">
+            <RefreshCw className="w-4 h-4" /> Retry
           </button>
         </div>
       )}
 
-      {/* TOP APPLICATION NAVBAR */}
-      <header className="h-14 border-b border-[#1c2230] bg-[#0d1017] px-5 flex items-center justify-between z-20 shrink-0">
-        
-        {/* Brand */}
+      {/* TOP BAR */}
+      <header className="h-16 border-b-2 border-slate-700 bg-slate-900 px-5 flex items-center justify-between z-20 shrink-0">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500 to-cyan-600 flex items-center justify-center shadow-md shadow-emerald-500/10">
-            <Layers className="w-4 h-4 text-black stroke-[2.5]" />
+          <div className="w-9 h-9 bg-emerald-400 border-2 border-black flex items-center justify-center" style={{ boxShadow: 'inset -3px -3px 0 #9a7a25, inset 3px 3px 0 #f0d98a' }}>
+            <Layers className="w-5 h-5 text-slate-950" />
           </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="font-bold text-base tracking-tight text-white font-mono">
-                API<span className="text-emerald-400">Guard</span>
-              </span>
-              <span className="text-[10px] text-slate-400 font-mono px-1.5 py-0.5 rounded bg-[#171b26] border border-[#232a3b]">
-                v1.0-live
-              </span>
-            </div>
-            <p className="text-[11px] text-slate-400 tracking-normal hidden md:block">
-              Graph-Guided API Authorization & BOLA Detection Engine
-            </p>
+          <div className="leading-none">
+            <div className="font-display text-[11px] text-emerald-400">APIGuard</div>
+            <div className="text-sm text-slate-400 mt-1.5">BOLA detection · {TARGET_LABEL}</div>
           </div>
         </div>
 
-        {/* Center Target & Status Chips */}
-        <div className="flex items-center gap-3 text-xs font-mono">
-          <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#131722] border border-[#202738] text-slate-300">
-            <Server className="w-3.5 h-3.5 text-cyan-400" />
-            <span>Target:</span>
-            <code className="text-cyan-300">127.0.0.1:8000</code>
-            <span className="text-[10px] text-emerald-400 font-bold ml-1">ALLOWLISTED</span>
-          </div>
-
-          <button
-            onClick={() => setShowGuidedDemo(true)}
-            className="hidden sm:flex items-center gap-1 px-2.5 py-1 rounded-md bg-emerald-950/40 hover:bg-emerald-900/60 border border-emerald-800 text-emerald-300 font-semibold transition"
-          >
-            <HelpCircle className="w-3.5 h-3.5" />
-            <span>Guided Demo [D]</span>
+        <div className="flex items-center gap-2">
+          <button className="btn-ghost" aria-pressed={dryRun} onClick={() => setDryRun(!dryRun)} title="Plan the scan without sending traffic">
+            Dry run
+          </button>
+          <button className="btn-ghost" aria-pressed={enableMutations} onClick={() => setEnableMutations(!enableMutations)} title="Allow PATCH / DELETE probes">
+            Mutations
           </button>
 
-          <button
-            onClick={() => setShowBenchmarkModal(true)}
-            className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-cyan-950/40 hover:bg-cyan-900/60 border border-cyan-800 text-cyan-300 font-semibold transition"
-          >
-            <BarChart3 className="w-3.5 h-3.5" />
-            <span>Benchmarks</span>
-          </button>
+          <span className="w-0.5 h-8 bg-slate-700 mx-1" />
 
-          <button
-            onClick={handleOpenDryRun}
-            className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-950/40 hover:bg-amber-900/60 border border-amber-800 text-amber-300 font-semibold transition"
-          >
-            <Cpu className="w-3.5 h-3.5" />
-            <span>Dry-Run Table</span>
-          </button>
-
-          <button
-            onClick={() => setShowReportModal(true)}
-            className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-purple-950/40 hover:bg-purple-900/60 border border-purple-800 text-purple-300 font-semibold transition cursor-pointer"
-            title="Export Pentest & Security Audit Report"
-          >
-            <FileText className="w-3.5 h-3.5" />
-            <span>Export Report</span>
-          </button>
-        </div>
-
-        {/* Action Controls */}
-        <div className="flex items-center gap-3">
-          <label className="hidden sm:flex items-center gap-2 text-xs font-mono text-slate-400 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={dryRun}
-              onChange={(e) => setDryRun(e.target.checked)}
-              className="rounded bg-slate-900 border-slate-700 text-amber-500 focus:ring-0"
-            />
-            <span>Dry Run</span>
-          </label>
-
-          <label className="hidden sm:flex items-center gap-2 text-xs font-mono text-slate-400 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={enableMutations}
-              onChange={(e) => setEnableMutations(e.target.checked)}
-              className="rounded bg-slate-900 border-slate-700 text-emerald-500 focus:ring-0"
-            />
-            <span>Mutations</span>
-          </label>
-
-          {/* PERSISTENT AMBER CHIP: TARGET IS PATCHED */}
-          {isTargetPatched && (
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-950/80 border border-amber-600/70 text-amber-300 text-xs font-mono font-medium shadow-sm animate-pulse">
-              <AlertTriangle className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-              <span>Target is PATCHED, scans will find nothing</span>
-              <button
-                onClick={handleRevertPatch}
-                className="ml-1 px-1.5 py-0.5 rounded bg-amber-500/20 hover:bg-amber-500/40 text-amber-200 text-[10px] font-bold underline transition"
-                title="Revert to vulnerable mode"
-              >
-                Revert
-              </button>
-            </div>
-          )}
-
-          <button
-            onClick={handleReset}
-            className="p-2 rounded-lg bg-[#141923] hover:bg-[#1b2230] border border-[#202738] text-slate-400 hover:text-slate-200 transition"
-            title="Reset Target State"
-          >
-            <RotateCcw className="w-4 h-4" />
-          </button>
+          <button className="btn-ghost" onClick={() => setShowGuidedDemo(true)} title="Guided demo [D]"><HelpCircle className="w-4 h-4" /></button>
+          <button className="btn-ghost" onClick={() => setShowBenchmarkModal(true)} title="Benchmarks"><BarChart3 className="w-4 h-4" /></button>
+          <button className="btn-ghost" onClick={handleOpenDryRun} title="Preview planned requests"><Cpu className="w-4 h-4" /></button>
+          <button className="btn-ghost" onClick={() => setShowReportModal(true)} title="Export audit report"><FileText className="w-4 h-4" /></button>
+          <button className="btn-ghost" onClick={handleReset} title="Reset target state"><RotateCcw className="w-4 h-4" /></button>
 
           <button
             onClick={handleRunScan}
             disabled={isScanning || backendOffline}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-black text-xs font-semibold tracking-wide transition shadow-lg shadow-emerald-500/15 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="btn-grace ml-2"
           >
-            <Play className={`w-3.5 h-3.5 fill-black ${isScanning ? 'animate-spin' : ''}`} />
-            {isScanning ? 'AUDITING...' : 'RUN EXECUTION AUDIT'}
+            <Play className={`w-4 h-4 ${isScanning ? 'animate-spin' : ''}`} />
+            {isScanning ? 'AUDITING' : 'BEGIN AUDIT'}
           </button>
         </div>
       </header>
 
-      {/* REFERENCE PATCH VERIFICATION BANNER */}
-      {verificationBanner && (
-        <div className="bg-emerald-950/90 border-b border-emerald-600 px-6 py-2 flex items-center justify-between text-xs text-emerald-200 font-mono z-30 shadow-lg">
-          <div className="flex items-center gap-2">
-            <span className="px-2 py-0.5 rounded bg-emerald-500 text-black font-bold text-[10px]">
-              PATCH VERIFIED
-            </span>
-            <span>
-              Reference fix applied to the demo target (patched_mode). Re-scan: {verificationBanner.before} confirmed leak → {verificationBanner.after} confirmed leaks.
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={handleRevertPatch}
-              className="px-2.5 py-1 rounded bg-[#162030] hover:bg-[#1e2c42] border border-[#283852] text-slate-200 font-semibold transition text-[10px]"
-            >
-              Revert Target & Reset
-            </button>
-            <button
-              onClick={() => setVerificationBanner(null)}
-              className="text-slate-400 hover:text-white px-1.5 text-xs"
-            >
-              ✕
-            </button>
-          </div>
+      {/* STATUS BANNERS (only when relevant) */}
+      {isTargetPatched && (
+        <div className="bg-amber-950 border-b-2 border-amber-600 px-5 py-1.5 flex items-center justify-between text-amber-200 text-sm">
+          <span className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-amber-400" /> Target is patched. Scans will find nothing.
+          </span>
+          <button onClick={handleRevertPatch} className="btn-ghost">Revert</button>
         </div>
       )}
 
-      {/* MAIN THREE-COLUMN WORKSPACE */}
-      <main className="flex-1 p-3 grid grid-cols-1 lg:grid-cols-12 gap-3 overflow-hidden">
-        
-        {/* COLUMN 1: OPENAPI SPEC & IDENTITIES (COL-SPAN 3) */}
+      {verificationBanner && (
+        <div className="bg-emerald-950 border-b-2 border-emerald-400 px-5 py-1.5 flex items-center justify-between text-emerald-200 text-sm z-30">
+          <span className="flex items-center gap-3">
+            <span className="font-display text-[10px] text-emerald-300">LEAK FELLED</span>
+            <span>Re-scan after patch: {verificationBanner.before} confirmed → {verificationBanner.after}</span>
+          </span>
+          <button onClick={() => setVerificationBanner(null)} className="btn-ghost" title="Dismiss"><X className="w-4 h-4" /></button>
+        </div>
+      )}
+
+      {/* WORKSPACE */}
+      <main className="flex-1 p-4 grid grid-cols-1 lg:grid-cols-12 gap-4 overflow-hidden">
+
         <section className="lg:col-span-3 h-full overflow-hidden">
-          <SpecPanel
-            nodes={nodes}
-            onImportSpec={importSpec}
-            isLoading={isGraphLoading}
-          />
+          <SpecPanel nodes={nodes} onImportSpec={importSpec} isLoading={isGraphLoading} />
         </section>
 
-        {/* COLUMN 2: REAL REACT FLOW DEPENDENCY DAG (COL-SPAN 5) */}
-        <section className="lg:col-span-5 h-full rounded-xl border border-[#1e2536] bg-[#090b10] overflow-hidden relative shadow-xl flex flex-col">
-          <div className="h-10 px-4 bg-[#121622] border-b border-[#1d2538] flex items-center justify-between text-xs font-mono shrink-0">
+        <section className="lg:col-span-5 h-full rounded-xl border border-slate-700 bg-slate-950 overflow-hidden relative flex flex-col">
+          <div className="h-11 px-4 bg-slate-900 border-b-2 border-slate-700 flex items-center justify-between shrink-0">
             <div className="flex items-center gap-2">
-              <GitBranch className="w-3.5 h-3.5 text-cyan-400" />
-              <span className="font-semibold text-slate-200">React Flow Dependency DAG</span>
+              <GitBranch className="w-4 h-4 text-emerald-400" />
+              <span className="panel-title">Dependency Graph</span>
             </div>
-            <span className="text-[10px] text-slate-400">
-              {nodes.length} Nodes · {edges.length} Edges
-            </span>
+            <span className="text-sm text-slate-400">{nodes.length} nodes · {edges.length} edges</span>
           </div>
 
           <div className="flex-1 min-h-0 relative h-full w-full">
@@ -383,21 +286,20 @@ export default function App() {
               onSelectNode={(nodeId) => setSelectedNodeId(nodeId)}
             />
 
-            {/* Selected Node Bottom Drawer */}
             {selectedNodeObj && (
-              <div className="absolute bottom-14 left-4 right-4 bg-[#0d121c]/95 backdrop-blur border border-[#1f2738] rounded-xl p-3.5 text-xs font-mono shadow-2xl z-20">
-                <div className="flex items-center justify-between mb-1.5">
+              <div className="absolute bottom-14 left-4 right-4 bg-slate-900 border-2 border-emerald-400 p-3 z-20 shadow-lg">
+                <div className="flex items-center justify-between mb-1">
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] px-1.5 py-0.2 rounded bg-blue-500/20 text-blue-300 font-bold">
+                    <span className="text-sm px-1.5 bg-emerald-400 text-slate-950">
                       {selectedNodeObj.metadata?.method || selectedNodeObj.type}
                     </span>
-                    <span className="font-bold text-slate-100">{selectedNodeObj.label}</span>
+                    <span className="text-slate-100">{selectedNodeObj.label}</span>
                   </div>
-                  <button onClick={() => setSelectedNodeId(null)} className="text-slate-400 hover:text-white text-[10px]">
-                    Dismiss
+                  <button onClick={() => setSelectedNodeId(null)} className="text-slate-400 hover:text-white" title="Dismiss">
+                    <X className="w-4 h-4" />
                   </button>
                 </div>
-                <div className="text-[11px] text-slate-400">
+                <div className="text-sm text-slate-400">
                   {selectedNodeObj.metadata?.summary || 'Resource graph operation node'}
                 </div>
               </div>
@@ -405,14 +307,10 @@ export default function App() {
           </div>
         </section>
 
-        {/* COLUMN 3: EXECUTION STREAM & FINDINGS (COL-SPAN 4) */}
-        <section className="lg:col-span-4 h-full flex flex-col gap-3 overflow-hidden">
-          {/* Top Half: Streaming Real Console */}
+        <section className="lg:col-span-4 h-full flex flex-col gap-4 overflow-hidden">
           <div className="flex-1 min-h-0">
             <ScanConsole events={events} isScanning={isScanning} />
           </div>
-
-          {/* Bottom Half: Confirmed Findings */}
           <div className="h-56 shrink-0">
             <FindingsList
               findings={findings}
@@ -420,17 +318,15 @@ export default function App() {
               onSelectFinding={(f) => setSelectedFinding(f)}
               showAllHistory={showAllHistory}
               onToggleHistory={() => setShowAllHistory(!showAllHistory)}
-              onExportReport={() => setShowReportModal(true)}
             />
           </div>
         </section>
-
       </main>
 
-      {/* FINDING DETAIL MODAL / SPLIT INSPECTOR */}
+      {/* MODALS */}
       {selectedFinding && (
-        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-6">
-          <div className="w-full max-w-4xl h-[85vh] bg-[#0b0e14] rounded-2xl overflow-hidden border border-[#232c40] shadow-2xl">
+        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-6">
+          <div className="w-full max-w-4xl h-[85vh] bg-slate-950 overflow-hidden border-2 border-emerald-400 shadow-2xl">
             <FindingDetail
               finding={selectedFinding}
               onClose={() => setSelectedFinding(null)}
@@ -444,10 +340,9 @@ export default function App() {
         </div>
       )}
 
-      {/* DRY-RUN PREVIEW MODAL */}
       {showDryRunModal && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6">
-          <div className="w-full max-w-5xl h-[85vh] bg-[#0b0e14] rounded-2xl overflow-hidden border border-[#232c40] shadow-2xl">
+        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-6">
+          <div className="w-full max-w-5xl h-[85vh] bg-slate-950 overflow-hidden border-2 border-emerald-400 shadow-2xl">
             <DryRunModal
               data={dryRunData}
               isLoading={isDryRunLoading}
@@ -461,19 +356,17 @@ export default function App() {
         </div>
       )}
 
-      {/* BENCHMARK MODAL */}
       {showBenchmarkModal && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6">
-          <div className="w-full max-w-5xl h-[85vh] bg-[#0b0e14] rounded-2xl overflow-hidden border border-[#232c40] shadow-2xl">
+        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-6">
+          <div className="w-full max-w-5xl h-[85vh] bg-slate-950 overflow-hidden border-2 border-emerald-400 shadow-2xl">
             <BenchmarkPanel onClose={() => setShowBenchmarkModal(false)} />
           </div>
         </div>
       )}
 
-      {/* AI REMEDIATION MODAL */}
       {showRemediationFinding && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6">
-          <div className="w-full max-w-5xl h-[85vh] bg-[#0b0e14] rounded-2xl overflow-hidden border border-[#232c40] shadow-2xl">
+        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-6">
+          <div className="w-full max-w-5xl h-[85vh] bg-slate-950 overflow-hidden border-2 border-emerald-400 shadow-2xl">
             <RemediationModal
               finding={showRemediationFinding}
               onClose={() => setShowRemediationFinding(null)}
@@ -484,10 +377,9 @@ export default function App() {
         </div>
       )}
 
-      {/* INTERACTIVE GUIDED DEMO MODAL */}
       {showGuidedDemo && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6">
-          <div className="w-full max-w-3xl h-[65vh] bg-[#0b0e14] rounded-2xl overflow-hidden border border-[#232c40] shadow-2xl">
+        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-6">
+          <div className="w-full max-w-3xl h-[65vh] bg-slate-950 overflow-hidden border-2 border-emerald-400 shadow-2xl">
             <GuidedDemoModal
               onClose={() => setShowGuidedDemo(false)}
               onLoadSpec={() => {
@@ -502,7 +394,6 @@ export default function App() {
         </div>
       )}
 
-      {/* AUDIT & PENTEST REPORT MODAL */}
       <AuditReportModal
         isOpen={showReportModal}
         onClose={() => setShowReportModal(false)}
@@ -513,44 +404,13 @@ export default function App() {
         isTargetPatched={isTargetPatched}
       />
 
-      {/* HONESTY & STATUS STRIP (RULEBOOK REQUIREMENT) */}
-      <footer className="h-7 border-t border-[#1c2230] bg-[#080a0f] px-5 flex items-center justify-between text-[10px] text-slate-500 font-mono shrink-0">
-        <div className="flex items-center gap-4">
-          <span className="flex items-center gap-1 text-emerald-400 font-semibold">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Working: Real REST + SSE Engine
-          </span>
-          <span className="flex items-center gap-1 text-cyan-400 font-semibold">
-            <span className="w-1.5 h-1.5 rounded-full bg-cyan-400"></span> Working: React Flow + Dagre DAG
-          </span>
-          <span className="flex items-center gap-1 font-semibold">
-            <span
-              className={`w-1.5 h-1.5 rounded-full ${
-                modelStatusText.startsWith('model call: tested')
-                  ? 'bg-emerald-400'
-                  : modelStatusText.includes('configured')
-                  ? 'bg-amber-400'
-                  : 'bg-purple-400'
-              }`}
-            ></span>
-            <span
-              className={
-                modelStatusText.startsWith('model call: tested')
-                  ? 'text-emerald-400'
-                  : modelStatusText.includes('configured')
-                  ? 'text-amber-400'
-                  : 'text-purple-400'
-              }
-            >
-              {modelStatusText}
-            </span>
-          </span>
-          <span className="flex items-center gap-1 text-amber-400 font-semibold">
-            <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span> Working: Empirical Ground Truth Benchmarks
-          </span>
-        </div>
-        <div>
-          <span>APIGuard · Graph-Guided API Authorization & BOLA Detection Engine</span>
-        </div>
+      {/* FOOTER: one quiet line */}
+      <footer className="h-8 border-t-2 border-slate-700 bg-slate-900 px-5 flex items-center justify-between text-sm text-slate-500 shrink-0">
+        <span className="flex items-center gap-2">
+          <span className={`w-2 h-2 ${modelOk ? 'bg-emerald-400' : modelWarn ? 'bg-amber-400' : 'bg-slate-500'}`} />
+          <span className={modelOk ? 'text-emerald-400' : modelWarn ? 'text-amber-400' : ''}>{modelStatusText}</span>
+        </span>
+        <span>Press D for the guided demo</span>
       </footer>
 
     </div>

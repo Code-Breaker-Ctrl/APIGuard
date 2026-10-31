@@ -44,9 +44,9 @@ export const BenchmarkPanel: React.FC<BenchmarkPanelProps> = ({ onClose }) => {
   }, []);
 
   return (
-    <div className="flex flex-col h-full bg-[#0b0e14] text-xs font-mono select-none">
+    <div className="flex flex-col h-full bg-[#15100c] text-xs font-mono select-none">
       {/* Header */}
-      <div className="h-12 px-5 bg-[#121622] border-b border-[#1f283d] flex items-center justify-between shrink-0">
+      <div className="h-12 px-5 bg-[#201a13] border-b border-[#372d22] flex items-center justify-between shrink-0">
         <div className="flex items-center gap-2.5">
           <BarChart3 className="w-4 h-4 text-cyan-400" />
           <span className="font-bold text-slate-100 text-sm">Empirical Benchmark & Controlled Ablation</span>
@@ -92,7 +92,7 @@ export const BenchmarkPanel: React.FC<BenchmarkPanelProps> = ({ onClose }) => {
           <>
             {/* Top Stat Summary Cards */}
             <div className="grid grid-cols-4 gap-3">
-              <div className="p-3.5 rounded-xl bg-[#0e1422] border border-[#1f2940]">
+              <div className="p-3.5 rounded-xl bg-[#1e1812] border border-[#382e23]">
                 <div className="text-[10px] text-slate-400 uppercase tracking-wider">APIGuard Recall</div>
                 <div className="text-2xl font-black text-emerald-400 mt-1">
                   {(data.aggregate_metrics.graph_guided.aggregate_recall * 100).toFixed(0)}%
@@ -102,7 +102,7 @@ export const BenchmarkPanel: React.FC<BenchmarkPanelProps> = ({ onClose }) => {
                 </div>
               </div>
 
-              <div className="p-3.5 rounded-xl bg-[#0e1422] border border-[#1f2940]">
+              <div className="p-3.5 rounded-xl bg-[#1e1812] border border-[#382e23]">
                 <div className="text-[10px] text-slate-400 uppercase tracking-wider">Option A Baseline Recall</div>
                 <div className="text-2xl font-black text-amber-400 mt-1">
                   {(data.aggregate_metrics.baseline.aggregate_recall * 100).toFixed(0)}%
@@ -112,7 +112,7 @@ export const BenchmarkPanel: React.FC<BenchmarkPanelProps> = ({ onClose }) => {
                 </div>
               </div>
 
-              <div className="p-3.5 rounded-xl bg-[#0e1422] border border-[#1f2940]">
+              <div className="p-3.5 rounded-xl bg-[#1e1812] border border-[#382e23]">
                 <div className="text-[10px] text-slate-400 uppercase tracking-wider">Precision (All Variants)</div>
                 <div className="text-2xl font-black text-cyan-400 mt-1">
                   100% <span className="text-xs font-normal text-slate-400">vs 100% Base</span>
@@ -120,7 +120,7 @@ export const BenchmarkPanel: React.FC<BenchmarkPanelProps> = ({ onClose }) => {
                 <div className="text-[10px] text-slate-500 mt-0.5">0 False Positives on Secure Suite</div>
               </div>
 
-              <div className="p-3.5 rounded-xl bg-[#0e1422] border border-[#1f2940]">
+              <div className="p-3.5 rounded-xl bg-[#1e1812] border border-[#382e23]">
                 <div className="text-[10px] text-slate-400 uppercase tracking-wider">Reqs per Finding (Aggregate)</div>
                 <div className="text-2xl font-black text-slate-200 mt-1">
                   {data.aggregate_metrics.graph_guided.requests_per_finding.toFixed(1)} <span className="text-xs font-normal text-slate-400">vs {data.aggregate_metrics.baseline.requests_per_finding.toFixed(1)} Base</span>
@@ -132,7 +132,7 @@ export const BenchmarkPanel: React.FC<BenchmarkPanelProps> = ({ onClose }) => {
             </div>
 
             {/* Honest Trade-Off Callout Note */}
-            <div className="p-3 rounded-lg bg-[#0e1422] border border-cyan-900/40 text-[11px] text-slate-300 flex items-start gap-2.5">
+            <div className="p-3 rounded-lg bg-[#1e1812] border border-cyan-900/40 text-[11px] text-slate-300 flex items-start gap-2.5">
               <Info className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
               <div>
                 <strong className="text-cyan-300">Efficiency & Coverage Trade-Off:</strong>{' '}
@@ -141,15 +141,15 @@ export const BenchmarkPanel: React.FC<BenchmarkPanelProps> = ({ onClose }) => {
             </div>
 
             {/* Variants Comparison Table */}
-            <div className="border border-[#1e2638] rounded-xl overflow-hidden bg-[#0d1017]">
-              <div className="h-9 px-4 bg-[#121622] border-b border-[#1c2436] flex items-center justify-between text-[11px] font-bold text-slate-300">
+            <div className="border border-[#342a20] rounded-xl overflow-hidden bg-[#17120e]">
+              <div className="h-9 px-4 bg-[#201a13] border-b border-[#31281f] flex items-center justify-between text-[11px] font-bold text-slate-300">
                 <span>Multi-Variant Ground Truth Evaluation</span>
                 <span className="text-slate-500 font-normal">Generated: {data.timestamp}</span>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-[11px] border-collapse">
                   <thead>
-                    <tr className="border-b border-[#1c2436] bg-[#0f131d] text-slate-400 text-[10px] uppercase">
+                    <tr className="border-b border-[#31281f] bg-[#1c1610] text-slate-400 text-[10px] uppercase">
                       <th className="py-2.5 px-3">Variant Description</th>
                       <th className="py-2.5 px-3 text-center">Truth</th>
                       <th className="py-2.5 px-3 text-center text-amber-400">Base Found</th>
@@ -163,7 +163,7 @@ export const BenchmarkPanel: React.FC<BenchmarkPanelProps> = ({ onClose }) => {
                       <th className="py-2.5 px-3 text-center text-cyan-400">Time to 1st</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#171e2e]">
+                  <tbody className="divide-y divide-[#2a221a]">
                     {Object.entries(data.variants).map(([vKey, vVal]) => {
                       const baseRecall = vVal.baseline.recall === null ? 'n/a' : `${(vVal.baseline.recall * 100).toFixed(0)}%`;
                       const graphRecall = vVal.graph_guided.recall === null ? 'n/a' : `${(vVal.graph_guided.recall * 100).toFixed(0)}%`;
@@ -173,7 +173,7 @@ export const BenchmarkPanel: React.FC<BenchmarkPanelProps> = ({ onClose }) => {
                       const graphRpf = vVal.graph_guided.req_per_finding !== null ? vVal.graph_guided.req_per_finding.toFixed(1) : 'n/a';
 
                       return (
-                        <tr key={vKey} className="hover:bg-[#121724] transition">
+                        <tr key={vKey} className="hover:bg-[#211b14] transition">
                           <td className="py-2.5 px-3 font-medium text-slate-200">
                             <div>{vVal.description}</div>
                             <div className="text-[10px] text-slate-500 font-mono">{vKey}</div>
@@ -207,7 +207,7 @@ export const BenchmarkPanel: React.FC<BenchmarkPanelProps> = ({ onClose }) => {
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   {Object.entries(data.ablations).map(([aKey, aVal]: [string, any]) => (
-                    <div key={aKey} className="p-3.5 rounded-xl bg-[#0e131f] border border-[#1d273b] space-y-2">
+                    <div key={aKey} className="p-3.5 rounded-xl bg-[#1c1611] border border-[#352b21] space-y-2">
                       <div className="flex items-center justify-between">
                         <span className="font-bold text-slate-100 text-[11px]">{aVal.name}</span>
                         <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${
@@ -217,7 +217,7 @@ export const BenchmarkPanel: React.FC<BenchmarkPanelProps> = ({ onClose }) => {
                         </span>
                       </div>
                       <p className="text-[11px] text-slate-400">{aVal.note}</p>
-                      <div className="text-[10px] text-slate-500 font-mono pt-1 border-t border-[#172030] flex justify-between">
+                      <div className="text-[10px] text-slate-500 font-mono pt-1 border-t border-[#2c231b] flex justify-between">
                         <span>Requests: {aVal.requests}</span>
                         <span>Duration: {aVal.duration_ms}ms</span>
                       </div>

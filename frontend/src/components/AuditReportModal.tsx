@@ -297,10 +297,10 @@ export const AuditReportModal: React.FC<AuditReportModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 font-mono select-none">
-      <div className="w-full max-w-4xl h-[88vh] bg-[#0b0e14] rounded-2xl overflow-hidden border border-[#232c40] shadow-2xl flex flex-col text-xs">
+      <div className="w-full max-w-4xl h-[88vh] bg-[#15100c] rounded-2xl overflow-hidden border border-[#3b3125] shadow-2xl flex flex-col text-xs">
         
         {/* Header */}
-        <div className="h-14 px-6 bg-[#121622] border-b border-[#1f283d] flex items-center justify-between shrink-0">
+        <div className="h-14 px-6 bg-[#201a13] border-b border-[#372d22] flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
               <FileText className="w-4 h-4" />
@@ -324,11 +324,11 @@ export const AuditReportModal: React.FC<AuditReportModalProps> = ({
 
           <div className="flex items-center gap-2">
             {/* Tab switchers */}
-            <div className="flex items-center bg-[#090b10] p-0.5 rounded-lg border border-[#1e2538] mr-2">
+            <div className="flex items-center bg-[#110d09] p-0.5 rounded-lg border border-[#332a20] mr-2">
               <button
                 onClick={() => setActiveTab('preview')}
                 className={`px-3 py-1 rounded text-xs transition ${
-                  activeTab === 'preview' ? 'bg-[#182030] text-emerald-400 font-bold' : 'text-slate-400 hover:text-white'
+                  activeTab === 'preview' ? 'bg-[#2c241b] text-emerald-400 font-bold' : 'text-slate-400 hover:text-white'
                 }`}
               >
                 Executive Preview
@@ -336,7 +336,7 @@ export const AuditReportModal: React.FC<AuditReportModalProps> = ({
               <button
                 onClick={() => setActiveTab('markdown')}
                 className={`px-3 py-1 rounded text-xs transition ${
-                  activeTab === 'markdown' ? 'bg-[#182030] text-emerald-400 font-bold' : 'text-slate-400 hover:text-white'
+                  activeTab === 'markdown' ? 'bg-[#2c241b] text-emerald-400 font-bold' : 'text-slate-400 hover:text-white'
                 }`}
               >
                 Raw Markdown
@@ -354,11 +354,11 @@ export const AuditReportModal: React.FC<AuditReportModalProps> = ({
         </div>
 
         {/* Content area */}
-        <div className="flex-1 overflow-y-auto p-6 bg-[#090b10]">
+        <div className="flex-1 overflow-y-auto p-6 bg-[#110d09]">
           {activeTab === 'preview' ? (
             <div className="space-y-6 max-w-3xl mx-auto">
               {/* Executive Summary Card */}
-              <div className="p-5 rounded-xl bg-[#0f1420] border border-[#1e2638] space-y-4">
+              <div className="p-5 rounded-xl bg-[#1d1711] border border-[#342a20] space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 text-slate-200 text-sm font-bold">
                     {findings.length === 0 ? (
@@ -372,21 +372,21 @@ export const AuditReportModal: React.FC<AuditReportModalProps> = ({
                 </div>
 
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
-                  <div className="p-3 rounded-lg bg-[#141a29] border border-[#232c40]">
+                  <div className="p-3 rounded-lg bg-[#251e17] border border-[#3b3125]">
                     <div className="text-[10px] text-slate-400 uppercase">Endpoints Mapped</div>
                     <div className="text-lg font-bold text-slate-100 mt-1">{nodeCount}</div>
                   </div>
-                  <div className="p-3 rounded-lg bg-[#141a29] border border-[#232c40]">
+                  <div className="p-3 rounded-lg bg-[#251e17] border border-[#3b3125]">
                     <div className="text-[10px] text-slate-400 uppercase">DAG Relationships</div>
                     <div className="text-lg font-bold text-cyan-400 mt-1">{edgeCount}</div>
                   </div>
-                  <div className="p-3 rounded-lg bg-[#141a29] border border-[#232c40]">
+                  <div className="p-3 rounded-lg bg-[#251e17] border border-[#3b3125]">
                     <div className="text-[10px] text-slate-400 uppercase">BOLA Leaks</div>
                     <div className={`text-lg font-bold mt-1 ${findings.length === 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
                       {findings.length}
                     </div>
                   </div>
-                  <div className="p-3 rounded-lg bg-[#141a29] border border-[#232c40]">
+                  <div className="p-3 rounded-lg bg-[#251e17] border border-[#3b3125]">
                     <div className="text-[10px] text-slate-400 uppercase">False Positives</div>
                     <div className="text-lg font-bold text-emerald-400 mt-1">0.0%</div>
                   </div>
@@ -413,7 +413,7 @@ export const AuditReportModal: React.FC<AuditReportModalProps> = ({
                 </div>
 
                 {findings.length === 0 ? (
-                  <div className="p-8 rounded-xl bg-[#0f1420] border border-emerald-900/40 text-center space-y-2">
+                  <div className="p-8 rounded-xl bg-[#1d1711] border border-emerald-900/40 text-center space-y-2">
                     <ShieldCheck className="w-8 h-8 text-emerald-400 mx-auto" />
                     <div className="text-sm font-bold text-emerald-300">Clean Authorization Baseline</div>
                     <p className="text-slate-400 text-xs max-w-md mx-auto">
@@ -422,7 +422,7 @@ export const AuditReportModal: React.FC<AuditReportModalProps> = ({
                   </div>
                 ) : (
                   findings.map((f, idx) => (
-                    <div key={f.id || idx} className="p-5 rounded-xl bg-[#0f1420] border border-rose-900/40 space-y-3">
+                    <div key={f.id || idx} className="p-5 rounded-xl bg-[#1d1711] border border-rose-900/40 space-y-3">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <span className="px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 font-bold border border-rose-500/40">
@@ -433,7 +433,7 @@ export const AuditReportModal: React.FC<AuditReportModalProps> = ({
                         <span className="text-[11px] text-slate-400 font-mono">Resource: {f.resource_type}</span>
                       </div>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs bg-[#141a29] p-3 rounded-lg border border-[#20293d]">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs bg-[#251e17] p-3 rounded-lg border border-[#382e23]">
                         <div>
                           <span className="text-slate-400">Victim Owner:</span> <span className="text-emerald-300 font-bold">{f.identities.owner}</span>
                         </div>
@@ -453,7 +453,7 @@ export const AuditReportModal: React.FC<AuditReportModalProps> = ({
                           <GitBranch className="w-3.5 h-3.5 text-cyan-400" />
                           <span>Graph Propagation Path:</span>
                         </div>
-                        <div className="p-2 rounded bg-[#07090e] border border-[#1a2133] text-cyan-300 text-[11px]">
+                        <div className="p-2 rounded bg-[#0f0b08] border border-[#2e261d] text-cyan-300 text-[11px]">
                           {f.graph_path.join(' ➔ ')}
                         </div>
                       </div>
@@ -463,7 +463,7 @@ export const AuditReportModal: React.FC<AuditReportModalProps> = ({
                           <Terminal className="w-3.5 h-3.5 text-emerald-400" />
                           <span>Reproduction cURL:</span>
                         </div>
-                        <div className="p-2.5 rounded bg-[#07090e] border border-[#1a2133] text-slate-300 text-[11px] overflow-x-auto whitespace-pre">
+                        <div className="p-2.5 rounded bg-[#0f0b08] border border-[#2e261d] text-slate-300 text-[11px] overflow-x-auto whitespace-pre">
                           {f.repro_curl}
                         </div>
                       </div>
@@ -477,14 +477,14 @@ export const AuditReportModal: React.FC<AuditReportModalProps> = ({
               <textarea
                 readOnly
                 value={markdownContent}
-                className="w-full h-full p-4 rounded-xl bg-[#07090e] border border-[#1e2638] text-slate-300 font-mono text-xs resize-none focus:outline-none"
+                className="w-full h-full p-4 rounded-xl bg-[#0f0b08] border border-[#342a20] text-slate-300 font-mono text-xs resize-none focus:outline-none"
               />
             </div>
           )}
         </div>
 
         {/* Footer Actions */}
-        <div className="h-14 px-6 bg-[#121622] border-t border-[#1f283d] flex items-center justify-between shrink-0">
+        <div className="h-14 px-6 bg-[#201a13] border-t border-[#372d22] flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2 text-slate-400 text-xs">
             <span>Export formats available: Markdown (.md) and Printable HTML</span>
           </div>
@@ -492,7 +492,7 @@ export const AuditReportModal: React.FC<AuditReportModalProps> = ({
           <div className="flex items-center gap-2.5">
             <button
               onClick={handleCopyMarkdown}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#1b2233] hover:bg-[#252f47] border border-[#2b3752] text-slate-200 transition font-bold"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#2f261d] hover:bg-[#403528] border border-[#4a3d2f] text-slate-200 transition font-bold"
             >
               {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
               <span>{copied ? 'Copied MD!' : 'Copy Markdown'}</span>
@@ -500,7 +500,7 @@ export const AuditReportModal: React.FC<AuditReportModalProps> = ({
 
             <button
               onClick={handleDownloadMarkdown}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#1b2233] hover:bg-[#252f47] border border-[#2b3752] text-slate-200 transition font-bold"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#2f261d] hover:bg-[#403528] border border-[#4a3d2f] text-slate-200 transition font-bold"
             >
               <Download className="w-3.5 h-3.5 text-cyan-400" />
               <span>Download .md</span>
@@ -508,7 +508,7 @@ export const AuditReportModal: React.FC<AuditReportModalProps> = ({
 
             <button
               onClick={handleDownloadHtml}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#1b2233] hover:bg-[#252f47] border border-[#2b3752] text-slate-200 transition font-bold"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#2f261d] hover:bg-[#403528] border border-[#4a3d2f] text-slate-200 transition font-bold"
             >
               <Download className="w-3.5 h-3.5 text-purple-400" />
               <span>Download .html</span>

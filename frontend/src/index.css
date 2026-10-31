@@ -1,40 +1,199 @@
 @import "tailwindcss";
 
+/* ============================================================
+   ELDEN RING x PIXEL: "Site of Grace" theme
+   Palette is applied by overriding Tailwind's colour tokens, so
+   every existing utility (text-emerald-400, bg-rose-950, ...) maps
+   into the Lands Between: gold = grace, crimson = blood, ember = amber.
+   ============================================================ */
+@theme {
+  --font-sans: "VT323", ui-monospace, monospace;
+  --font-mono: "VT323", ui-monospace, monospace;
+  --font-display: "Press Start 2P", "VT323", monospace;
+  --color-emerald-50: #fcf0d0;
+  --color-emerald-100: #f7e8c0;
+  --color-emerald-200: #f0dba6;
+  --color-emerald-300: #e3c379;
+  --color-emerald-400: #d4a843;
+  --color-emerald-500: #b08c38;
+  --color-emerald-600: #90722f;
+  --color-emerald-700: #6c5624;
+  --color-emerald-800: #4c3d1b;
+  --color-emerald-900: #302613;
+  --color-emerald-950: #201a0e;
+  --color-cyan-50: #f6f1da;
+  --color-cyan-100: #ebead8;
+  --color-cyan-200: #d8dfd4;
+  --color-cyan-300: #b6cacc;
+  --color-cyan-400: #8fb3c4;
+  --color-cyan-500: #7795a2;
+  --color-cyan-600: #627a84;
+  --color-cyan-700: #4b5b62;
+  --color-cyan-800: #364044;
+  --color-cyan-900: #24282a;
+  --color-cyan-950: #191b1b;
+  --color-amber-50: #fdedce;
+  --color-amber-100: #f9e1bc;
+  --color-amber-200: #f4ce9e;
+  --color-amber-300: #ebab6a;
+  --color-amber-400: #e0832c;
+  --color-amber-500: #ba6d26;
+  --color-amber-600: #985a20;
+  --color-amber-700: #724419;
+  --color-amber-800: #503114;
+  --color-amber-900: #32200e;
+  --color-amber-950: #21160c;
+  --color-rose-50: #fbe8cf;
+  --color-rose-100: #f5d6bf;
+  --color-rose-200: #ecb8a4;
+  --color-rose-300: #db8373;
+  --color-rose-400: #c8453b;
+  --color-rose-500: #a63a32;
+  --color-rose-600: #88312a;
+  --color-rose-700: #662620;
+  --color-rose-800: #481d18;
+  --color-rose-900: #2e1511;
+  --color-rose-950: #1f100d;
+  --color-purple-50: #f7ecda;
+  --color-purple-100: #ede0d7;
+  --color-purple-200: #dccbd2;
+  --color-purple-300: #bda6ca;
+  --color-purple-400: #9a7bc0;
+  --color-purple-500: #80679f;
+  --color-purple-600: #6a5581;
+  --color-purple-700: #504060;
+  --color-purple-800: #392e43;
+  --color-purple-900: #261e29;
+  --color-purple-950: #1a151a;
+  --color-blue-50: #f3eed9;
+  --color-blue-100: #e5e4d6;
+  --color-blue-200: #cdd3cf;
+  --color-blue-300: #a1b6c5;
+  --color-blue-400: #6f93b8;
+  --color-blue-500: #5d7a98;
+  --color-blue-600: #4d647c;
+  --color-blue-700: #3c4c5c;
+  --color-blue-800: #2c3640;
+  --color-blue-900: #1e2328;
+  --color-blue-950: #16181a;
+  --color-slate-50: #f6efdc;
+  --color-slate-100: #efe3c4;
+  --color-slate-200: #d9ccaa;
+  --color-slate-300: #bfb18d;
+  --color-slate-400: #9a8d70;
+  --color-slate-500: #75694f;
+  --color-slate-600: #574d38;
+  --color-slate-700: #3d3526;
+  --color-slate-800: #2b2418;
+  --color-slate-900: #1b160e;
+  --color-slate-950: #100d08;
+}
+
+:root {
+  --ink: #0c0a08;
+  --panel: #14110d;
+  --panel-2: #1b160e;
+  --line: #3d3526;
+  --gold: #d4a843;
+  --gold-hi: #f0d98a;
+  --parchment: #d9ccaa;
+  --blood: #c8453b;
+}
+
 @layer base {
+  html { font-size: 18px; }
   body {
-    background-color: #0b0e14;
-    color: #e2e8f0;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    background-color: var(--ink);
+    background-image:
+      linear-gradient(45deg, rgba(212,168,67,.025) 25%, transparent 25%, transparent 75%, rgba(212,168,67,.025) 75%),
+      linear-gradient(45deg, rgba(212,168,67,.025) 25%, transparent 25%, transparent 75%, rgba(212,168,67,.025) 75%);
+    background-size: 8px 8px;
+    background-position: 0 0, 4px 4px;
+    color: var(--parchment);
+    font-family: "VT323", ui-monospace, monospace;
+    font-synthesis: none;
+    -webkit-font-smoothing: none;
+    text-rendering: optimizeSpeed;
+    letter-spacing: .02em;
   }
+  /* VT323 ships one weight; faux-bold only smears the pixels */
+  *, *::before, *::after { font-weight: 400 !important; border-radius: 0 !important; }
+  img, canvas { image-rendering: pixelated; }
+  svg { shape-rendering: crispEdges; }
+  svg.lucide { stroke-linecap: square; stroke-linejoin: miter; }
+  button, [role="button"], label { cursor: pointer; }
 }
 
-/* Custom scrollbars for hacker terminal feel */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  background: #0d121c;
-}
-::-webkit-scrollbar-thumb {
-  background: #1e293b;
-  border-radius: 3px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #334155;
-}
-
-@keyframes pulse-slow {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
+/* ---------- Type scale: a pixel font needs larger sizes than the original tiny text ---------- */
+[class*="text-[8"], [class*="text-[9px"] { font-size: 14px !important; line-height: 1.1 !important; }
+[class*="text-[10"], [class*="text-[11"] { font-size: 16px !important; line-height: 1.15 !important; }
+.text-xs { font-size: 17px !important; line-height: 1.2 !important; }
+.text-sm { font-size: 19px !important; }
+.text-base { font-size: 21px !important; }
+.text-lg { font-size: 24px !important; }
+.text-xl { font-size: 28px !important; }
+.text-2xl { font-size: 32px !important; }
+.font-display { font-family: var(--font-display) !important; letter-spacing: 0; }
+.panel-title {
+  font-family: var(--font-display) !important; font-size: 10px !important; letter-spacing: 0;
+  color: var(--gold) !important; text-transform: uppercase; line-height: 1.4 !important;
 }
 
-.animate-pulse-slow {
-  animation: pulse-slow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+/* ---------- Pixel frames: square, 2px borders, hard offset shadow, no blur ---------- */
+[class~="border"] { border-width: 2px; }
+[class*="rounded-xl"], [class*="rounded-2xl"] {
+  box-shadow: 0 0 0 2px #000, 4px 4px 0 2px #000 !important;
 }
+.shadow-lg, .shadow-xl, .shadow-2xl, .shadow-md, .shadow-sm { box-shadow: 4px 4px 0 #000 !important; }
+[class*="backdrop-blur"] { backdrop-filter: none !important; }
+[class*="bg-black/"] { background-color: rgba(8, 6, 4, .88) !important; }
 
-/* Ensure React Flow nodes never stay hidden when dimensions are known */
-.react-flow__node {
-  visibility: visible !important;
+/* ---------- Buttons: stepped press ---------- */
+button { transition: none !important; }
+button:not(:disabled):hover { filter: brightness(1.15); }
+button:not(:disabled):active { transform: translate(2px, 2px); }
+button:disabled { cursor: not-allowed; }
+.btn-grace {
+  background: var(--gold); color: #1b160e; border: 2px solid #000;
+  box-shadow: inset -3px -3px 0 #9a7a25, inset 3px 3px 0 var(--gold-hi), 4px 4px 0 #000;
+  font-family: var(--font-display); font-size: 10px; padding: 10px 14px; line-height: 1;
+  display: inline-flex; align-items: center; gap: 8px;
 }
+.btn-grace:not(:disabled):active { box-shadow: inset 3px 3px 0 #9a7a25, 2px 2px 0 #000; }
+.btn-grace:disabled { opacity: .55; }
+.btn-ghost {
+  background: var(--panel-2); color: var(--parchment); border: 2px solid var(--line);
+  box-shadow: 3px 3px 0 #000; padding: 6px 8px; display: inline-flex; align-items: center; gap: 6px;
+  font-size: 17px; line-height: 1;
+}
+.btn-ghost:not(:disabled):hover { border-color: var(--gold); color: var(--gold-hi); }
+.btn-ghost[aria-pressed="true"] { border-color: var(--gold); color: var(--gold-hi); background: #2b2418; }
 
+/* ---------- Scrollbars ---------- */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--ink); border-left: 2px solid var(--line); }
+::-webkit-scrollbar-thumb { background: var(--gold); border: 2px solid var(--ink); }
+::-webkit-scrollbar-thumb:hover { background: var(--gold-hi); }
+
+/* ---------- Animations in steps (no smooth easing) ---------- */
+@keyframes pulse-slow { 0%, 100% { opacity: 1; } 50% { opacity: .4; } }
+.animate-pulse-slow, .animate-pulse { animation: pulse-slow 1.2s steps(2, jump-none) infinite !important; }
+.animate-spin { animation-timing-function: steps(8) !important; }
+
+/* ---------- Checkbox as a pixel box ---------- */
+input[type="checkbox"] {
+  appearance: none; width: 16px; height: 16px; background: var(--ink);
+  border: 2px solid var(--line); display: inline-grid; place-content: center; margin: 0;
+}
+input[type="checkbox"]:checked { border-color: var(--gold); }
+input[type="checkbox"]:checked::after { content: ""; width: 8px; height: 8px; background: var(--gold); }
+
+/* ---------- React Flow ---------- */
+.react-flow__node { visibility: visible !important; font-size: 14px; }
+.react-flow__attribution { display: none !important; }
+.react-flow__handle { border-radius: 0 !important; }
+.react-flow__node [class*="text-[8"],
+.react-flow__node [class*="text-[9"],
+.react-flow__node [class*="text-[10"] { font-size: 14px !important; }
+
+::selection { background: var(--gold); color: var(--ink); }

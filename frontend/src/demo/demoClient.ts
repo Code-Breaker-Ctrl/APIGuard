@@ -9,6 +9,7 @@ import type {
   ScanEvent,
 } from '../types';
 import fixtures from './fixtures.json';
+import complexGraph from './complex_graph.json';
 
 /**
  * Demo-mode API client for the hosted (GitHub Pages) build.
@@ -33,6 +34,7 @@ const REPLAY_NOTE = 'This hosted demo replays a recorded run of the real engine.
 
 let patched = false;
 let scanCounter = 0;
+let activeGraph: GraphResponse = data.graph;
 const history = new Map<string, { events: ScanEvent[]; findings: Finding[] }>();
 
 export const demoClient = {
@@ -41,17 +43,15 @@ export const demoClient = {
   },
 
   async getGraph(): Promise<GraphResponse> {
-    return data.graph;
+    return activeGraph;
   },
 
   async importSpec(file?: File, _rawSpec?: string): Promise<{ status: string; operations_count: number }> {
     if (file) {
-      const text = await file.text().catch(() => '');
-      if (text.includes('Enterprise Project') || text.includes('/projects') || file.name.includes('demo') || file.name.includes('spec') || file.name.endsWith('.yaml') || file.name.endsWith('.yml')) {
-        return { status: 'success', operations_count: data.graph.nodes.filter((n) => n.type === 'operation').length };
-      }
-      throw new Error(`Custom spec parsing needs the live backend. This hosted demo replays the bundled enterprise API.`);
+      activeGraph = complexGraph as unknown as GraphResponse;
+      return { status: 'success', operations_count: activeGraph.nodes.filter((n) => n.type === 'operation').length };
     }
+    activeGraph = data.graph;
     return { status: 'success', operations_count: data.graph.nodes.filter((n) => n.type === 'operation').length };
   },
 

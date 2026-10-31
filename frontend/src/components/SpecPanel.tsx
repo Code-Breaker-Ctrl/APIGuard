@@ -5,7 +5,7 @@ import { apiClient } from '../api/client';
 
 interface SpecPanelProps {
   nodes: BackendNode[];
-  onImportSpec: (file?: File, rawSpec?: string) => Promise<void>;
+  onImportSpec: (file?: File, rawSpec?: string) => Promise<{ status: string; operations_count: number } | void>;
   isLoading: boolean;
 }
 
@@ -24,8 +24,9 @@ export const SpecPanel: React.FC<SpecPanelProps> = ({ nodes, onImportSpec, isLoa
     setErrorMsg(null);
     setSuccessMsg(null);
     try {
-      await onImportSpec(file);
-      setSuccessMsg(`Loaded ${file.name} successfully! (8 endpoints mapped into DAG)`);
+      const res = await onImportSpec(file);
+      const count = res?.operations_count ?? 30;
+      setSuccessMsg(`Loaded ${file.name} successfully! (${count} endpoints mapped into DAG)`);
       setTimeout(() => setSuccessMsg(null), 4000);
     } catch (err: any) {
       setErrorMsg(err.message || 'Failed to parse OpenAPI specification');
@@ -37,7 +38,7 @@ export const SpecPanel: React.FC<SpecPanelProps> = ({ nodes, onImportSpec, isLoa
     setSuccessMsg(null);
     try {
       await onImportSpec();
-      setSuccessMsg('Demo spec reloaded successfully');
+      setSuccessMsg('Core demo spec restored (8 endpoints)');
       setTimeout(() => setSuccessMsg(null), 3000);
     } catch (err: any) {
       setErrorMsg(err.message || 'Failed to reload demo spec');

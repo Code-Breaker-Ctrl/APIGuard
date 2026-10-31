@@ -25,8 +25,9 @@ export function useGraph() {
   const importSpec = useCallback(async (file?: File, rawSpec?: string) => {
     setIsLoading(true);
     try {
-      await apiClient.importSpec(file, rawSpec);
+      const res = await apiClient.importSpec(file, rawSpec);
       await loadGraph();
+      return res;
     } finally {
       setIsLoading(false);
     }

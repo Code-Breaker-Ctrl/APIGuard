@@ -1,0 +1,1088 @@
+{
+  "nodes": [
+    {
+      "id": "login",
+      "label": "POST /auth/login",
+      "type": "operation",
+      "metadata": {
+        "method": "POST",
+        "path": "/auth/login",
+        "summary": "Authenticate identity and obtain bearer token",
+        "path_params": [],
+        "security": []
+      }
+    },
+    {
+      "id": "refreshToken",
+      "label": "POST /auth/refresh",
+      "type": "operation",
+      "metadata": {
+        "method": "POST",
+        "path": "/auth/refresh",
+        "summary": "Refresh active session bearer token",
+        "path_params": [],
+        "security": [
+          "bearerAuth"
+        ]
+      }
+    },
+    {
+      "id": "getCurrentUser",
+      "label": "GET /auth/me",
+      "type": "operation",
+      "metadata": {
+        "method": "GET",
+        "path": "/auth/me",
+        "summary": "Get authenticated identity profile",
+        "path_params": [],
+        "security": [
+          "bearerAuth"
+        ]
+      }
+    },
+    {
+      "id": "createOrg",
+      "label": "POST /orgs",
+      "type": "operation",
+      "metadata": {
+        "method": "POST",
+        "path": "/orgs",
+        "summary": "Create enterprise organization",
+        "path_params": [],
+        "security": [
+          "bearerAuth"
+        ]
+      }
+    },
+    {
+      "id": "getOrgById",
+      "label": "GET /orgs/{org_id}",
+      "type": "operation",
+      "metadata": {
+        "method": "GET",
+        "path": "/orgs/{org_id}",
+        "summary": "Get organization details and policy",
+        "path_params": [
+          "org_id"
+        ],
+        "security": [
+          "bearerAuth"
+        ]
+      }
+    },
+    {
+      "id": "updateOrg",
+      "label": "PATCH /orgs/{org_id}",
+      "type": "operation",
+      "metadata": {
+        "method": "PATCH",
+        "path": "/orgs/{org_id}",
+        "summary": "Update organization metadata",
+        "path_params": [
+          "org_id"
+        ],
+        "security": [
+          "bearerAuth"
+        ]
+      }
+    },
+    {
+      "id": "getOrgMembers",
+      "label": "GET /orgs/{org_id}/members",
+      "type": "operation",
+      "metadata": {
+        "method": "GET",
+        "path": "/orgs/{org_id}/members",
+        "summary": "List organization members and roles",
+        "path_params": [
+          "org_id"
+        ],
+        "security": [
+          "bearerAuth"
+        ]
+      }
+    },
+    {
+      "id": "inviteOrgMember",
+      "label": "POST /orgs/{org_id}/invites",
+      "type": "operation",
+      "metadata": {
+        "method": "POST",
+        "path": "/orgs/{org_id}/invites",
+        "summary": "Issue organization member invitation",
+        "path_params": [
+          "org_id"
+        ],
+        "security": [
+          "bearerAuth"
+        ]
+      }
+    },
+    {
+      "id": "createProject",
+      "label": "POST /projects",
+      "type": "operation",
+      "metadata": {
+        "method": "POST",
+        "path": "/projects",
+        "summary": "Create a new project resource",
+        "path_params": [],
+        "security": [
+          "bearerAuth"
+        ]
+      }
+    },
+    {
+      "id": "getProjectById",
+      "label": "GET /projects/{project_id}",
+      "type": "operation",
+      "metadata": {
+        "method": "GET",
+        "path": "/projects/{project_id}",
+        "summary": "Get project details",
+        "path_params": [
+          "project_id"
+        ],
+        "security": [
+          "bearerAuth"
+        ]
+      }
+    },
+    {
+      "id": "updateProject",
+      "label": "PATCH /projects/{project_id}",
+      "type": "operation",
+      "metadata": {
+        "method": "PATCH",
+        "path": "/projects/{project_id}",
+        "summary": "Update project properties",
+        "path_params": [
+          "project_id"
+        ],
+        "security": [
+          "bearerAuth"
+        ]
+      }
+    },
+    {
+      "id": "deleteProject",
+      "label": "DELETE /projects/{project_id}",
+      "type": "operation",
+      "metadata": {
+        "method": "DELETE",
+        "path": "/projects/{project_id}",
+        "summary": "Delete project resource",
+        "path_params": [
+          "project_id"
+        ],
+        "security": [
+          "bearerAuth"
+        ]
+      }
+    },
+    {
+      "id": "exportProjectBilling",
+      "label": "GET /projects/{project_id}/export",
+      "type": "operation",
+      "metadata": {
+        "method": "GET",
+        "path": "/projects/{project_id}/export",
+        "summary": "Export financial and billing data for a project",
+        "path_params": [
+          "project_id"
+        ],
+        "security": [
+          "bearerAuth"
+        ]
+      }
+    },
+    {
+      "id": "getProjectSummary",
+      "label": "GET /projects/{project_id}/summary",
+      "type": "operation",
+      "metadata": {
+        "method": "GET",
+        "path": "/projects/{project_id}/summary",
+        "summary": "Get brief public project stats (verifier trap)",
+        "path_params": [
+          "project_id"
+        ],
+        "security": [
+          "bearerAuth"
+        ]
+      }
+    },
+    {
+      "id": "getProjectMembers",
+      "label": "GET /projects/{project_id}/members",
+      "type": "operation",
+      "metadata": {
+        "method": "GET",
+        "path": "/projects/{project_id}/members",
+        "summary": "Get project team members",
+        "path_params": [
+          "project_id"
+        ],
+        "security": [
+          "bearerAuth"
+        ]
+      }
+    },
+    {
+      "id": "createDeployment",
+      "label": "POST /deployments",
+      "type": "operation",
+      "metadata": {
+        "method": "POST",
+        "path": "/deployments",
+        "summary": "Trigger cloud deployment pipeline",
+        "path_params": [],
+        "security": [
+          "bearerAuth"
+        ]
+      }
+    },
+    {
+      "id": "getDeploymentById",
+      "label": "GET /deployments/{deployment_id}",
+      "type": "operation",
+      "metadata": {
+        "method": "GET",
+        "path": "/deployments/{deployment_id}",
+        "summary": "Get deployment build status",
+        "path_params": [
+          "deployment_id"
+        ],
+        "security": [
+          "bearerAuth"
+        ]
+      }
+    },
+    {
+      "id": "getDeploymentLogs",
+      "label": "GET /deployments/{deployment_id}/logs",
+      "type": "operation",
+      "metadata": {
+        "method": "GET",
+        "path": "/deployments/{deployment_id}/logs",
+        "summary": "Stream build and deployment logs",
+        "path_params": [
+          "deployment_id"
+        ],
+        "security": [
+          "bearerAuth"
+        ]
+      }
+    },
+    {
+      "id": "rollbackDeployment",
+      "label": "POST /deployments/{deployment_id}/rollback",
+      "type": "operation",
+      "metadata": {
+        "method": "POST",
+        "path": "/deployments/{deployment_id}/rollback",
+        "summary": "Rollback deployment to prior revision",
+        "path_params": [
+          "deployment_id"
+        ],
+        "security": [
+          "bearerAuth"
+        ]
+      }
+    },
+    {
+      "id": "createApiKey",
+      "label": "POST /keys",
+      "type": "operation",
+      "metadata": {
+        "method": "POST",
+        "path": "/keys",
+        "summary": "Provision new scoped API key",
+        "path_params": [],
+        "security": [
+          "bearerAuth"
+        ]
+      }
+    },
+    {
+      "id": "getApiKeyById",
+      "label": "GET /keys/{key_id}",
+      "type": "operation",
+      "metadata": {
+        "method": "GET",
+        "path": "/keys/{key_id}",
+        "summary": "Inspect API key metadata and scopes",
+        "path_params": [
+          "key_id"
+        ],
+        "security": [
+          "bearerAuth"
+        ]
+      }
+    },
+    {
+      "id": "revokeApiKey",
+      "label": "DELETE /keys/{key_id}",
+      "type": "operation",
+      "metadata": {
+        "method": "DELETE",
+        "path": "/keys/{key_id}",
+        "summary": "Revoke and invalidate API key",
+        "path_params": [
+          "key_id"
+        ],
+        "security": [
+          "bearerAuth"
+        ]
+      }
+    },
+    {
+      "id": "createWebhook",
+      "label": "POST /webhooks",
+      "type": "operation",
+      "metadata": {
+        "method": "POST",
+        "path": "/webhooks",
+        "summary": "Register incoming webhook endpoint",
+        "path_params": [],
+        "security": [
+          "bearerAuth"
+        ]
+      }
+    },
+    {
+      "id": "getWebhookById",
+      "label": "GET /webhooks/{webhook_id}",
+      "type": "operation",
+      "metadata": {
+        "method": "GET",
+        "path": "/webhooks/{webhook_id}",
+        "summary": "Retrieve webhook subscription details",
+        "path_params": [
+          "webhook_id"
+        ],
+        "security": [
+          "bearerAuth"
+        ]
+      }
+    },
+    {
+      "id": "testWebhookDelivery",
+      "label": "POST /webhooks/{webhook_id}/test",
+      "type": "operation",
+      "metadata": {
+        "method": "POST",
+        "path": "/webhooks/{webhook_id}/test",
+        "summary": "Dispatch ping event to test webhook delivery",
+        "path_params": [
+          "webhook_id"
+        ],
+        "security": [
+          "bearerAuth"
+        ]
+      }
+    },
+    {
+      "id": "generateInvoice",
+      "label": "POST /invoices",
+      "type": "operation",
+      "metadata": {
+        "method": "POST",
+        "path": "/invoices",
+        "summary": "Generate tenant billing cycle invoice",
+        "path_params": [],
+        "security": [
+          "bearerAuth"
+        ]
+      }
+    },
+    {
+      "id": "getInvoiceById",
+      "label": "GET /invoices/{invoice_id}",
+      "type": "operation",
+      "metadata": {
+        "method": "GET",
+        "path": "/invoices/{invoice_id}",
+        "summary": "Retrieve invoice details and line items",
+        "path_params": [
+          "invoice_id"
+        ],
+        "security": [
+          "bearerAuth"
+        ]
+      }
+    },
+    {
+      "id": "downloadInvoicePdf",
+      "label": "GET /invoices/{invoice_id}/pdf",
+      "type": "operation",
+      "metadata": {
+        "method": "GET",
+        "path": "/invoices/{invoice_id}/pdf",
+        "summary": "Download signed PDF tax invoice",
+        "path_params": [
+          "invoice_id"
+        ],
+        "security": [
+          "bearerAuth"
+        ]
+      }
+    },
+    {
+      "id": "queryAuditLogs",
+      "label": "GET /audits",
+      "type": "operation",
+      "metadata": {
+        "method": "GET",
+        "path": "/audits",
+        "summary": "Query global security audit events",
+        "path_params": [],
+        "security": [
+          "bearerAuth"
+        ]
+      }
+    },
+    {
+      "id": "getAuditRecord",
+      "label": "GET /audits/{audit_id}",
+      "type": "operation",
+      "metadata": {
+        "method": "GET",
+        "path": "/audits/{audit_id}",
+        "summary": "Fetch immutable audit event record",
+        "path_params": [
+          "audit_id"
+        ],
+        "security": [
+          "bearerAuth"
+        ]
+      }
+    },
+    {
+      "id": "res_auth",
+      "label": "Auth",
+      "type": "resource_type",
+      "metadata": {
+        "resource_name": "auth"
+      }
+    },
+    {
+      "id": "res_orgs",
+      "label": "Orgs",
+      "type": "resource_type",
+      "metadata": {
+        "resource_name": "orgs"
+      }
+    },
+    {
+      "id": "id_orgs",
+      "label": "orgs_id",
+      "type": "identifier",
+      "metadata": {
+        "param_name": "org_id"
+      }
+    },
+    {
+      "id": "res_projects",
+      "label": "Projects",
+      "type": "resource_type",
+      "metadata": {
+        "resource_name": "projects"
+      }
+    },
+    {
+      "id": "id_projects",
+      "label": "projects_id",
+      "type": "identifier",
+      "metadata": {
+        "param_name": "project_id"
+      }
+    },
+    {
+      "id": "res_deployments",
+      "label": "Deployments",
+      "type": "resource_type",
+      "metadata": {
+        "resource_name": "deployments"
+      }
+    },
+    {
+      "id": "id_deployments",
+      "label": "deployments_id",
+      "type": "identifier",
+      "metadata": {
+        "param_name": "deployment_id"
+      }
+    },
+    {
+      "id": "res_keys",
+      "label": "Keys",
+      "type": "resource_type",
+      "metadata": {
+        "resource_name": "keys"
+      }
+    },
+    {
+      "id": "id_keys",
+      "label": "keys_id",
+      "type": "identifier",
+      "metadata": {
+        "param_name": "key_id"
+      }
+    },
+    {
+      "id": "res_webhooks",
+      "label": "Webhooks",
+      "type": "resource_type",
+      "metadata": {
+        "resource_name": "webhooks"
+      }
+    },
+    {
+      "id": "id_webhooks",
+      "label": "webhooks_id",
+      "type": "identifier",
+      "metadata": {
+        "param_name": "webhook_id"
+      }
+    },
+    {
+      "id": "res_invoices",
+      "label": "Invoices",
+      "type": "resource_type",
+      "metadata": {
+        "resource_name": "invoices"
+      }
+    },
+    {
+      "id": "id_invoices",
+      "label": "invoices_id",
+      "type": "identifier",
+      "metadata": {
+        "param_name": "invoice_id"
+      }
+    },
+    {
+      "id": "res_audits",
+      "label": "Audits",
+      "type": "resource_type",
+      "metadata": {
+        "resource_name": "audits"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from_node": "login",
+      "to_node": "res_auth",
+      "type": "OPERATES_ON",
+      "confidence": 0.9,
+      "provenance": "schema",
+      "observation_ids": []
+    },
+    {
+      "from_node": "refreshToken",
+      "to_node": "res_auth",
+      "type": "OPERATES_ON",
+      "confidence": 0.9,
+      "provenance": "schema",
+      "observation_ids": []
+    },
+    {
+      "from_node": "getCurrentUser",
+      "to_node": "res_auth",
+      "type": "OPERATES_ON",
+      "confidence": 0.9,
+      "provenance": "schema",
+      "observation_ids": []
+    },
+    {
+      "from_node": "createOrg",
+      "to_node": "res_orgs",
+      "type": "OPERATES_ON",
+      "confidence": 0.9,
+      "provenance": "schema",
+      "observation_ids": []
+    },
+    {
+      "from_node": "createOrg",
+      "to_node": "id_orgs",
+      "type": "PRODUCES",
+      "confidence": 0.8,
+      "provenance": "schema",
+      "observation_ids": []
+    },
+    {
+      "from_node": "getOrgById",
+      "to_node": "res_orgs",
+      "type": "OPERATES_ON",
+      "confidence": 0.9,
+      "provenance": "schema",
+      "observation_ids": []
+    },
+    {
+      "from_node": "id_orgs",
+      "to_node": "getOrgById",
+      "type": "CONSUMES",
+      "confidence": 0.8,
+      "provenance": "schema",
+      "observation_ids": []
+    },
+    {
+      "from_node": "updateOrg",
+      "to_node": "res_orgs",
+      "type": "OPERATES_ON",
+      "confidence": 0.9,
+      "provenance": "schema",
+      "observation_ids": []
+    },
+    {
+      "from_node": "id_orgs",
+      "to_node": "updateOrg",
+      "type": "CONSUMES",
+      "confidence": 0.8,
+      "provenance": "schema",
+      "observation_ids": []
+    },
+    {
+      "from_node": "getOrgMembers",
+      "to_node": "res_orgs",
+      "type": "OPERATES_ON",
+      "confidence": 0.9,
+      "provenance": "schema",
+      "observation_ids": []
+    },
+    {
+      "from_node": "id_orgs",
+      "to_node": "getOrgMembers",
+      "type": "CONSUMES",
+      "confidence": 0.8,
+      "provenance": "schema",
+      "observation_ids": []
+    },
+    {
+      "from_node": "getOrgById",
+      "to_node": "getOrgMembers",
+      "type": "NESTED_UNDER",
+      "confidence": 0.5,
+      "provenance": "propagated",
+      "observation_ids": []
+    },
+    {
+      "from_node": "inviteOrgMember",
+      "to_node": "res_orgs",
+      "type": "OPERATES_ON",
+      "confidence": 0.9,
+      "provenance": "schema",
+      "observation_ids": []
+    },
+    {
+      "from_node": "id_orgs",
+      "to_node": "inviteOrgMember",
+      "type": "CONSUMES",
+      "confidence": 0.8,
+      "provenance": "schema",
+      "observation_ids": []
+    },
+    {
+      "from_node": "getOrgById",
+      "to_node": "inviteOrgMember",
+      "type": "NESTED_UNDER",
+      "confidence": 0.5,
+      "provenance": "propagated",
+      "observation_ids": []
+    },
+    {
+      "from_node": "createProject",
+      "to_node": "res_projects",
+      "type": "OPERATES_ON",
+      "confidence": 0.9,
+      "provenance": "schema",
+      "observation_ids": []
+    },
+    {
+      "from_node": "createProject",
+      "to_node": "id_projects",
+      "type": "PRODUCES",
+      "confidence": 0.8,
+      "provenance": "schema",
+      "observation_ids": []
+    },
+    {
+      "from_node": "getProjectById",
+      "to_node": "res_projects",
+      "type": "OPERATES_ON",
+      "confidence": 0.9,
+      "provenance": "schema",
+      "observation_ids": []
+    },
+    {
+      "from_node": "id_projects",
+      "to_node": "getProjectById",
+      "type": "CONSUMES",
+      "confidence": 0.8,
+      "provenance": "schema",
+      "observation_ids": []
+    },
+    {
+      "from_node": "updateProject",
+      "to_node": "res_projects",
+      "type": "OPERATES_ON",
+      "confidence": 0.9,
+      "provenance": "schema",
+      "observation_ids": []
+    },
+    {
+      "from_node": "id_projects",
+      "to_node": "updateProject",
+      "type": "CONSUMES",
+      "confidence": 0.8,
+      "provenance": "schema",
+      "observation_ids": []
+    },
+    {
+      "from_node": "deleteProject",
+      "to_node": "res_projects",
+      "type": "OPERATES_ON",
+      "confidence": 0.9,
+      "provenance": "schema",
+      "observation_ids": []
+    },
+    {
+      "from_node": "id_projects",
+      "to_node": "deleteProject",
+      "type": "CONSUMES",
+      "confidence": 0.8,
+      "provenance": "schema",
+      "observation_ids": []
+    },
+    {
+      "from_node": "exportProjectBilling",
+      "to_node": "res_projects",
+      "type": "OPERATES_ON",
+      "confidence": 0.9,
+      "provenance": "schema",
+      "observation_ids": []
+    },
+    {
+      "from_node": "id_projects",
+      "to_node": "exportProjectBilling",
+      "type": "CONSUMES",
+      "confidence": 0.8,
+      "provenance": "schema",
+      "observation_ids": []
+    },
+    {
+      "from_node": "getProjectById",
+      "to_node": "exportProjectBilling",
+      "type": "NESTED_UNDER",
+      "confidence": 0.5,
+      "provenance": "propagated",
+      "observation_ids": []
+    },
+    {
+      "from_node": "getProjectSummary",
+      "to_node": "res_projects",
+      "type": "OPERATES_ON",
+      "confidence": 0.9,
+      "provenance": "schema",
+      "observation_ids": []
+    },
+    {
+      "from_node": "id_projects",
+      "to_node": "getProjectSummary",
+      "type": "CONSUMES",
+      "confidence": 0.8,
+      "provenance": "schema",
+      "observation_ids": []
+    },
+    {
+      "from_node": "getProjectById",
+      "to_node": "getProjectSummary",
+      "type": "NESTED_UNDER",
+      "confidence": 0.5,
+      "provenance": "propagated",
+      "observation_ids": []
+    },
+    {
+      "from_node": "getProjectMembers",
+      "to_node": "res_projects",
+      "type": "OPERATES_ON",
+      "confidence": 0.9,
+      "provenance": "schema",
+      "observation_ids": []
+    },
+    {
+      "from_node": "id_projects",
+      "to_node": "getProjectMembers",
+      "type": "CONSUMES",
+      "confidence": 0.8,
+      "provenance": "schema",
+      "observation_ids": []
+    },
+    {
+      "from_node": "getProjectById",
+      "to_node": "getProjectMembers",
+      "type": "NESTED_UNDER",
+      "confidence": 0.5,
+      "provenance": "propagated",
+      "observation_ids": []
+    },
+    {
+      "from_node": "createDeployment",
+      "to_node": "res_deployments",
+      "type": "OPERATES_ON",
+      "confidence": 0.9,
+      "provenance": "schema",
+      "observation_ids": []
+    },
+    {
+      "from_node": "createDeployment",
+      "to_node": "id_deployments",
+      "type": "PRODUCES",
+      "confidence": 0.8,
+      "provenance": "schema",
+      "observation_ids": []
+    },
+    {
+      "from_node": "getDeploymentById",
+      "to_node": "res_deployments",
+      "type": "OPERATES_ON",
+      "confidence": 0.9,
+      "provenance": "schema",
+      "observation_ids": []
+    },
+    {
+      "from_node": "id_deployments",
+      "to_node": "getDeploymentById",
+      "type": "CONSUMES",
+      "confidence": 0.8,
+      "provenance": "schema",
+      "observation_ids": []
+    },
+    {
+      "from_node": "getDeploymentLogs",
+      "to_node": "res_deployments",
+      "type": "OPERATES_ON",
+      "confidence": 0.9,
+      "provenance": "schema",
+      "observation_ids": []
+    },
+    {
+      "from_node": "id_deployments",
+      "to_node": "getDeploymentLogs",
+      "type": "CONSUMES",
+      "confidence": 0.8,
+      "provenance": "schema",
+      "observation_ids": []
+    },
+    {
+      "from_node": "getDeploymentById",
+      "to_node": "getDeploymentLogs",
+      "type": "NESTED_UNDER",
+      "confidence": 0.5,
+      "provenance": "propagated",
+      "observation_ids": []
+    },
+    {
+      "from_node": "rollbackDeployment",
+      "to_node": "res_deployments",
+      "type": "OPERATES_ON",
+      "confidence": 0.9,
+      "provenance": "schema",
+      "observation_ids": []
+    },
+    {
+      "from_node": "id_deployments",
+      "to_node": "rollbackDeployment",
+      "type": "CONSUMES",
+      "confidence": 0.8,
+      "provenance": "schema",
+      "observation_ids": []
+    },
+    {
+      "from_node": "getDeploymentById",
+      "to_node": "rollbackDeployment",
+      "type": "NESTED_UNDER",
+      "confidence": 0.5,
+      "provenance": "propagated",
+      "observation_ids": []
+    },
+    {
+      "from_node": "createApiKey",
+      "to_node": "res_keys",
+      "type": "OPERATES_ON",
+      "confidence": 0.9,
+      "provenance": "schema",
+      "observation_ids": []
+    },
+    {
+      "from_node": "createApiKey",
+      "to_node": "id_keys",
+      "type": "PRODUCES",
+      "confidence": 0.8,
+      "provenance": "schema",
+      "observation_ids": []
+    },
+    {
+      "from_node": "getApiKeyById",
+      "to_node": "res_keys",
+      "type": "OPERATES_ON",
+      "confidence": 0.9,
+      "provenance": "schema",
+      "observation_ids": []
+    },
+    {
+      "from_node": "id_keys",
+      "to_node": "getApiKeyById",
+      "type": "CONSUMES",
+      "confidence": 0.8,
+      "provenance": "schema",
+      "observation_ids": []
+    },
+    {
+      "from_node": "revokeApiKey",
+      "to_node": "res_keys",
+      "type": "OPERATES_ON",
+      "confidence": 0.9,
+      "provenance": "schema",
+      "observation_ids": []
+    },
+    {
+      "from_node": "id_keys",
+      "to_node": "revokeApiKey",
+      "type": "CONSUMES",
+      "confidence": 0.8,
+      "provenance": "schema",
+      "observation_ids": []
+    },
+    {
+      "from_node": "createWebhook",
+      "to_node": "res_webhooks",
+      "type": "OPERATES_ON",
+      "confidence": 0.9,
+      "provenance": "schema",
+      "observation_ids": []
+    },
+    {
+      "from_node": "createWebhook",
+      "to_node": "id_webhooks",
+      "type": "PRODUCES",
+      "confidence": 0.8,
+      "provenance": "schema",
+      "observation_ids": []
+    },
+    {
+      "from_node": "getWebhookById",
+      "to_node": "res_webhooks",
+      "type": "OPERATES_ON",
+      "confidence": 0.9,
+      "provenance": "schema",
+      "observation_ids": []
+    },
+    {
+      "from_node": "id_webhooks",
+      "to_node": "getWebhookById",
+      "type": "CONSUMES",
+      "confidence": 0.8,
+      "provenance": "schema",
+      "observation_ids": []
+    },
+    {
+      "from_node": "testWebhookDelivery",
+      "to_node": "res_webhooks",
+      "type": "OPERATES_ON",
+      "confidence": 0.9,
+      "provenance": "schema",
+      "observation_ids": []
+    },
+    {
+      "from_node": "id_webhooks",
+      "to_node": "testWebhookDelivery",
+      "type": "CONSUMES",
+      "confidence": 0.8,
+      "provenance": "schema",
+      "observation_ids": []
+    },
+    {
+      "from_node": "getWebhookById",
+      "to_node": "testWebhookDelivery",
+      "type": "NESTED_UNDER",
+      "confidence": 0.5,
+      "provenance": "propagated",
+      "observation_ids": []
+    },
+    {
+      "from_node": "generateInvoice",
+      "to_node": "res_invoices",
+      "type": "OPERATES_ON",
+      "confidence": 0.9,
+      "provenance": "schema",
+      "observation_ids": []
+    },
+    {
+      "from_node": "generateInvoice",
+      "to_node": "id_invoices",
+      "type": "PRODUCES",
+      "confidence": 0.8,
+      "provenance": "schema",
+      "observation_ids": []
+    },
+    {
+      "from_node": "getInvoiceById",
+      "to_node": "res_invoices",
+      "type": "OPERATES_ON",
+      "confidence": 0.9,
+      "provenance": "schema",
+      "observation_ids": []
+    },
+    {
+      "from_node": "id_invoices",
+      "to_node": "getInvoiceById",
+      "type": "CONSUMES",
+      "confidence": 0.8,
+      "provenance": "schema",
+      "observation_ids": []
+    },
+    {
+      "from_node": "downloadInvoicePdf",
+      "to_node": "res_invoices",
+      "type": "OPERATES_ON",
+      "confidence": 0.9,
+      "provenance": "schema",
+      "observation_ids": []
+    },
+    {
+      "from_node": "id_invoices",
+      "to_node": "downloadInvoicePdf",
+      "type": "CONSUMES",
+      "confidence": 0.8,
+      "provenance": "schema",
+      "observation_ids": []
+    },
+    {
+      "from_node": "getInvoiceById",
+      "to_node": "downloadInvoicePdf",
+      "type": "NESTED_UNDER",
+      "confidence": 0.5,
+      "provenance": "propagated",
+      "observation_ids": []
+    },
+    {
+      "from_node": "queryAuditLogs",
+      "to_node": "res_audits",
+      "type": "OPERATES_ON",
+      "confidence": 0.9,
+      "provenance": "schema",
+      "observation_ids": []
+    },
+    {
+      "from_node": "getAuditRecord",
+      "to_node": "res_audits",
+      "type": "OPERATES_ON",
+      "confidence": 0.9,
+      "provenance": "schema",
+      "observation_ids": []
+    }
+  ]
+}

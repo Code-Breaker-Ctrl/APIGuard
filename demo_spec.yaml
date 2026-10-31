@@ -1,8 +1,8 @@
 openapi: 3.0.3
 info:
-  title: Enterprise Project & Billing Services API
-  version: 1.0.0
-  description: Multi-tenant project and invoicing management API
+  title: Enterprise Cloud Platform & Core Microservices API
+  version: 2.4.0
+  description: High-scale enterprise multi-tenant API featuring Identity, Organizations, Workspaces, Cloud Deployments, Security Keys, Webhook pipelines, Invoicing and Compliance Audit trails.
 paths:
   /auth/login:
     post:
@@ -16,11 +16,152 @@ paths:
               $ref: '#/components/schemas/LoginRequest'
       responses:
         '200':
-          description: Login successful
+          description: OK
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthToken'
+
+  /auth/refresh:
+    post:
+      summary: Refresh active session bearer token
+      operationId: refreshToken
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthToken'
+
+  /auth/me:
+    get:
+      summary: Get authenticated identity profile
+      operationId: getCurrentUser
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+  /orgs:
+    post:
+      summary: Create enterprise organization
+      operationId: createOrg
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrgInput'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organization'
+
+  /orgs/{org_id}:
+    get:
+      summary: Get organization details and policy
+      operationId: getOrgById
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: org_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organization'
+
+    patch:
+      summary: Update organization metadata
+      operationId: updateOrg
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: org_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateOrgInput'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organization'
+
+  /orgs/{org_id}/members:
+    get:
+      summary: List organization members and roles
+      operationId: getOrgMembers
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: org_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrgMember'
+
+  /orgs/{org_id}/invites:
+    post:
+      summary: Issue organization member invitation
+      operationId: inviteOrgMember
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: org_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateInviteInput'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrgInvite'
 
   /projects:
     post:
@@ -36,7 +177,7 @@ paths:
               $ref: '#/components/schemas/CreateProjectInput'
       responses:
         '201':
-          description: Project created
+          description: Created
           content:
             application/json:
               schema:
@@ -56,7 +197,7 @@ paths:
             type: string
       responses:
         '200':
-          description: Project retrieved
+          description: OK
           content:
             application/json:
               schema:
@@ -64,7 +205,7 @@ paths:
         '403':
           description: Forbidden
         '404':
-          description: Project not found
+          description: Not Found
 
     patch:
       summary: Update project properties
@@ -85,7 +226,7 @@ paths:
               $ref: '#/components/schemas/UpdateProjectInput'
       responses:
         '200':
-          description: Updated project
+          description: OK
           content:
             application/json:
               schema:
@@ -104,7 +245,7 @@ paths:
             type: string
       responses:
         '200':
-          description: Deleted successfully
+          description: OK
 
   /projects/{project_id}/export:
     get:
@@ -120,7 +261,7 @@ paths:
             type: string
       responses:
         '200':
-          description: Project export payload
+          description: OK
           content:
             application/json:
               schema:
@@ -140,11 +281,11 @@ paths:
             type: string
       responses:
         '200':
-          description: Public summary stats
+          description: OK
 
   /projects/{project_id}/members:
     get:
-      summary: Get project members (unimplemented route returning 404)
+      summary: Get project team members
       operationId: getProjectMembers
       security:
         - bearerAuth: []
@@ -156,7 +297,282 @@ paths:
             type: string
       responses:
         '200':
-          description: Project member list
+          description: OK
+
+  /deployments:
+    post:
+      summary: Trigger cloud deployment pipeline
+      operationId: createDeployment
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDeploymentInput'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Deployment'
+
+  /deployments/{deployment_id}:
+    get:
+      summary: Get deployment build status
+      operationId: getDeploymentById
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: deployment_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Deployment'
+
+  /deployments/{deployment_id}/logs:
+    get:
+      summary: Stream build and deployment logs
+      operationId: getDeploymentLogs
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: deployment_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+
+  /deployments/{deployment_id}/rollback:
+    post:
+      summary: Rollback deployment to prior revision
+      operationId: rollbackDeployment
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: deployment_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+
+  /keys:
+    post:
+      summary: Provision new scoped API key
+      operationId: createApiKey
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateApiKeyInput'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiKey'
+
+  /keys/{key_id}:
+    get:
+      summary: Inspect API key metadata and scopes
+      operationId: getApiKeyById
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: key_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiKey'
+
+    delete:
+      summary: Revoke and invalidate API key
+      operationId: revokeApiKey
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: key_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+
+  /webhooks:
+    post:
+      summary: Register incoming webhook endpoint
+      operationId: createWebhook
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateWebhookInput'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Webhook'
+
+  /webhooks/{webhook_id}:
+    get:
+      summary: Retrieve webhook subscription details
+      operationId: getWebhookById
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: webhook_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Webhook'
+
+  /webhooks/{webhook_id}/test:
+    post:
+      summary: Dispatch ping event to test webhook delivery
+      operationId: testWebhookDelivery
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: webhook_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+
+  /invoices:
+    post:
+      summary: Generate tenant billing cycle invoice
+      operationId: generateInvoice
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateInvoiceInput'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Invoice'
+
+  /invoices/{invoice_id}:
+    get:
+      summary: Retrieve invoice details and line items
+      operationId: getInvoiceById
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: invoice_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Invoice'
+
+  /invoices/{invoice_id}/pdf:
+    get:
+      summary: Download signed PDF tax invoice
+      operationId: downloadInvoicePdf
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: invoice_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+
+  /audits:
+    get:
+      summary: Query global security audit events
+      operationId: queryAuditLogs
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AuditEvent'
+
+  /audits/{audit_id}:
+    get:
+      summary: Fetch immutable audit event record
+      operationId: getAuditRecord
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: audit_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditEvent'
 
 components:
   securitySchemes:
@@ -167,80 +583,186 @@ components:
   schemas:
     LoginRequest:
       type: object
-      required:
-        - username
-        - password
+      required: [username, password]
       properties:
-        username:
-          type: string
-        password:
-          type: string
+        username: {type: string}
+        password: {type: string}
 
     AuthToken:
       type: object
-      required:
-        - token
+      required: [token, user_id]
       properties:
-        token:
-          type: string
-        user_id:
-          type: string
-        role:
-          type: string
+        token: {type: string}
+        user_id: {type: string}
+        role: {type: string}
+
+    User:
+      type: object
+      required: [id, email]
+      properties:
+        id: {type: string}
+        email: {type: string}
+        name: {type: string}
+        role: {type: string}
+
+    CreateOrgInput:
+      type: object
+      required: [name]
+      properties:
+        name: {type: string}
+        billing_tier: {type: string}
+
+    UpdateOrgInput:
+      type: object
+      properties:
+        name: {type: string}
+        domain: {type: string}
+
+    Organization:
+      type: object
+      required: [id, name, owner_id]
+      properties:
+        id: {type: string}
+        name: {type: string}
+        owner_id: {type: string}
+        billing_tier: {type: string}
+
+    OrgMember:
+      type: object
+      required: [user_id, role]
+      properties:
+        user_id: {type: string}
+        role: {type: string}
+
+    CreateInviteInput:
+      type: object
+      required: [email, role]
+      properties:
+        email: {type: string}
+        role: {type: string}
+
+    OrgInvite:
+      type: object
+      required: [invite_id, email, token]
+      properties:
+        invite_id: {type: string}
+        email: {type: string}
+        role: {type: string}
+        token: {type: string}
 
     CreateProjectInput:
       type: object
-      required:
-        - name
+      required: [name]
       properties:
-        name:
-          type: string
-        confidential_data:
-          type: string
-        budget:
-          type: string
+        name: {type: string}
+        confidential_data: {type: string}
+        budget: {type: string}
 
     UpdateProjectInput:
       type: object
       properties:
-        name:
-          type: string
-        budget:
-          type: string
+        name: {type: string}
+        budget: {type: string}
 
     Project:
       type: object
-      required:
-        - id
-        - owner_id
-        - name
+      required: [id, owner_id, name]
       properties:
-        id:
-          type: string
-        owner_id:
-          type: string
-        owner_email:
-          type: string
-        name:
-          type: string
-        confidential_data:
-          type: string
-        budget:
-          type: string
-        billing_card:
-          type: string
+        id: {type: string}
+        owner_id: {type: string}
+        owner_email: {type: string}
+        name: {type: string}
+        confidential_data: {type: string}
+        budget: {type: string}
+        billing_card: {type: string}
 
     ProjectExport:
       type: object
-      required:
-        - export_id
-        - project_id
+      required: [export_id, project_id]
       properties:
-        export_id:
-          type: string
-        project_id:
-          type: string
-        owner_email:
-          type: string
-        financial_payload:
-          type: object
+        export_id: {type: string}
+        project_id: {type: string}
+        owner_email: {type: string}
+        financial_payload: {type: object}
+
+    CreateDeploymentInput:
+      type: object
+      required: [project_id, branch]
+      properties:
+        project_id: {type: string}
+        branch: {type: string}
+        environment: {type: string}
+
+    Deployment:
+      type: object
+      required: [id, project_id, status]
+      properties:
+        id: {type: string}
+        project_id: {type: string}
+        status: {type: string}
+        commit_hash: {type: string}
+        url: {type: string}
+
+    CreateApiKeyInput:
+      type: object
+      required: [name, scopes]
+      properties:
+        name: {type: string}
+        scopes:
+          type: array
+          items: {type: string}
+
+    ApiKey:
+      type: object
+      required: [id, key_prefix, owner_id]
+      properties:
+        id: {type: string}
+        key_prefix: {type: string}
+        owner_id: {type: string}
+        scopes:
+          type: array
+          items: {type: string}
+
+    CreateWebhookInput:
+      type: object
+      required: [target_url, events]
+      properties:
+        target_url: {type: string}
+        events:
+          type: array
+          items: {type: string}
+
+    Webhook:
+      type: object
+      required: [id, target_url, secret]
+      properties:
+        id: {type: string}
+        target_url: {type: string}
+        secret: {type: string}
+        status: {type: string}
+
+    CreateInvoiceInput:
+      type: object
+      required: [org_id, amount]
+      properties:
+        org_id: {type: string}
+        amount: {type: number}
+
+    Invoice:
+      type: object
+      required: [id, org_id, amount, status]
+      properties:
+        id: {type: string}
+        org_id: {type: string}
+        amount: {type: number}
+        status: {type: string}
+
+    AuditEvent:
+      type: object
+      required: [id, actor, action, timestamp]
+      properties:
+        id: {type: string}
+        actor: {type: string}
+        action: {type: string}
+        timestamp: {type: string}
+        details: {type: object}

@@ -144,11 +144,14 @@ Every metric below was measured by running both scanners against the bundled dem
 
 ## 🎨 Design: Paper & Grace
 
-The dashboard uses a light pixel theme: cream paper with a faint grid, chunky black pixel type with a lime shadow, and gold and moss accents. All the scenery (ruins, a resting knight, a golden tree, a thin golden ring) lives in the banner at the top, so the working panels stay plain and easy to read. The chevron in the toolbar hides the banner to give the panels more room (it starts hidden on short screens).
+The dashboard uses a light pixel theme: cream paper with a faint grid, chunky black pixel type with a lime shadow, and gold and moss accents. All the scenery (ruins, a resting knight, a golden tree, a thin golden ring) lives in the banner at the top, so the working panels stay plain and easy to read. The chevron in the toolbar hides the banner to give the panels more room (the choice is remembered; the banner starts open).
+
+Scrolling down turns the banner into the logo: the scenery fades, and the big pixel title shrinks and glides into the toolbar's top-left corner while the buttons slide over to make room (on screens at least 1240px wide; narrower ones just scroll the banner away). Scrolling back up reverses it, and clicking the logo returns to the top. For visitors who prefer reduced motion the logo simply fades in.
 
 The banner is alive: mist drifts over the ruins and water, the floating islands bob, motes of light rise from the spires, golden leaves fall from the tree, birds circle the ruins, arch lights flicker, and the ring quickens while an audit runs. None of it animates when the visitor prefers reduced motion, and the light and birds pause while the banner is off screen.
 
-- The wordmark is an SVG drawn from code, with moss, vines (that sway) and flowers: [`PixelTitle.tsx`](frontend/src/components/PixelTitle.tsx).
+- The wordmark is an SVG drawn from code, with moss, vines (that sway) and flowers: [`PixelTitle.tsx`](frontend/src/components/PixelTitle.tsx), built from [`pixelTitleData.ts`](frontend/src/components/pixelTitleData.ts).
+- The title-to-logo scroll effect is [`BrandDock.tsx`](frontend/src/components/BrandDock.tsx): scroll progress goes into CSS variables, nothing re-renders while scrolling.
 - The scenery is cut from fine pixel art, not redrawn: `pip install -r scripts/requirements.txt`, then `python scripts/make_hero_art.py --src <reference-banner>` rebuilds `frontend/src/assets/hero/` (add `--preview DIR` to check the result on the paper colour). The reference image is not stored in the repo.
 - The light, leaves and birds are drawn on a canvas by [`heroLights.ts`](frontend/src/components/heroLights.ts); where things sit is in [`heroScene.ts`](frontend/src/components/heroScene.ts).
 - The page scrolls over the graph and the report: the graph zooms with Ctrl + scroll (or the +/- buttons), and the report grows instead of scrolling inside itself.

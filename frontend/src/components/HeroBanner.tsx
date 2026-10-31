@@ -80,37 +80,43 @@ interface HeroBannerProps {
  * over a fortress on the right), with a thin golden ring and the wordmark over the middle. It is alive: mist
  * drifts, the floating islands bob, light rises from the spires, leaves fall from the tree and birds circle
  * the ruins. The scenery never sits behind anything you need to read.
+ *
+ * Scrolling down dissolves the scenery and the wordmark flies into the toolbar as its logo (BrandDock.tsx drives
+ * that through the --p variable on this element: 0 at the top of the page, 1 once the toolbar is pinned).
  */
 export const HeroBanner: React.FC<HeroBannerProps> = ({ active = false }) => (
   <section className={`hero${active ? ' hero--active' : ''}`} aria-label="APIGuard">
-    <div className="hero-water" aria-hidden="true">
-      <i style={{ backgroundImage: `url(${water})` }} />
-    </div>
-    <div className="hero-fog hero-fog--far" aria-hidden="true">
-      <i style={{ backgroundImage: `url(${fog})` }} />
+    <div className="hero-layers" aria-hidden="true">
+      <div className="hero-water">
+        <i style={{ backgroundImage: `url(${water})` }} />
+      </div>
+      <div className="hero-fog hero-fog--far">
+        <i style={{ backgroundImage: `url(${fog})` }} />
+      </div>
+
+      <div className="hero-scene hero-scene--left">
+        <img className="hero-art" src={leftScene} alt="" draggable={false} />
+        {ISLANDS.filter((i) => i.scene === 'left').map((i) => (
+          <Island key={i.id} {...i} x0={LEFT_X0} sceneW={LEFT_W} />
+        ))}
+      </div>
+      <div className="hero-scene hero-scene--right">
+        <img className="hero-art" src={rightScene} alt="" draggable={false} />
+        {ISLANDS.filter((i) => i.scene === 'right').map((i) => (
+          <Island key={i.id} {...i} x0={RIGHT_X0} sceneW={RIGHT_W} />
+        ))}
+      </div>
+
+      <div className="hero-fog hero-fog--near">
+        <i style={{ backgroundImage: `url(${fog})` }} />
+      </div>
+      <HeroLights active={active} />
+
+      <div className="hero-ring">
+        <img src={emblem} alt="" draggable={false} />
+      </div>
     </div>
 
-    <div className="hero-scene hero-scene--left" aria-hidden="true">
-      <img className="hero-art" src={leftScene} alt="" draggable={false} />
-      {ISLANDS.filter((i) => i.scene === 'left').map((i) => (
-        <Island key={i.id} {...i} x0={LEFT_X0} sceneW={LEFT_W} />
-      ))}
-    </div>
-    <div className="hero-scene hero-scene--right" aria-hidden="true">
-      <img className="hero-art" src={rightScene} alt="" draggable={false} />
-      {ISLANDS.filter((i) => i.scene === 'right').map((i) => (
-        <Island key={i.id} {...i} x0={RIGHT_X0} sceneW={RIGHT_W} />
-      ))}
-    </div>
-
-    <div className="hero-fog hero-fog--near" aria-hidden="true">
-      <i style={{ backgroundImage: `url(${fog})` }} />
-    </div>
-    <HeroLights active={active} />
-
-    <div className="hero-ring" aria-hidden="true">
-      <img src={emblem} alt="" draggable={false} />
-    </div>
     <div className="hero-stack">
       <h1 className="sr-only">APIGuard</h1>
       <PixelTitle className="hero-title" />

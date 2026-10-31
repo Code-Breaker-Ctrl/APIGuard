@@ -27,6 +27,8 @@ import { RemediationModal } from './components/RemediationModal';
 import { GuidedDemoModal } from './components/GuidedDemoModal';
 import { AuditReportModal } from './components/AuditReportModal';
 import { HeroBanner, MiniBrand } from './components/HeroBanner';
+import { BrandDock } from './components/BrandDock';
+import { useMediaQuery } from './hooks/useMediaQuery';
 import type { Finding, DryRunResponse } from './types';
 import { apiClient, IS_DEMO } from './api/client';
 
@@ -62,17 +64,19 @@ export default function App() {
   const [enableMutations, setEnableMutations] = useState(false);
   const [dryRun, setDryRun] = useState(false);
   const [requestBudget, setRequestBudget] = useState<number>(30);
-  // The scenic banner is optional: remembered per browser, and closed by default on short screens
+  // The scenic banner is optional and remembered per browser. It starts open: the page scrolls, and the
+  // banner turns into the toolbar's logo as you go down.
   const [bannerCollapsed, setBannerCollapsed] = useState<boolean>(() => {
     try {
-      const saved = localStorage.getItem('apiguard.banner');
-      if (saved === 'closed') return true;
-      if (saved === 'open') return false;
+      return localStorage.getItem('apiguard.banner') === 'closed';
     } catch {
       // storage may be unavailable (private window, blocked site data)
+      return false;
     }
-    return window.innerHeight < 800;
   });
+  // On a wide screen the wordmark flies into the toolbar as the logo; on a narrow one the banner just scrolls away
+  const wide = useMediaQuery('(min-width: 1240px)');
+  const logoDocks = !bannerCollapsed && wide;
   const toggleBanner = () => {
     const next = !bannerCollapsed;
     setBannerCollapsed(next);
@@ -287,7 +291,7 @@ export default function App() {
       {/* TOOLBAR */}
       <div className="toolbar sticky top-0 z-40">
         <div className="flex flex-wrap items-center gap-3">
-          {bannerCollapsed && <MiniBrand />}
+          {bannerCollapsed ? <MiniBrand /> : logoDocks && <BrandDock />}
           <button className="btn-ghost" aria-pressed={dryRun} onClick={() => setDryRun(!dryRun)} title="When on, the main button previews the plan instead of sending traffic">
             Dry run
           </button>

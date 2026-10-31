@@ -324,6 +324,21 @@ input[type="checkbox"]:checked::after { content: ""; width: 8px; height: 8px; ba
   .hero-water i, .hero-fog i, .hero-island, .hero-ring::before, .hero-ring img, .vine { animation: none; }
 }
 
+/* Scrolling down turns the banner into the toolbar's logo. BrandDock.tsx writes --p (0 at the top of the page,
+   1 once the toolbar is pinned) on the hero and the logo; the scenery and the subtitle fade out as it grows. */
+.hero-layers { position: absolute; inset: 0; opacity: clamp(0, calc(1 - var(--p, 0) * 1.1), 1); }
+.hero-sub, .hero-tag { opacity: clamp(0, calc(1 - var(--p, 0) * 4), 1); }
+/* the toolbar's logo stands in for the hero wordmark, which stays only to hold its place */
+.hero-title { opacity: var(--title-o, 1); }
+.brand-slot { position: relative; display: block; flex: none; }
+.brand-dock { position: absolute; left: 0; display: block; padding: 0; border: 0; background: none; line-height: 0; cursor: pointer; pointer-events: none; }
+.brand-dock svg { display: block; width: 100%; height: auto; overflow: visible; }
+.brand-dock .growth { opacity: clamp(0, calc(1 - var(--p, 1) * 1.6), 1); }
+.brand-dock.is-docked .growth { display: none; }
+.brand-dock:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; }
+/* the buttons next to the logo start out flush left and slide over as the logo arrives */
+.brand-slot ~ * { translate: calc((var(--dock, 1) - 1) * (var(--logo-w, 0px) + 12px)) 0; }
+
 /* ---------- Toolbar under the hero ---------- */
 .toolbar {
   display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; flex: none;

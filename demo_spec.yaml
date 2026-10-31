@@ -1,0 +1,246 @@
+openapi: 3.0.3
+info:
+  title: Enterprise Project & Billing Services API
+  version: 1.0.0
+  description: Multi-tenant project and invoicing management API
+paths:
+  /auth/login:
+    post:
+      summary: Authenticate identity and obtain bearer token
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthToken'
+
+  /projects:
+    post:
+      summary: Create a new project resource
+      operationId: createProject
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateProjectInput'
+      responses:
+        '201':
+          description: Project created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+
+  /projects/{project_id}:
+    get:
+      summary: Get project details
+      operationId: getProjectById
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: project_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Project retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+        '403':
+          description: Forbidden
+        '404':
+          description: Project not found
+
+    patch:
+      summary: Update project properties
+      operationId: updateProject
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: project_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProjectInput'
+      responses:
+        '200':
+          description: Updated project
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+
+    delete:
+      summary: Delete project resource
+      operationId: deleteProject
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: project_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Deleted successfully
+
+  /projects/{project_id}/export:
+    get:
+      summary: Export financial and billing data for a project
+      operationId: exportProjectBilling
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: project_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Project export payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectExport'
+
+  /projects/{project_id}/summary:
+    get:
+      summary: Get brief public project stats (verifier trap)
+      operationId: getProjectSummary
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: project_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Public summary stats
+
+  /projects/{project_id}/members:
+    get:
+      summary: Get project members (unimplemented route returning 404)
+      operationId: getProjectMembers
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: project_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Project member list
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+
+  schemas:
+    LoginRequest:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+
+    AuthToken:
+      type: object
+      required:
+        - token
+      properties:
+        token:
+          type: string
+        user_id:
+          type: string
+        role:
+          type: string
+
+    CreateProjectInput:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+        confidential_data:
+          type: string
+        budget:
+          type: string
+
+    UpdateProjectInput:
+      type: object
+      properties:
+        name:
+          type: string
+        budget:
+          type: string
+
+    Project:
+      type: object
+      required:
+        - id
+        - owner_id
+        - name
+      properties:
+        id:
+          type: string
+        owner_id:
+          type: string
+        owner_email:
+          type: string
+        name:
+          type: string
+        confidential_data:
+          type: string
+        budget:
+          type: string
+        billing_card:
+          type: string
+
+    ProjectExport:
+      type: object
+      required:
+        - export_id
+        - project_id
+      properties:
+        export_id:
+          type: string
+        project_id:
+          type: string
+        owner_email:
+          type: string
+        financial_payload:
+          type: object

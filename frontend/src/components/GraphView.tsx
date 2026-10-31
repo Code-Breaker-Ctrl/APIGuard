@@ -352,7 +352,7 @@ export const GraphView: React.FC<GraphViewProps> = ({
   return (
     <div
       ref={containerRef}
-      className="w-full h-full relative bg-[#110d09] min-h-0"
+      className="w-full h-full relative bg-transparent min-h-0"
       style={{ width: '100%', height: '100%' }}
     >
       {/* Fit view button overlay */}
@@ -390,7 +390,7 @@ export const GraphView: React.FC<GraphViewProps> = ({
         }}
         fitView
         fitViewOptions={{ padding: 0.06 }}
-        className="bg-[#110d09]"
+        className="bg-transparent"
       >
         <FitViewInternal dep={backendNodes} />
         <Background variant={BackgroundVariant.Dots} gap={18} size={1} color="#30271e" />
@@ -403,7 +403,7 @@ export const GraphView: React.FC<GraphViewProps> = ({
       </ReactFlow>
 
       {/* Legend strip */}
-      <div className="absolute bottom-3 left-3 z-10 flex items-center gap-4 text-sm bg-slate-900 px-3 py-1.5 border-2 border-slate-700">
+      <div className="absolute bottom-3 left-3 z-10 flex items-center gap-4 text-sm panel-soft px-3 py-1.5">
         <span className="flex items-center gap-1.5 text-slate-300"><span className="w-2.5 h-2.5 bg-amber-500"></span> ID</span>
         <span className="flex items-center gap-1.5 text-slate-300"><span className="w-2.5 h-2.5 bg-blue-500"></span> Operation</span>
         <span className="flex items-center gap-1.5 text-slate-300"><span className="w-2.5 h-2.5 bg-rose-500"></span> Leak</span>

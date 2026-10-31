@@ -24,6 +24,7 @@ import { BenchmarkPanel } from './components/BenchmarkPanel';
 import { RemediationModal } from './components/RemediationModal';
 import { GuidedDemoModal } from './components/GuidedDemoModal';
 import { AuditReportModal } from './components/AuditReportModal';
+import { GraceBackdrop } from './components/GraceBackdrop';
 import type { Finding, DryRunResponse } from './types';
 import { apiClient } from './api/client';
 
@@ -186,8 +187,12 @@ export default function App() {
   const modelOk = modelStatusText.startsWith('model call: tested');
   const modelWarn = modelStatusText.includes('configured');
 
+  const mood = isScanning ? 'scanning' : findings.length > 0 ? 'leak' : 'idle';
+
   return (
-    <div className="h-screen w-screen text-slate-200 flex flex-col overflow-hidden">
+    <>
+    <GraceBackdrop mood={mood} />
+    <div className="relative z-10 h-screen w-screen text-slate-200 flex flex-col overflow-hidden">
 
       {/* BACKEND OFFLINE BANNER */}
       {backendOffline && (
@@ -203,7 +208,7 @@ export default function App() {
       )}
 
       {/* TOP BAR */}
-      <header className="h-16 border-b-2 border-slate-700 bg-slate-900 px-5 flex items-center justify-between z-20 shrink-0">
+      <header className="h-16 px-5 flex items-center justify-between z-20 shrink-0">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 bg-emerald-400 border-2 border-black flex items-center justify-center" style={{ boxShadow: 'inset -3px -3px 0 #9a7a25, inset 3px 3px 0 #f0d98a' }}>
             <Layers className="w-5 h-5 text-slate-950" />
@@ -264,12 +269,12 @@ export default function App() {
       {/* WORKSPACE */}
       <main className="flex-1 p-4 grid grid-cols-1 lg:grid-cols-12 gap-4 overflow-hidden">
 
-        <section className="lg:col-span-3 h-full overflow-hidden">
+        <section className="lg:col-span-3 self-start max-h-full overflow-hidden">
           <SpecPanel nodes={nodes} onImportSpec={importSpec} isLoading={isGraphLoading} />
         </section>
 
-        <section className="lg:col-span-5 h-full rounded-xl border border-slate-700 bg-slate-950 overflow-hidden relative flex flex-col">
-          <div className="h-11 px-4 bg-slate-900 border-b-2 border-slate-700 flex items-center justify-between shrink-0">
+        <section className="lg:col-span-5 h-full panel-soft overflow-hidden relative flex flex-col">
+          <div className="h-11 px-4 flex items-center justify-between shrink-0">
             <div className="flex items-center gap-2">
               <GitBranch className="w-4 h-4 text-emerald-400" />
               <span className="panel-title">Dependency Graph</span>
@@ -405,7 +410,7 @@ export default function App() {
       />
 
       {/* FOOTER: one quiet line */}
-      <footer className="h-8 border-t-2 border-slate-700 bg-slate-900 px-5 flex items-center justify-between text-sm text-slate-500 shrink-0">
+      <footer className="h-8 px-5 flex items-center justify-between text-sm text-slate-500 shrink-0">
         <span className="flex items-center gap-2">
           <span className={`w-2 h-2 ${modelOk ? 'bg-emerald-400' : modelWarn ? 'bg-amber-400' : 'bg-slate-500'}`} />
           <span className={modelOk ? 'text-emerald-400' : modelWarn ? 'text-amber-400' : ''}>{modelStatusText}</span>
@@ -414,5 +419,6 @@ export default function App() {
       </footer>
 
     </div>
+    </>
   );
 }

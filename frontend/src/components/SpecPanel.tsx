@@ -51,8 +51,8 @@ export const SpecPanel: React.FC<SpecPanelProps> = ({ nodes, onImportSpec, isLoa
   const players = identities.filter((i) => i.key === 'user_a' || i.key === 'user_b');
 
   return (
-    <div className="flex flex-col h-full bg-slate-900 border border-slate-700 rounded-xl overflow-hidden">
-      <div className="h-11 px-4 bg-slate-900 border-b-2 border-slate-700 flex items-center justify-between shrink-0">
+    <div className="flex flex-col panel-soft overflow-hidden max-h-[calc(100vh-9rem)]">
+      <div className="h-11 px-4 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-2">
           <FileCode className="w-4 h-4 text-emerald-400" />
           <span className="panel-title">Spec</span>

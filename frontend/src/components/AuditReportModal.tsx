@@ -139,14 +139,14 @@ export const AuditReportModal: React.FC<AuditReportModalProps> = ({
   <title>APIGuard Security Assessment Report - ${reportDate}</title>
   <style>
     :root {
-      --bg: #0b0e14;
-      --card-bg: #121622;
-      --border: #1e2538;
-      --text: #e2e8f0;
-      --text-muted: #94a3b8;
-      --accent: #10b981;
-      --danger: #f43f5e;
-      --warning: #f59e0b;
+      --bg: #fffcf1;
+      --card-bg: #fffef8;
+      --border: #d9d2ae;
+      --text: #181a14;
+      --text-muted: #4b5238;
+      --accent: #5d7a14;
+      --danger: #b3342b;
+      --warning: #a97508;
     }
     @media print {
       body { background: #ffffff !important; color: #0f172a !important; font-size: 11pt; }
@@ -166,20 +166,21 @@ export const AuditReportModal: React.FC<AuditReportModalProps> = ({
     }
     .container { max-width: 900px; margin: 0 auto; }
     .header { border-bottom: 2px solid var(--border); padding-bottom: 20px; margin-bottom: 30px; }
-    .brand { font-size: 24px; font-weight: bold; color: #ffffff; }
+    .brand { font-size: 24px; font-weight: bold; color: #181a14; }
+    .brand span { text-shadow: 2px 2px 0 #d8e820; }
     .brand span { color: var(--accent); }
     .title { font-size: 20px; font-weight: bold; margin-top: 10px; }
     .meta { color: var(--text-muted); font-size: 13px; margin-top: 6px; }
     .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 20px; margin-bottom: 20px; }
     .badge { display: inline-block; padding: 4px 10px; border-radius: 4px; font-weight: bold; font-size: 12px; }
-    .badge-danger { background: rgba(244, 63, 94, 0.2); color: var(--danger); border: 1px solid var(--danger); }
-    .badge-success { background: rgba(16, 185, 129, 0.2); color: var(--accent); border: 1px solid var(--accent); }
+    .badge-danger { background: rgba(179, 52, 43, 0.12); color: var(--danger); border: 1px solid var(--danger); }
+    .badge-success { background: rgba(93, 122, 20, 0.14); color: var(--accent); border: 1px solid var(--accent); }
     table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 13px; }
     th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); }
     th { color: var(--text-muted); text-transform: uppercase; font-size: 11px; }
-    pre { background: #07090e; border: 1px solid var(--border); padding: 12px; border-radius: 6px; overflow-x: auto; font-size: 12px; color: #38bdf8; }
-    code { font-family: monospace; background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 4px; }
-    .print-btn { background: var(--accent); color: #000; border: none; padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; float: right; }
+    pre { background: #f4efd8; border: 1px solid var(--border); padding: 12px; border-radius: 6px; overflow-x: auto; font-size: 12px; color: #2e3220; }
+    code { font-family: monospace; background: rgba(24,26,20,0.06); padding: 2px 6px; border-radius: 4px; }
+    .print-btn { background: var(--accent); color: #fffcf1; border: none; padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; float: right; }
   </style>
 </head>
 <body>
@@ -222,7 +223,7 @@ export const AuditReportModal: React.FC<AuditReportModalProps> = ({
     ` : findings.map((f, i) => `
       <div class="card" style="border-left: 4px solid var(--danger);">
         <div style="display:flex; justify-content:space-between; align-items:center;">
-          <h4 style="margin:0; font-size:15px; color:#ffffff;">
+          <h4 style="margin:0; font-size:15px; color:#181a14;">
             Finding #${i + 1}: ${escapeHtml(f.method)} ${escapeHtml(f.endpoint)}
           </h4>
           <span class="badge badge-danger">${escapeHtml(f.severity)}</span>
@@ -297,10 +298,10 @@ export const AuditReportModal: React.FC<AuditReportModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 font-mono select-none">
-      <div className="w-full max-w-4xl h-[88vh] bg-[#15100c] rounded-2xl overflow-hidden border border-[#3b3125] shadow-2xl flex flex-col text-xs">
+      <div className="w-full max-w-4xl h-[88vh] bg-slate-950 rounded-2xl overflow-hidden border border-slate-600 shadow-2xl flex flex-col text-xs">
         
         {/* Header */}
-        <div className="h-14 px-6 bg-[#201a13] border-b border-[#372d22] flex items-center justify-between shrink-0">
+        <div className="h-14 px-6 bg-slate-900 border-b border-slate-700 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
               <FileText className="w-4 h-4" />
@@ -324,11 +325,11 @@ export const AuditReportModal: React.FC<AuditReportModalProps> = ({
 
           <div className="flex items-center gap-2">
             {/* Tab switchers */}
-            <div className="flex items-center bg-[#110d09] p-0.5 rounded-lg border border-[#332a20] mr-2">
+            <div className="flex items-center bg-slate-950 p-0.5 rounded-lg border border-slate-700 mr-2">
               <button
                 onClick={() => setActiveTab('preview')}
                 className={`px-3 py-1 rounded text-xs transition ${
-                  activeTab === 'preview' ? 'bg-[#2c241b] text-emerald-400 font-bold' : 'text-slate-400 hover:text-white'
+                  activeTab === 'preview' ? 'bg-slate-800 text-emerald-400 font-bold' : 'text-slate-400 hover:text-white'
                 }`}
               >
                 Executive Preview
@@ -336,7 +337,7 @@ export const AuditReportModal: React.FC<AuditReportModalProps> = ({
               <button
                 onClick={() => setActiveTab('markdown')}
                 className={`px-3 py-1 rounded text-xs transition ${
-                  activeTab === 'markdown' ? 'bg-[#2c241b] text-emerald-400 font-bold' : 'text-slate-400 hover:text-white'
+                  activeTab === 'markdown' ? 'bg-slate-800 text-emerald-400 font-bold' : 'text-slate-400 hover:text-white'
                 }`}
               >
                 Raw Markdown
@@ -354,11 +355,11 @@ export const AuditReportModal: React.FC<AuditReportModalProps> = ({
         </div>
 
         {/* Content area */}
-        <div className="flex-1 overflow-y-auto p-6 bg-[#110d09]">
+        <div className="flex-1 overflow-y-auto p-6 bg-slate-950">
           {activeTab === 'preview' ? (
             <div className="space-y-6 max-w-3xl mx-auto">
               {/* Executive Summary Card */}
-              <div className="p-5 rounded-xl bg-[#1d1711] border border-[#342a20] space-y-4">
+              <div className="p-5 rounded-xl bg-slate-900 border border-slate-700 space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 text-slate-200 text-sm font-bold">
                     {findings.length === 0 ? (
@@ -372,21 +373,21 @@ export const AuditReportModal: React.FC<AuditReportModalProps> = ({
                 </div>
 
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
-                  <div className="p-3 rounded-lg bg-[#251e17] border border-[#3b3125]">
+                  <div className="p-3 rounded-lg bg-slate-800 border border-slate-600">
                     <div className="text-[10px] text-slate-400 uppercase">Endpoints Mapped</div>
                     <div className="text-lg font-bold text-slate-100 mt-1">{operationCount}</div>
                   </div>
-                  <div className="p-3 rounded-lg bg-[#251e17] border border-[#3b3125]">
+                  <div className="p-3 rounded-lg bg-slate-800 border border-slate-600">
                     <div className="text-[10px] text-slate-400 uppercase">DAG Relationships</div>
                     <div className="text-lg font-bold text-cyan-400 mt-1">{edgeCount}</div>
                   </div>
-                  <div className="p-3 rounded-lg bg-[#251e17] border border-[#3b3125]">
+                  <div className="p-3 rounded-lg bg-slate-800 border border-slate-600">
                     <div className="text-[10px] text-slate-400 uppercase">BOLA Leaks</div>
                     <div className={`text-lg font-bold mt-1 ${findings.length === 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
                       {findings.length}
                     </div>
                   </div>
-                  <div className="p-3 rounded-lg bg-[#251e17] border border-[#3b3125]">
+                  <div className="p-3 rounded-lg bg-slate-800 border border-slate-600">
                     <div className="text-[10px] text-slate-400 uppercase">Verified By</div>
                     <div className="text-lg font-bold text-emerald-400 mt-1">Response diff</div>
                   </div>
@@ -413,7 +414,7 @@ export const AuditReportModal: React.FC<AuditReportModalProps> = ({
                 </div>
 
                 {findings.length === 0 ? (
-                  <div className="p-8 rounded-xl bg-[#1d1711] border border-emerald-900/40 text-center space-y-2">
+                  <div className="p-8 rounded-xl bg-slate-900 border border-emerald-900/40 text-center space-y-2">
                     <ShieldCheck className="w-8 h-8 text-emerald-400 mx-auto" />
                     <div className="text-sm font-bold text-emerald-300">No Confirmed Leaks</div>
                     <p className="text-slate-400 text-xs max-w-md mx-auto">
@@ -422,7 +423,7 @@ export const AuditReportModal: React.FC<AuditReportModalProps> = ({
                   </div>
                 ) : (
                   findings.map((f, idx) => (
-                    <div key={f.id || idx} className="p-5 rounded-xl bg-[#1d1711] border border-rose-900/40 space-y-3">
+                    <div key={f.id || idx} className="p-5 rounded-xl bg-slate-900 border border-rose-900/40 space-y-3">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <span className="px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 font-bold border border-rose-500/40">
@@ -433,7 +434,7 @@ export const AuditReportModal: React.FC<AuditReportModalProps> = ({
                         <span className="text-[11px] text-slate-400 font-mono">Resource: {f.resource_type}</span>
                       </div>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs bg-[#251e17] p-3 rounded-lg border border-[#382e23]">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs bg-slate-800 p-3 rounded-lg border border-slate-700">
                         <div>
                           <span className="text-slate-400">Victim Owner:</span> <span className="text-emerald-300 font-bold">{f.identities.owner}</span>
                         </div>
@@ -453,7 +454,7 @@ export const AuditReportModal: React.FC<AuditReportModalProps> = ({
                           <GitBranch className="w-3.5 h-3.5 text-cyan-400" />
                           <span>Graph Propagation Path:</span>
                         </div>
-                        <div className="p-2 rounded bg-[#0f0b08] border border-[#2e261d] text-cyan-300 text-[11px]">
+                        <div className="p-2 rounded bg-slate-950 border border-slate-700 text-cyan-300 text-[11px]">
                           {f.graph_path.join(' ➔ ')}
                         </div>
                       </div>
@@ -463,7 +464,7 @@ export const AuditReportModal: React.FC<AuditReportModalProps> = ({
                           <Terminal className="w-3.5 h-3.5 text-emerald-400" />
                           <span>Reproduction cURL:</span>
                         </div>
-                        <div className="p-2.5 rounded bg-[#0f0b08] border border-[#2e261d] text-slate-300 text-[11px] overflow-x-auto whitespace-pre">
+                        <div className="p-2.5 rounded bg-slate-950 border border-slate-700 text-slate-300 text-[11px] overflow-x-auto whitespace-pre">
                           {f.repro_curl}
                         </div>
                       </div>
@@ -477,14 +478,14 @@ export const AuditReportModal: React.FC<AuditReportModalProps> = ({
               <textarea
                 readOnly
                 value={markdownContent}
-                className="w-full h-full p-4 rounded-xl bg-[#0f0b08] border border-[#342a20] text-slate-300 font-mono text-xs resize-none focus:outline-none"
+                className="w-full h-full p-4 rounded-xl bg-slate-950 border border-slate-700 text-slate-300 font-mono text-xs resize-none focus:outline-none"
               />
             </div>
           )}
         </div>
 
         {/* Footer Actions */}
-        <div className="h-14 px-6 bg-[#201a13] border-t border-[#372d22] flex items-center justify-between shrink-0">
+        <div className="h-14 px-6 bg-slate-900 border-t border-slate-700 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2 text-slate-400 text-xs">
             <span>Export formats available: Markdown (.md) and Printable HTML</span>
           </div>
@@ -492,7 +493,7 @@ export const AuditReportModal: React.FC<AuditReportModalProps> = ({
           <div className="flex items-center gap-2.5">
             <button
               onClick={handleCopyMarkdown}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#2f261d] hover:bg-[#403528] border border-[#4a3d2f] text-slate-200 transition font-bold"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200 transition font-bold"
             >
               {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
               <span>{copied ? 'Copied MD!' : 'Copy Markdown'}</span>
@@ -500,7 +501,7 @@ export const AuditReportModal: React.FC<AuditReportModalProps> = ({
 
             <button
               onClick={handleDownloadMarkdown}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#2f261d] hover:bg-[#403528] border border-[#4a3d2f] text-slate-200 transition font-bold"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200 transition font-bold"
             >
               <Download className="w-3.5 h-3.5 text-cyan-400" />
               <span>Download .md</span>
@@ -508,7 +509,7 @@ export const AuditReportModal: React.FC<AuditReportModalProps> = ({
 
             <button
               onClick={handleDownloadHtml}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#2f261d] hover:bg-[#403528] border border-[#4a3d2f] text-slate-200 transition font-bold"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200 transition font-bold"
             >
               <Download className="w-3.5 h-3.5 text-purple-400" />
               <span>Download .html</span>

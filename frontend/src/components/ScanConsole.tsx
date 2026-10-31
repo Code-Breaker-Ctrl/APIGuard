@@ -24,7 +24,7 @@ export const ScanConsole: React.FC<ScanConsoleProps> = ({ events, isScanning }) 
   };
 
   return (
-    <div className="flex flex-col h-full bg-slate-950 border border-slate-700 rounded-xl overflow-hidden">
+    <div className="flex flex-col h-full panel overflow-hidden">
       <div className="h-11 px-4 bg-slate-900 border-b-2 border-slate-700 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-2">
           <Terminal className="w-4 h-4 text-emerald-400" />

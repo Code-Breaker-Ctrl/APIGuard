@@ -16,9 +16,9 @@ export const DryRunModal: React.FC<DryRunModalProps> = ({
   onExecuteLive,
 }) => {
   return (
-    <div className="flex flex-col h-full bg-[#15100c] text-xs font-mono select-none">
+    <div className="flex flex-col h-full bg-slate-950 text-xs font-mono select-none">
       {/* Header */}
-      <div className="h-12 px-5 bg-[#201a13] border-b border-[#372d22] flex items-center justify-between shrink-0">
+      <div className="h-12 px-5 bg-slate-900 border-b border-slate-700 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-2.5">
           <Cpu className="w-4 h-4 text-amber-400" />
           <span className="font-bold text-slate-100 text-sm">Dry-Run Execution Plan Preview</span>
@@ -48,19 +48,19 @@ export const DryRunModal: React.FC<DryRunModalProps> = ({
           <>
             {/* Budget Metrics Card */}
             <div className="grid grid-cols-4 gap-3">
-              <div className="p-3 rounded-lg bg-[#1d1711] border border-[#342a20]">
+              <div className="p-3 rounded-lg bg-slate-900 border border-slate-700">
                 <div className="text-[10px] text-slate-400 uppercase">Allocated Budget</div>
                 <div className="text-xl font-bold text-slate-100 mt-1">{data.total_budget} reqs</div>
               </div>
-              <div className="p-3 rounded-lg bg-[#1d1711] border border-[#342a20]">
+              <div className="p-3 rounded-lg bg-slate-900 border border-slate-700">
                 <div className="text-[10px] text-slate-400 uppercase">Planned Operations</div>
                 <div className="text-xl font-bold text-cyan-400 mt-1">{data.total_planned} reqs</div>
               </div>
-              <div className="p-3 rounded-lg bg-[#1d1711] border border-[#342a20]">
+              <div className="p-3 rounded-lg bg-slate-900 border border-slate-700">
                 <div className="text-[10px] text-slate-400 uppercase">Remaining Budget</div>
                 <div className="text-xl font-bold text-emerald-400 mt-1">{data.budget_remaining} reqs</div>
               </div>
-              <div className="p-3 rounded-lg bg-[#1d1711] border border-[#342a20]">
+              <div className="p-3 rounded-lg bg-slate-900 border border-slate-700">
                 <div className="text-[10px] text-slate-400 uppercase">Mutating Tests</div>
                 <div className="text-xl font-bold mt-1">
                   {data.mutations_enabled ? (
@@ -81,15 +81,15 @@ export const DryRunModal: React.FC<DryRunModalProps> = ({
             </div>
 
             {/* Plan Table */}
-            <div className="border border-[#342a20] rounded-xl overflow-hidden bg-[#17120e]">
-              <div className="h-9 px-4 bg-[#201a13] border-b border-[#31281f] flex items-center justify-between text-[11px] font-bold text-slate-300">
+            <div className="border border-slate-700 rounded-xl overflow-hidden bg-slate-950">
+              <div className="h-9 px-4 bg-slate-900 border-b border-slate-700 flex items-center justify-between text-[11px] font-bold text-slate-300">
                 <span>Sequence Steps ({data.planned_steps.length})</span>
-                <span className="text-slate-500 font-normal">Order: Setup $\to$ Control $\to$ Adversary Probe</span>
+                <span className="text-slate-500 font-normal">Order: Setup → Control → Adversary Probe</span>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-[11px] border-collapse">
                   <thead>
-                    <tr className="border-b border-[#31281f] bg-[#1c1610] text-slate-400 text-[10px] uppercase">
+                    <tr className="border-b border-slate-700 bg-slate-900 text-slate-400 text-[10px] uppercase">
                       <th className="py-2.5 px-3">#</th>
                       <th className="py-2.5 px-3">Phase</th>
                       <th className="py-2.5 px-3">Method</th>
@@ -99,9 +99,9 @@ export const DryRunModal: React.FC<DryRunModalProps> = ({
                       <th className="py-2.5 px-3">Cleanup</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#2a221a]">
+                  <tbody className="divide-y divide-slate-800">
                     {data.planned_steps.map((s, idx) => (
-                      <tr key={s.step_id} className="hover:bg-[#211b14] transition">
+                      <tr key={s.step_id} className="hover:bg-slate-900 transition">
                         <td className="py-2.5 px-3 text-slate-500">{idx + 1}</td>
                         <td className="py-2.5 px-3">
                           <span className={`px-1.5 py-0.2 rounded font-bold text-[9px] ${
@@ -140,10 +140,10 @@ export const DryRunModal: React.FC<DryRunModalProps> = ({
       </div>
 
       {/* Footer */}
-      <div className="h-14 px-5 bg-[#1a140f] border-t border-[#372d22] flex items-center justify-between shrink-0">
+      <div className="h-14 px-5 bg-slate-900 border-t border-slate-700 flex items-center justify-between shrink-0">
         <button
           onClick={onClose}
-          className="px-4 py-1.5 rounded-lg border border-[#3c3226] text-slate-300 hover:bg-[#2d251c] transition"
+          className="px-4 py-1.5 rounded-lg border border-slate-600 text-slate-300 hover:bg-slate-800 transition"
         >
           Cancel
         </button>

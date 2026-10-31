@@ -18,7 +18,7 @@ export const FindingsList: React.FC<FindingsListProps> = ({
   onToggleHistory,
 }) => {
   return (
-    <div className="flex flex-col h-full bg-slate-900 border border-slate-700 rounded-xl overflow-hidden">
+    <div className="flex flex-col h-full panel overflow-hidden">
       <div className="h-11 px-4 bg-slate-900 border-b-2 border-slate-700 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-2">
           <ShieldAlert className="w-4 h-4 text-rose-400" />
@@ -57,12 +57,10 @@ export const FindingsList: React.FC<FindingsListProps> = ({
                 }`}
               >
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-base">
-                    <span className="px-1.5 bg-rose-500 text-slate-950">{f.severity}</span>
-                    <span className="text-slate-100">{f.method} {f.endpoint}</span>
-                  </div>
+                  <span className="px-1.5 text-base bg-rose-500 text-slate-950">{f.severity}</span>
                   <ChevronRight className="w-4 h-4 text-slate-500" />
                 </div>
+                <div className="text-base text-slate-100 mt-1 break-words">{f.method} {f.endpoint}</div>
                 <div className="text-sm text-slate-400 mt-1 truncate">
                   Leaked: <span className="text-rose-400">{f.diff_fields.join(', ')}</span>
                 </div>

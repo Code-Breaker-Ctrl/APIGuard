@@ -42,7 +42,7 @@ Re-record after changing the engine: `python scripts/record_demo.py`. The site r
 
 | Screen | Description |
 |---|---|
-| ![Graph Idle](docs/screenshots/01_graph_idle.png) | **React Flow DAG:** Operation, Resource, and Identifier nodes with Dagre auto-layout. |
+| ![Graph Idle](docs/screenshots/01_graph_idle.png) | **React Flow DAG:** Operation and Identifier nodes with Dagre auto-layout, under the pixel-art banner. |
 | ![Dry Run Preview](docs/screenshots/02_dry_run_table.png) | **Dry-Run Mode:** Planned multi-identity sequence table without sending any traffic. |
 | ![Live SSE Scan](docs/screenshots/05_graph_after_scan.png) | **Real-Time Audit:** Streaming console, live SSE event propagation, and red BOLA badge. |
 | ![Differential Finding Detail](docs/screenshots/06_finding_detail.png) | **Differential Inspector:** Aman vs Taaran response diff, leaked fields in red, and repro cURL. |
@@ -110,7 +110,7 @@ Every metric below was measured by running both scanners against the bundled dem
 
 ### Technologies Used
 - **Backend:** Python 3.12, FastAPI, Pydantic v2, `aiosqlite` (WAL-mode SQLite), `openapi-spec-validator`, `httpx` (async ASGI/HTTP client), `pytest`, `pytest-asyncio`.
-- **Frontend:** React 19, Vite, TypeScript, Tailwind CSS, `@xyflow/react` (React Flow), `dagre` (graph layout), `lucide-react`.
+- **Frontend:** React 19, Vite, TypeScript, Tailwind CSS v4 (custom light pixel theme), `@xyflow/react` (React Flow), `dagre` (graph layout), `lucide-react`, with the Press Start 2P and VT323 pixel fonts.
 - **AI Remediation:** LLM via OpenRouter or Gemini (whichever is configured), with SQLite caching and automatic deterministic offline template fallback.
 
 ### Reused Open-Source Components & Attributions
@@ -129,6 +129,16 @@ Every metric below was measured by running both scanners against the bundled dem
 | **AI Remediation Engine** | **Supported / Offline Fallback** | LLM via OpenRouter or Gemini (whichever is configured) is used strictly for post-scan surgical remediation ($v_1 \to v_2$). If no API key is provided, a deterministic offline template is badged. |
 | **Safe by Default** | **Working** | Requests are strictly restricted to allowlisted loopback hosts (`127.0.0.1`). Mutating requests (`PATCH`/`DELETE`) are blocked unless explicitly toggled. Each scan still creates one test record on the target (the setup step). |
 | **Git Commit History** | **Verified** | Clean, incremental commit history with tests passing at every stage. |
+
+---
+
+## 🎨 Design: Paper & Grace
+
+The dashboard uses a light pixel theme: cream paper with a faint grid, chunky black pixel type with a lime shadow, and gold and moss accents. All the scenery (ruins, a resting knight, a golden tree, a thin golden ring) lives in the banner at the top, so the working panels stay plain and easy to read. The chevron in the toolbar hides the banner to give the panels more room (it starts hidden on short screens).
+
+- The wordmark is an SVG drawn from code: [`PixelTitle.tsx`](frontend/src/components/PixelTitle.tsx).
+- The scenery is generated, not hand-edited: `pip install -r scripts/requirements.txt`, then `python scripts/make_hero_art.py` rewrites `frontend/src/assets/hero/*.png` (add `--preview DIR` for 4x previews).
+- Colours are Tailwind tokens re-mapped in [`index.css`](frontend/src/index.css), so existing utility classes keep their meaning on the light background.
 
 ---
 
@@ -155,15 +165,16 @@ APIGuard/
 │   └── requirements.txt           # Backend dependencies
 ├── frontend/                      # React 19 + TypeScript + Vite + Tailwind CSS v4
 │   ├── src/
-│   │   ├── components/            # GraphView, AuditReportModal, FindingDetail, Modals
+│   │   ├── components/            # HeroBanner, PixelTitle, GraphView, AuditReportModal, FindingDetail, Modals
 │   │   ├── hooks/                 # useGraph, useScan (real-time SSE streaming)
 │   │   ├── demo/                  # Demo-mode client + recorded fixtures (hosted replay)
+│   │   ├── assets/hero/           # Generated pixel-art scenery for the banner
 │   │   └── App.tsx                # Main security dashboard
 │   ├── package.json
 │   └── vite.config.ts
 ├── benchmarks/                    # Ground truth manifests and empirical benchmark data
 ├── docs/                          # Architectural docs, screenshots, and demo script
-├── scripts/record_demo.py         # Records real engine runs for the hosted demo
+├── scripts/                       # record_demo.py (hosted demo data), make_hero_art.py (banner art)
 ├── .github/workflows/pages.yml    # Deploys the hosted replay demo to GitHub Pages
 ├── pitch.md                       # Hackathon pitch, concepts primer and judge Q&A
 ├── run_prototype.bat              # One-click dual-server launcher for Windows

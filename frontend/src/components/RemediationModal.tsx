@@ -119,9 +119,9 @@ export const RemediationModal: React.FC<RemediationModalProps> = ({
   const isCachedReal = data?.source === 'cached_real';
 
   return (
-    <div className="flex flex-col h-full bg-[#15100c] text-xs font-mono select-none">
+    <div className="flex flex-col h-full bg-slate-950 text-xs font-mono select-none">
       {/* Header */}
-      <div className="h-12 px-5 bg-[#201a13] border-b border-[#372d22] flex items-center justify-between shrink-0">
+      <div className="h-12 px-5 bg-slate-900 border-b border-slate-700 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-2.5">
           <Sparkles className="w-4 h-4 text-purple-400" />
           <span className="font-bold text-slate-100 text-sm">
@@ -148,7 +148,7 @@ export const RemediationModal: React.FC<RemediationModalProps> = ({
             type="button"
             onClick={handleTestModel}
             disabled={isTestingModel}
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#2c241b] hover:bg-[#3b3125] border border-[#504333] text-cyan-300 hover:text-white transition disabled:opacity-50 cursor-pointer text-[10px]"
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 border border-slate-600 text-cyan-300 hover:text-white transition disabled:opacity-50 cursor-pointer text-[10px]"
             title="Perform a minimal test call to verify LLM connection"
           >
             <Terminal className="w-3 h-3 text-cyan-400" />
@@ -203,7 +203,7 @@ export const RemediationModal: React.FC<RemediationModalProps> = ({
         ) : (
           <>
             {/* Target & Mode Banner */}
-            <div className="p-3 rounded-lg bg-[#1e1812] border border-[#352c21] flex items-center justify-between">
+            <div className="p-3 rounded-lg bg-slate-900 border border-slate-700 flex items-center justify-between">
               <div>
                 <span className="text-slate-400">Target Endpoint: </span>
                 <span className="text-cyan-300 font-bold">{data.endpoint}</span>
@@ -226,7 +226,7 @@ export const RemediationModal: React.FC<RemediationModalProps> = ({
             {/* Prompt Comparison Side-by-Side */}
             <div className="grid grid-cols-2 gap-4">
               {/* V1 Naive Prompt */}
-              <div className="flex flex-col border border-rose-900/40 rounded-xl bg-[#18130e] overflow-hidden">
+              <div className="flex flex-col border border-rose-900/40 rounded-xl bg-slate-950 overflow-hidden">
                 <div className="h-9 px-3 bg-rose-950/30 border-b border-rose-900/40 flex items-center justify-between text-rose-300 font-bold">
                   <span className="flex items-center gap-1.5">
                     <AlertTriangle className="w-3.5 h-3.5" /> Naive Prompt (v1)
@@ -235,10 +235,10 @@ export const RemediationModal: React.FC<RemediationModalProps> = ({
                     {data.is_real ? 'Real Model Output (v1)' : 'Illustrative template, not model output'}
                   </span>
                 </div>
-                <div className="p-3 bg-[#0f0b08] border-b border-[#282119] text-[10px] text-slate-400 italic">
+                <div className="p-3 bg-slate-950 border-b border-slate-700 text-[10px] text-slate-400 italic">
                   "{data.v1_prompt}"
                 </div>
-                <div className="p-3 flex-1 overflow-x-auto bg-[#140f0b]">
+                <div className="p-3 flex-1 overflow-x-auto bg-slate-950">
                   <pre className="text-[11px] text-rose-200/90 font-mono leading-relaxed">
                     {data.v1_output}
                   </pre>
@@ -246,7 +246,7 @@ export const RemediationModal: React.FC<RemediationModalProps> = ({
               </div>
 
               {/* V2 Graph-Guided Prompt */}
-              <div className="flex flex-col border border-emerald-900/40 rounded-xl bg-[#18130e] overflow-hidden">
+              <div className="flex flex-col border border-emerald-900/40 rounded-xl bg-slate-950 overflow-hidden">
                 <div className="h-9 px-3 bg-emerald-950/30 border-b border-emerald-900/40 flex items-center justify-between text-emerald-300 font-bold">
                   <span className="flex items-center gap-1.5">
                     <ShieldCheck className="w-3.5 h-3.5" /> Graph-Guided Prompt (v2)
@@ -255,10 +255,10 @@ export const RemediationModal: React.FC<RemediationModalProps> = ({
                     {data.is_real ? 'Real Model Output (v2)' : 'Illustrative template, not model output'}
                   </span>
                 </div>
-                <div className="p-3 bg-[#0f0b08] border-b border-[#282119] text-[10px] text-cyan-300/80 italic">
+                <div className="p-3 bg-slate-950 border-b border-slate-700 text-[10px] text-cyan-300/80 italic">
                   "{data.v2_prompt}"
                 </div>
-                <div className="p-3 flex-1 overflow-x-auto bg-[#140f0b]">
+                <div className="p-3 flex-1 overflow-x-auto bg-slate-950">
                   <pre className="text-[11px] text-emerald-200/90 font-mono leading-relaxed">
                     {data.code_patch}
                   </pre>
@@ -267,7 +267,7 @@ export const RemediationModal: React.FC<RemediationModalProps> = ({
             </div>
 
             {/* Explanation & Reasoning */}
-            <div className="p-3.5 rounded-xl bg-[#1d1711] border border-[#342a20] space-y-1.5">
+            <div className="p-3.5 rounded-xl bg-slate-900 border border-slate-700 space-y-1.5">
               <div className="text-[11px] font-bold text-slate-200 flex items-center gap-1.5">
                 <Code2 className="w-3.5 h-3.5 text-cyan-400" />
                 Root-Cause Explanation & Remediation Rationale
@@ -276,8 +276,8 @@ export const RemediationModal: React.FC<RemediationModalProps> = ({
             </div>
 
             {/* Unit Test & Copy */}
-            <div className="border border-[#342a20] rounded-xl overflow-hidden bg-[#17120e]">
-              <div className="h-9 px-4 bg-[#201a13] border-b border-[#31281f] flex items-center justify-between">
+            <div className="border border-slate-700 rounded-xl overflow-hidden bg-slate-950">
+              <div className="h-9 px-4 bg-slate-900 border-b border-slate-700 flex items-center justify-between">
                 <span className="text-[11px] font-bold text-slate-300">
                   Verification Unit Test (Pytest / FastAPI TestClient)
                 </span>
@@ -289,7 +289,7 @@ export const RemediationModal: React.FC<RemediationModalProps> = ({
                   {copiedTest ? 'Copied Test' : 'Copy Test'}
                 </button>
               </div>
-              <div className="p-3 bg-[#110d09] overflow-x-auto">
+              <div className="p-3 bg-slate-950 overflow-x-auto">
                 <pre className="text-[11px] text-cyan-200/90 font-mono">{data.unit_test}</pre>
               </div>
             </div>
@@ -298,7 +298,7 @@ export const RemediationModal: React.FC<RemediationModalProps> = ({
       </div>
 
       {/* Footer */}
-      <div className="h-14 px-5 bg-[#1a140f] border-t border-[#372d22] flex items-center justify-between shrink-0">
+      <div className="h-14 px-5 bg-slate-900 border-t border-slate-700 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-2">
           {onApplyReferenceFixAndRescan && (
             <div className="flex items-center gap-2">

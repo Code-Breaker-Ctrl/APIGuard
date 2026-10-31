@@ -69,9 +69,9 @@ export const GuidedDemoModal: React.FC<GuidedDemoModalProps> = ({
   const active = steps[currentStep];
 
   return (
-    <div className="flex flex-col h-full bg-[#15100c] text-xs font-mono select-none">
+    <div className="flex flex-col h-full bg-slate-950 text-xs font-mono select-none">
       {/* Header */}
-      <div className="h-12 px-5 bg-[#201a13] border-b border-[#372d22] flex items-center justify-between shrink-0">
+      <div className="h-12 px-5 bg-slate-900 border-b border-slate-700 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-2.5">
           <Sparkles className="w-4 h-4 text-emerald-400" />
           <span className="font-bold text-slate-100 text-sm">Interactive Hackathon Guided Demo</span>
@@ -88,16 +88,16 @@ export const GuidedDemoModal: React.FC<GuidedDemoModalProps> = ({
       </div>
 
       {/* Progress Bar */}
-      <div className="grid grid-cols-4 gap-1 p-2 bg-[#100c09] border-b border-[#2b231b]">
+      <div className="grid grid-cols-4 gap-1 p-2 bg-slate-950 border-b border-slate-700">
         {steps.map((s, idx) => (
           <button
             key={idx}
             onClick={() => setCurrentStep(idx)}
             className={`py-2 px-3 rounded-lg text-left transition flex items-center gap-2 ${
               idx === currentStep
-                ? 'bg-[#282018] border border-cyan-600/50 text-white'
+                ? 'bg-slate-800 border border-cyan-600/50 text-white'
                 : idx < currentStep
-                ? 'bg-[#1d1711] text-emerald-300 border border-[#31281e]'
+                ? 'bg-slate-900 text-emerald-300 border border-slate-700'
                 : 'bg-transparent text-slate-500 border border-transparent'
             }`}
           >
@@ -119,7 +119,7 @@ export const GuidedDemoModal: React.FC<GuidedDemoModalProps> = ({
       <div className="flex-1 p-6 flex flex-col justify-between overflow-y-auto">
         <div className="space-y-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#261e17] border border-[#403428] flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-slate-800 border border-slate-600 flex items-center justify-center">
               {active.icon}
             </div>
             <div>
@@ -128,7 +128,7 @@ export const GuidedDemoModal: React.FC<GuidedDemoModalProps> = ({
             </div>
           </div>
 
-          <div className="p-4 rounded-xl bg-[#1e1812] border border-[#372d22] text-slate-300 text-[12px] leading-relaxed">
+          <div className="p-4 rounded-xl bg-slate-900 border border-slate-700 text-slate-300 text-[12px] leading-relaxed">
             {active.description}
           </div>
 
@@ -140,7 +140,7 @@ export const GuidedDemoModal: React.FC<GuidedDemoModalProps> = ({
         </div>
 
         {/* Action Button */}
-        <div className="pt-4 flex items-center justify-between border-t border-[#2c241b] mt-4">
+        <div className="pt-4 flex items-center justify-between border-t border-slate-700 mt-4">
           <div className="text-[10px] text-slate-500">
             Step {currentStep + 1} of {steps.length}
           </div>
@@ -148,7 +148,7 @@ export const GuidedDemoModal: React.FC<GuidedDemoModalProps> = ({
             {currentStep > 0 && (
               <button
                 onClick={() => setCurrentStep((prev) => prev - 1)}
-                className="px-3.5 py-1.5 rounded-lg border border-[#3b3025] text-slate-300 hover:bg-[#282119] transition"
+                className="px-3.5 py-1.5 rounded-lg border border-slate-600 text-slate-300 hover:bg-slate-800 transition"
               >
                 Previous
               </button>

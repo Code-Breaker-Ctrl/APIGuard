@@ -9,7 +9,7 @@
 3. Open `http://127.0.0.1:5173` and click the reset icon (circular arrow) so the target and history are clean.
 4. Leave **Mutations** off for the first run.
 
-**The screen:** the top bar has the `Dry run` and `Mutations` toggles, five icon buttons (guided demo, benchmarks, dry-run table, export report, reset) and the gold **BEGIN AUDIT** button. Left: the spec's identities and endpoints. Centre: the dependency graph. Right: the Event Stream above the Findings list.
+**The screen:** the pixel-art banner sits on top (the chevron button in the toolbar hides it). Under it the toolbar has the `Dry run` and `Mutations` toggles, five icon buttons (guided demo, benchmarks, dry-run table, export report, reset) and the gold **BEGIN AUDIT** button. Left: the spec's identities and endpoints. Centre: the dependency graph. Right: the Event Stream above the Findings list.
 
 > With **Dry run** on, the main button becomes **PREVIEW PLAN** and opens the plan table instead of sending traffic.
 
@@ -18,7 +18,7 @@
 ### Act 1: The problem and the map (0:00 to 0:45)
 
 - *"Most scanners test API routes one at a time. When a route returns 200, nobody is alerted and everything looks fine. This is BOLA, OWASP API #1: it doesn't crash anything, it quietly returns someone else's data."*
-- Point at the graph. Blue boxes at the top are setup (login, create project). The orange key is the ID that creating a project produces. Below it are the routes that use the ID, and below those the routes nested under a project. Solid lines come from the OpenAPI file; dashed lines are inferred nesting.
+- Point at the graph. Blue boxes at the top are setup (login, create project). The gold key is the ID that creating a project produces. Below it are the routes that use the ID, and below those the routes nested under a project. Solid lines come from the OpenAPI file; dashed lines are inferred nesting.
 - Edges: `POST /projects` **produces** `project_id`; `GET /projects/{id}` **consumes** it; `/export`, `/summary` and `/members` are **nested under** the project route.
 
 ### Act 2: Plan and run (0:45 to 1:45)

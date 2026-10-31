@@ -1,16 +1,17 @@
 import { useState, useEffect, useCallback } from 'react';
-import { 
-  Play, 
-  RotateCcw, 
-  Layers, 
-  AlertTriangle, 
+import {
+  Play,
+  RotateCcw,
+  AlertTriangle,
   X,
   RefreshCw,
   GitBranch,
   BarChart3,
   Cpu,
   HelpCircle,
-  FileText
+  FileText,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 import { useGraph } from './hooks/useGraph';
 import { useScan } from './hooks/useScan';
@@ -24,6 +25,7 @@ import { BenchmarkPanel } from './components/BenchmarkPanel';
 import { RemediationModal } from './components/RemediationModal';
 import { GuidedDemoModal } from './components/GuidedDemoModal';
 import { AuditReportModal } from './components/AuditReportModal';
+import { HeroBanner, MiniBrand } from './components/HeroBanner';
 import type { Finding, DryRunResponse } from './types';
 import { apiClient, IS_DEMO } from './api/client';
 
@@ -47,6 +49,26 @@ export default function App() {
   const [backendOffline, setBackendOffline] = useState(false);
   const [enableMutations, setEnableMutations] = useState(false);
   const [dryRun, setDryRun] = useState(false);
+  // The scenic banner is optional: remembered per browser, and closed by default on short screens
+  const [bannerCollapsed, setBannerCollapsed] = useState<boolean>(() => {
+    try {
+      const saved = localStorage.getItem('apiguard.banner');
+      if (saved === 'closed') return true;
+      if (saved === 'open') return false;
+    } catch {
+      // storage may be unavailable (private window, blocked site data)
+    }
+    return window.innerHeight < 800;
+  });
+  const toggleBanner = () => {
+    const next = !bannerCollapsed;
+    setBannerCollapsed(next);
+    try {
+      localStorage.setItem('apiguard.banner', next ? 'closed' : 'open');
+    } catch {
+      // ignore
+    }
+  };
   const [verificationBanner, setVerificationBanner] = useState<{ before: number; after: number } | null>(null);
   const [isTargetPatched, setIsTargetPatched] = useState(false);
 
@@ -212,33 +234,31 @@ export default function App() {
         </div>
       )}
 
-      {/* TOP BAR */}
-      <header className="h-16 border-b-2 border-slate-700 bg-slate-900 px-5 flex items-center justify-between z-20 shrink-0">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 bg-emerald-400 border-2 border-black flex items-center justify-center" style={{ boxShadow: 'inset -3px -3px 0 #9a7a25, inset 3px 3px 0 #f0d98a' }}>
-            <Layers className="w-5 h-5 text-slate-950" />
-          </div>
-          <div className="leading-none">
-            <div className="font-display text-[11px] text-emerald-400">APIGuard</div>
-            <div className="text-sm text-slate-400 mt-1.5">BOLA detection · {TARGET_LABEL}</div>
-          </div>
-        </div>
+      {/* MASTHEAD: scenery and wordmark (collapsible) */}
+      {!bannerCollapsed && <HeroBanner />}
 
-        <div className="flex items-center gap-2">
+      {/* TOOLBAR */}
+      <div className="toolbar z-20">
+        <div className="flex items-center gap-3">
+          {bannerCollapsed && <MiniBrand />}
           <button className="btn-ghost" aria-pressed={dryRun} onClick={() => setDryRun(!dryRun)} title="When on, the main button previews the plan instead of sending traffic">
             Dry run
           </button>
           <button className="btn-ghost" aria-pressed={enableMutations} onClick={() => setEnableMutations(!enableMutations)} title="Allow PATCH / DELETE probes">
             Mutations
           </button>
+          <span className="hidden xl:inline text-sm text-slate-400">target {TARGET_LABEL}</span>
+        </div>
 
-          <span className="w-0.5 h-8 bg-slate-700 mx-1" />
-
+        <div className="flex items-center gap-2">
           <button className="btn-ghost" onClick={() => setShowGuidedDemo(true)} title="Guided demo [D]"><HelpCircle className="w-4 h-4" /></button>
           <button className="btn-ghost" onClick={() => setShowBenchmarkModal(true)} title="Benchmarks"><BarChart3 className="w-4 h-4" /></button>
           <button className="btn-ghost" onClick={handleOpenDryRun} title="Preview planned requests"><Cpu className="w-4 h-4" /></button>
           <button className="btn-ghost" onClick={() => setShowReportModal(true)} title="Export audit report"><FileText className="w-4 h-4" /></button>
           <button className="btn-ghost" onClick={handleReset} title="Reset target state"><RotateCcw className="w-4 h-4" /></button>
+          <button className="btn-ghost" onClick={toggleBanner} title={bannerCollapsed ? 'Show the banner' : 'Hide the banner'} aria-label={bannerCollapsed ? 'Show the banner' : 'Hide the banner'}>
+            {bannerCollapsed ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
+          </button>
 
           <button
             onClick={handleRunScan}
@@ -249,7 +269,7 @@ export default function App() {
             {isScanning ? 'AUDITING' : dryRun ? 'PREVIEW PLAN' : 'BEGIN AUDIT'}
           </button>
         </div>
-      </header>
+      </div>
 
       {/* STATUS BANNERS (only when relevant) */}
       {isTargetPatched && (
@@ -278,7 +298,7 @@ export default function App() {
           <SpecPanel nodes={nodes} onImportSpec={importSpec} isLoading={isGraphLoading} />
         </section>
 
-        <section className="lg:col-span-5 h-full rounded-xl border border-slate-700 bg-slate-950 overflow-hidden relative flex flex-col">
+        <section className="lg:col-span-5 h-full panel overflow-hidden relative flex flex-col">
           <div className="h-11 px-4 bg-slate-900 border-b-2 border-slate-700 flex items-center justify-between shrink-0">
             <div className="flex items-center gap-2">
               <GitBranch className="w-4 h-4 text-emerald-400" />
@@ -314,6 +334,14 @@ export default function App() {
                 </div>
               </div>
             )}
+          </div>
+
+          <div className="h-9 px-4 border-t-2 border-slate-800 flex items-center gap-5 text-sm text-slate-300 shrink-0">
+            <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 bg-amber-500" /> ID</span>
+            <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 bg-blue-500" /> Setup</span>
+            <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 bg-emerald-500" /> Safe</span>
+            <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 bg-rose-500" /> Leak</span>
+            <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 bg-slate-500" /> Unsure</span>
           </div>
         </section>
 

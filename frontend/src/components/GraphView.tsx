@@ -1,7 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import {
   ReactFlow,
-  Controls,
   Background,
   BackgroundVariant,
   MarkerType,
@@ -25,7 +24,7 @@ interface GraphViewProps {
   onSelectNode: (nodeId: string) => void;
 }
 
-const OP_W = 176;
+const OP_W = 160;
 const OP_H = 48;
 const ID_W = 130;
 const ID_H = 34;
@@ -89,7 +88,7 @@ const OperationNode = ({ data, selected }: any) => {
           </span>
         )}
       </div>
-      <div className="text-[11px] text-slate-200 truncate mt-0.5" title={path}>
+      <div className="text-[10px] text-slate-200 truncate mt-0.5" title={path}>
         {compactPath(path)}
       </div>
       <Handle type="source" position={Position.Bottom} className="w-2 h-2 bg-slate-500 border border-slate-800" />
@@ -185,16 +184,32 @@ export const GraphView: React.FC<GraphViewProps> = ({
       node.type === 'operation' ? { width: OP_W, height: OP_H } : { width: ID_W, height: ID_H };
 
     const g = new dagre.graphlib.Graph();
-    g.setGraph({ rankdir: 'TB', nodesep: 40, ranksep: 56, marginx: 16, marginy: 16 });
+    g.setGraph({ rankdir: 'TB', align: 'UL', nodesep: 28, ranksep: 50, marginx: 16, marginy: 16 });
     g.setDefaultEdgeLabel(() => ({}));
 
-    shownNodes.forEach((node) => g.setNode(node.id, sizeOf(node)));
+    // Nodes with no drawn edge (the login route) are laid out by hand: dagre would park them at the far
+    // left and make the whole graph wider, which shrinks everything when it is fitted to the panel.
+    const connected = new Set(shownEdges.flatMap((e) => [e.from_node, e.to_node]));
+    const loose = shownNodes.filter((n) => !connected.has(n.id));
+
+    shownNodes.filter((n) => connected.has(n.id)).forEach((node) => g.setNode(node.id, sizeOf(node)));
     shownEdges.forEach((edge) => g.setEdge(edge.from_node, edge.to_node));
 
     dagre.layout(g);
 
+    const placed = g.nodes().map((id) => g.node(id));
+    const topY = placed.length ? Math.min(...placed.map((p) => p.y)) : 0;
+    let nextX = placed.filter((p) => p.y === topY).reduce((right, p) => Math.max(right, p.x + p.width / 2), 0);
+    const loosePos: Record<string, { x: number; y: number }> = {};
+    loose.forEach((node) => {
+      const { width } = sizeOf(node);
+      nextX += 28 + width / 2;
+      loosePos[node.id] = { x: nextX, y: topY };
+      nextX += width / 2;
+    });
+
     const newNodes: Node[] = shownNodes.map((node) => {
-      const pos = g.node(node.id) || { x: 0, y: 0 };
+      const pos = g.node(node.id) || loosePos[node.id] || { x: 0, y: 0 };
       const { width, height } = sizeOf(node);
       const customType = node.type === 'identifier' ? 'identifierNode' : 'operationNode';
 
@@ -221,8 +236,8 @@ export const GraphView: React.FC<GraphViewProps> = ({
       const isVulnerableEdge =
         nodeStatesRef.current[edge.to_node] === 'vulnerable' || nodeStatesRef.current[edge.from_node] === 'vulnerable';
 
-      let strokeColor = isPropagated ? '#8fb3c4' : '#8a7d60';
-      if (isVulnerableEdge) strokeColor = '#c8453b';
+      let strokeColor = isPropagated ? '#2c7b94' : '#76764f';
+      if (isVulnerableEdge) strokeColor = '#b3342b';
 
       return {
         id: `e_${edge.from_node}_${edge.to_node}_${idx}`,
@@ -283,8 +298,8 @@ export const GraphView: React.FC<GraphViewProps> = ({
         );
         const isPropagated =
           edgeDef?.provenance === 'propagated' || edgeDef?.provenance === 'heuristic';
-        let strokeColor = isPropagated ? '#8fb3c4' : '#8a7d60';
-        if (isVulnerableEdge) strokeColor = '#c8453b';
+        let strokeColor = isPropagated ? '#2c7b94' : '#76764f';
+        if (isVulnerableEdge) strokeColor = '#b3342b';
 
         const shouldAnimate = edgeDef?.type === 'NESTED_UNDER' || isVulnerableEdge;
         if (e.style?.stroke === strokeColor && e.animated === shouldAnimate) {
@@ -352,7 +367,7 @@ export const GraphView: React.FC<GraphViewProps> = ({
   return (
     <div
       ref={containerRef}
-      className="w-full h-full relative bg-[#110d09] min-h-0"
+      className="w-full h-full relative bg-slate-950 min-h-0"
       style={{ width: '100%', height: '100%' }}
     >
       {/* Fit view button overlay */}
@@ -390,24 +405,11 @@ export const GraphView: React.FC<GraphViewProps> = ({
         }}
         fitView
         fitViewOptions={{ padding: 0.06 }}
-        className="bg-[#110d09]"
+        className="bg-slate-950"
       >
         <FitViewInternal dep={backendNodes} />
-        <Background variant={BackgroundVariant.Dots} gap={18} size={1} color="#30271e" />
-        <Controls
-          showFitView={false}
-          showInteractive={false}
-          fitViewOptions={{ padding: 0.06 }}
-          className="!bg-[#1a150f] !border !border-[#382e23] !rounded-lg text-slate-300 [&>button]:!bg-[#1a150f] [&>button]:!border-b [&>button]:!border-[#372d22] [&>button]:!fill-slate-300 [&>button:hover]:!bg-[#30271e]"
-        />
+        <Background variant={BackgroundVariant.Dots} gap={18} size={1} color="#d9d2ae" />
       </ReactFlow>
-
-      {/* Legend strip */}
-      <div className="absolute bottom-3 left-3 z-10 flex items-center gap-4 text-sm bg-slate-900 px-3 py-1.5 border-2 border-slate-700">
-        <span className="flex items-center gap-1.5 text-slate-300"><span className="w-2.5 h-2.5 bg-amber-500"></span> ID</span>
-        <span className="flex items-center gap-1.5 text-slate-300"><span className="w-2.5 h-2.5 bg-blue-500"></span> Operation</span>
-        <span className="flex items-center gap-1.5 text-slate-300"><span className="w-2.5 h-2.5 bg-rose-500"></span> Leak</span>
-      </div>
     </div>
   );
 };

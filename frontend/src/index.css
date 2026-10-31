@@ -1,118 +1,128 @@
 @import "tailwindcss";
 
 /* ============================================================
-   ELDEN RING x PIXEL: "Site of Grace" theme
-   Palette is applied by overriding Tailwind's colour tokens, so
-   every existing utility (text-emerald-400, bg-rose-950, ...) maps
-   into the Lands Between: gold = grace, crimson = blood, ember = amber.
+   PAPER & GRACE: a light pixel theme
+   Cream paper with a faint grid, near-black pixel type with a lime
+   shadow, gold and moss accents. The scenery lives in the hero banner
+   only; the working panels stay plain so everything is easy to read.
+
+   Tailwind's colour scales are re-mapped so existing utilities keep
+   their meaning but read on paper: 950 is the palest tint and 50 the
+   deepest ink (text-slate-200 is strong text, bg-rose-950 a faint wash).
    ============================================================ */
 @theme {
   --font-sans: "VT323", ui-monospace, monospace;
   --font-mono: "VT323", ui-monospace, monospace;
   --font-display: "Press Start 2P", "VT323", monospace;
-  --color-emerald-50: #fcf0d0;
-  --color-emerald-100: #f7e8c0;
-  --color-emerald-200: #f0dba6;
-  --color-emerald-300: #e3c379;
-  --color-emerald-400: #d4a843;
-  --color-emerald-500: #b08c38;
-  --color-emerald-600: #90722f;
-  --color-emerald-700: #6c5624;
-  --color-emerald-800: #4c3d1b;
-  --color-emerald-900: #302613;
-  --color-emerald-950: #201a0e;
-  --color-cyan-50: #f6f1da;
-  --color-cyan-100: #ebead8;
-  --color-cyan-200: #d8dfd4;
-  --color-cyan-300: #b6cacc;
-  --color-cyan-400: #8fb3c4;
-  --color-cyan-500: #7795a2;
-  --color-cyan-600: #627a84;
-  --color-cyan-700: #4b5b62;
-  --color-cyan-800: #364044;
-  --color-cyan-900: #24282a;
-  --color-cyan-950: #191b1b;
-  --color-amber-50: #fdedce;
-  --color-amber-100: #f9e1bc;
-  --color-amber-200: #f4ce9e;
-  --color-amber-300: #ebab6a;
-  --color-amber-400: #e0832c;
-  --color-amber-500: #ba6d26;
-  --color-amber-600: #985a20;
-  --color-amber-700: #724419;
-  --color-amber-800: #503114;
-  --color-amber-900: #32200e;
-  --color-amber-950: #21160c;
-  --color-rose-50: #fbe8cf;
-  --color-rose-100: #f5d6bf;
-  --color-rose-200: #ecb8a4;
-  --color-rose-300: #db8373;
-  --color-rose-400: #c8453b;
-  --color-rose-500: #a63a32;
-  --color-rose-600: #88312a;
-  --color-rose-700: #662620;
-  --color-rose-800: #481d18;
-  --color-rose-900: #2e1511;
-  --color-rose-950: #1f100d;
-  --color-purple-50: #f7ecda;
-  --color-purple-100: #ede0d7;
-  --color-purple-200: #dccbd2;
-  --color-purple-300: #bda6ca;
-  --color-purple-400: #9a7bc0;
-  --color-purple-500: #80679f;
-  --color-purple-600: #6a5581;
-  --color-purple-700: #504060;
-  --color-purple-800: #392e43;
-  --color-purple-900: #261e29;
-  --color-purple-950: #1a151a;
-  --color-blue-50: #f3eed9;
-  --color-blue-100: #e5e4d6;
-  --color-blue-200: #cdd3cf;
-  --color-blue-300: #a1b6c5;
-  --color-blue-400: #6f93b8;
-  --color-blue-500: #5d7a98;
-  --color-blue-600: #4d647c;
-  --color-blue-700: #3c4c5c;
-  --color-blue-800: #2c3640;
-  --color-blue-900: #1e2328;
-  --color-blue-950: #16181a;
-  --color-slate-50: #f6efdc;
-  --color-slate-100: #efe3c4;
-  --color-slate-200: #d9ccaa;
-  --color-slate-300: #bfb18d;
-  --color-slate-400: #9a8d70;
-  --color-slate-500: #75694f;
-  --color-slate-600: #574d38;
-  --color-slate-700: #3d3526;
-  --color-slate-800: #2b2418;
-  --color-slate-900: #1b160e;
-  --color-slate-950: #100d08;
+  --color-emerald-50: #222714;
+  --color-emerald-100: #293114;
+  --color-emerald-200: #323e14;
+  --color-emerald-300: #405214;
+  --color-emerald-400: #4e6514;
+  --color-emerald-500: #5d7a14;
+  --color-emerald-600: #869a4b;
+  --color-emerald-700: #aebb82;
+  --color-emerald-800: #ced5af;
+  --color-emerald-900: #e5e7ce;
+  --color-emerald-950: #f2f2df;
+  --color-cyan-50: #1b2826;
+  --color-cyan-100: #1d3133;
+  --color-cyan-200: #203f45;
+  --color-cyan-300: #24525e;
+  --color-cyan-400: #286678;
+  --color-cyan-500: #2c7b94;
+  --color-cyan-600: #619bab;
+  --color-cyan-700: #96bcc2;
+  --color-cyan-800: #c0d5d5;
+  --color-cyan-900: #dde7e2;
+  --color-cyan-950: #eef2ea;
+  --color-amber-50: #2c2712;
+  --color-amber-100: #3b3011;
+  --color-amber-200: #4f3d0f;
+  --color-amber-300: #6c4f0d;
+  --color-amber-400: #89610b;
+  --color-amber-500: #a97508;
+  --color-amber-600: #be9742;
+  --color-amber-700: #d4b87c;
+  --color-amber-800: #e5d4ab;
+  --color-amber-900: #f1e6cc;
+  --color-amber-950: #f8f1de;
+  --color-rose-50: #2e1e17;
+  --color-rose-100: #3d201a;
+  --color-rose-200: #53241d;
+  --color-rose-300: #722921;
+  --color-rose-400: #912e26;
+  --color-rose-500: #b3342b;
+  --color-rose-600: #c6665c;
+  --color-rose-700: #d9988e;
+  --color-rose-800: #e8c0b6;
+  --color-rose-900: #f3dcd1;
+  --color-rose-950: #f9ece1;
+  --color-purple-50: #242229;
+  --color-purple-100: #2d2738;
+  --color-purple-200: #392f4c;
+  --color-purple-300: #4a3a6a;
+  --color-purple-400: #5c4687;
+  --color-purple-500: #6f52a8;
+  --color-purple-600: #937cba;
+  --color-purple-700: #b7a7cc;
+  --color-purple-800: #d4c9db;
+  --color-purple-900: #e8e1e5;
+  --color-purple-950: #f3eeeb;
+  --color-blue-50: #1d2528;
+  --color-blue-100: #202c37;
+  --color-blue-200: #25374b;
+  --color-blue-300: #2c4669;
+  --color-blue-400: #335586;
+  --color-blue-500: #3a66a6;
+  --color-blue-600: #6b8cb9;
+  --color-blue-700: #9cb1cc;
+  --color-blue-800: #c4cfda;
+  --color-blue-900: #dfe4e5;
+  --color-blue-950: #eff0eb;
+  --color-slate-50: #12150f;
+  --color-slate-100: #1d2118;
+  --color-slate-200: #2e3220;
+  --color-slate-300: #46472f;
+  --color-slate-400: #5f6040;
+  --color-slate-500: #76764f;
+  --color-slate-600: #c9c29c;
+  --color-slate-700: #e2dbb8;
+  --color-slate-800: #f1ecd2;
+  --color-slate-900: #fbf7e6;
+  --color-slate-950: #fffdf5;
+  --color-white: #181a14;
+  --color-black: #fffcf1;
 }
 
 :root {
-  --ink: #0c0a08;
-  --panel: #14110d;
-  --panel-2: #1b160e;
-  --line: #3d3526;
-  --gold: #d4a843;
-  --gold-hi: #f0d98a;
-  --parchment: #d9ccaa;
-  --blood: #c8453b;
+  --paper: #fffcf1;
+  --card: #fffef8;
+  --ink: #181a14;
+  --ink-soft: #4b5238;
+  --line: #d9d2ae;
+  --line-strong: #b9b28a;
+  --lime: #d8e820;
+  --lime-soft: #f3f8c4;
+  --gold: #e8c060;
+  --gold-deep: #a8873a;
+  --moss: #5d7a14;
+  --blood: #b3342b;
+  --hero-px: 4px;
 }
+@media (max-height: 860px) { :root { --hero-px: 3px; } }
 
 @layer base {
   html { font-size: 18px; }
   body {
-    background-color: var(--ink);
+    background-color: var(--paper);
     background-image:
-      linear-gradient(45deg, rgba(212,168,67,.025) 25%, transparent 25%, transparent 75%, rgba(212,168,67,.025) 75%),
-      linear-gradient(45deg, rgba(212,168,67,.025) 25%, transparent 25%, transparent 75%, rgba(212,168,67,.025) 75%);
-    background-size: 8px 8px;
-    background-position: 0 0, 4px 4px;
-    color: var(--parchment);
+      linear-gradient(rgba(24, 26, 20, .045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(24, 26, 20, .045) 1px, transparent 1px);
+    background-size: 16px 16px;
+    color: var(--ink);
     font-family: "VT323", ui-monospace, monospace;
     font-synthesis: none;
-    -webkit-font-smoothing: none;
     text-rendering: optimizeSpeed;
     letter-spacing: .02em;
   }
@@ -127,6 +137,7 @@
 /* ---------- Type scale: a pixel font needs larger sizes than the original tiny text ---------- */
 [class*="text-[8"], [class*="text-[9px"] { font-size: 14px !important; line-height: 1.1 !important; }
 [class*="text-[10"], [class*="text-[11"] { font-size: 16px !important; line-height: 1.15 !important; }
+[class*="text-[12"], [class*="text-[13"] { font-size: 18px !important; line-height: 1.2 !important; }
 .text-xs { font-size: 17px !important; line-height: 1.2 !important; }
 .text-sm { font-size: 19px !important; }
 .text-base { font-size: 21px !important; }
@@ -135,58 +146,62 @@
 .text-2xl { font-size: 32px !important; }
 .font-display { font-family: var(--font-display) !important; letter-spacing: 0; }
 .panel-title {
+  display: inline-flex; align-items: center; gap: 8px;
   font-family: var(--font-display) !important; font-size: 10px !important; letter-spacing: 0;
-  color: var(--gold) !important; text-transform: uppercase; line-height: 1.4 !important;
+  color: var(--ink) !important; text-transform: uppercase; line-height: 1.4 !important;
+}
+.panel-title::before {
+  content: ""; width: 8px; height: 8px; background: var(--lime); border: 2px solid var(--ink); box-sizing: content-box; flex: none;
 }
 
-/* ---------- Pixel frames: square, 2px borders, hard offset shadow, no blur ---------- */
+/* ---------- Frames: square, 2px lines, hard offset shadow, no blur ---------- */
 [class~="border"] { border-width: 2px; }
-[class*="rounded-xl"], [class*="rounded-2xl"] {
-  box-shadow: 0 0 0 2px #000, 4px 4px 0 2px #000 !important;
+.panel {
+  background: var(--card); border: 2px solid var(--ink); box-shadow: 4px 4px 0 var(--line);
 }
-.shadow-lg, .shadow-xl, .shadow-2xl, .shadow-md, .shadow-sm { box-shadow: 4px 4px 0 #000 !important; }
+.shadow-lg, .shadow-xl, .shadow-2xl, .shadow-md, .shadow-sm { box-shadow: 4px 4px 0 rgba(24, 26, 20, .28) !important; }
 [class*="backdrop-blur"] { backdrop-filter: none !important; }
-[class*="bg-black/"] { background-color: rgba(8, 6, 4, .88) !important; }
+.fixed[class*="bg-black/"] { background-color: rgba(24, 26, 20, .55) !important; }
 
-/* ---------- Buttons: stepped press ---------- */
+/* ---------- Buttons: stepped press, lime shadow like the title ---------- */
 button { transition: none !important; }
-button:not(:disabled):hover { filter: brightness(1.15); }
 button:not(:disabled):active { transform: translate(2px, 2px); }
 button:disabled { cursor: not-allowed; }
 .btn-grace {
-  background: var(--gold); color: #1b160e; border: 2px solid #000;
-  box-shadow: inset -3px -3px 0 #9a7a25, inset 3px 3px 0 var(--gold-hi), 4px 4px 0 #000;
-  font-family: var(--font-display); font-size: 10px; padding: 10px 14px; line-height: 1;
+  background: var(--ink); color: var(--paper); border: 2px solid var(--ink);
+  box-shadow: 4px 4px 0 var(--lime);
+  font-family: var(--font-display); font-size: 10px; padding: 11px 14px; line-height: 1;
   display: inline-flex; align-items: center; gap: 8px;
 }
-.btn-grace:not(:disabled):active { box-shadow: inset 3px 3px 0 #9a7a25, 2px 2px 0 #000; }
-.btn-grace:disabled { opacity: .55; }
+.btn-grace:not(:disabled):hover { background: #2c3a1c; }
+.btn-grace:not(:disabled):active { box-shadow: 2px 2px 0 var(--lime); }
+.btn-grace:disabled { opacity: .5; box-shadow: 4px 4px 0 var(--line); }
 .btn-ghost {
-  background: var(--panel-2); color: var(--parchment); border: 2px solid var(--line);
-  box-shadow: 3px 3px 0 #000; padding: 6px 8px; display: inline-flex; align-items: center; gap: 6px;
+  background: var(--card); color: var(--ink); border: 2px solid var(--ink);
+  box-shadow: 3px 3px 0 var(--line); padding: 5px 8px; display: inline-flex; align-items: center; gap: 6px;
   font-size: 17px; line-height: 1;
 }
-.btn-ghost:not(:disabled):hover { border-color: var(--gold); color: var(--gold-hi); }
-.btn-ghost[aria-pressed="true"] { border-color: var(--gold); color: var(--gold-hi); background: #2b2418; }
+.btn-ghost:not(:disabled):hover { background: var(--lime-soft); }
+.btn-ghost[aria-pressed="true"] { background: var(--lime); }
+.btn-ghost:disabled { opacity: .5; }
 
 /* ---------- Scrollbars ---------- */
 ::-webkit-scrollbar { width: 10px; height: 10px; }
-::-webkit-scrollbar-track { background: var(--ink); border-left: 2px solid var(--line); }
-::-webkit-scrollbar-thumb { background: var(--gold); border: 2px solid var(--ink); }
-::-webkit-scrollbar-thumb:hover { background: var(--gold-hi); }
+::-webkit-scrollbar-track { background: #f4efd8; border-left: 2px solid var(--line); }
+::-webkit-scrollbar-thumb { background: var(--line-strong); border: 2px solid #f4efd8; }
+::-webkit-scrollbar-thumb:hover { background: var(--ink-soft); }
 
 /* ---------- Animations in steps (no smooth easing) ---------- */
-@keyframes pulse-slow { 0%, 100% { opacity: 1; } 50% { opacity: .4; } }
+@keyframes pulse-slow { 0%, 100% { opacity: 1; } 50% { opacity: .45; } }
 .animate-pulse-slow, .animate-pulse { animation: pulse-slow 1.2s steps(2, jump-none) infinite !important; }
 .animate-spin { animation-timing-function: steps(8) !important; }
 
 /* ---------- Checkbox as a pixel box ---------- */
 input[type="checkbox"] {
-  appearance: none; width: 16px; height: 16px; background: var(--ink);
-  border: 2px solid var(--line); display: inline-grid; place-content: center; margin: 0;
+  appearance: none; width: 16px; height: 16px; background: var(--card);
+  border: 2px solid var(--ink); display: inline-grid; place-content: center; margin: 0;
 }
-input[type="checkbox"]:checked { border-color: var(--gold); }
-input[type="checkbox"]:checked::after { content: ""; width: 8px; height: 8px; background: var(--gold); }
+input[type="checkbox"]:checked::after { content: ""; width: 8px; height: 8px; background: var(--ink); }
 
 /* ---------- React Flow ---------- */
 .react-flow__node { visibility: visible !important; font-size: 14px; }
@@ -196,4 +211,61 @@ input[type="checkbox"]:checked::after { content: ""; width: 8px; height: 8px; ba
 .react-flow__node [class*="text-[9"],
 .react-flow__node [class*="text-[10"] { font-size: 14px !important; }
 
-::selection { background: var(--gold); color: var(--ink); }
+::selection { background: var(--lime); color: var(--ink); }
+
+/* ============================================================
+   HERO BANNER: the only place with scenery
+   Everything is sized in "art pixels" (--hero-px) so the pixel art
+   always lands on whole screen pixels.
+   ============================================================ */
+.hero {
+  position: relative; flex: none; overflow: hidden;
+  height: calc(50 * var(--hero-px));
+}
+.hero-scene {
+  position: absolute; bottom: 0; height: calc(50 * var(--hero-px));
+  pointer-events: none; user-select: none;
+}
+.hero-scene img { display: block; height: 100%; width: auto; }
+/* a faint cell grid over the art, one line per art pixel */
+.hero-scene::after {
+  content: ""; position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 252, 241, .16) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 252, 241, .16) 1px, transparent 1px);
+  background-size: var(--hero-px) var(--hero-px);
+}
+.hero-scene--left { left: 0; }
+.hero-scene--right { right: 0; }
+.hero-scene--right::after { background-position: right bottom; }
+.hero-emblem {
+  position: absolute; left: 50%; top: calc(1 * var(--hero-px)); height: calc(30 * var(--hero-px));
+  transform: translateX(-50%); pointer-events: none; user-select: none;
+  animation: ring-glow 5s steps(5) infinite;
+}
+@keyframes ring-glow { 0%, 100% { opacity: .8; } 50% { opacity: 1; } }
+.hero-stack {
+  position: absolute; left: 50%; top: calc(12 * var(--hero-px)); transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center;
+}
+.hero-title { display: block; height: calc(24 * var(--hero-px)); width: auto; }
+.hero-sub {
+  margin-top: calc(2 * var(--hero-px)); display: flex; align-items: center; gap: 12px;
+  font-family: var(--font-display); font-size: 10px; letter-spacing: .32em; color: var(--ink); white-space: nowrap;
+}
+.hero-tag {
+  margin-top: calc(1.5 * var(--hero-px)); font-family: var(--font-display); font-size: 8px; letter-spacing: .14em;
+  color: var(--ink-soft); white-space: nowrap;
+}
+.orn { display: inline-flex; align-items: center; gap: 6px; }
+.orn i { display: block; width: 26px; height: 2px; background: var(--gold); }
+@media (max-height: 860px) { .hero-sub { font-size: 9px; } }
+@media (max-width: 1180px) { .hero-scene { opacity: .4; } }
+@media (max-width: 900px) { .hero-scene, .hero-emblem { display: none; } }
+@media (prefers-reduced-motion: reduce) { .hero-emblem { animation: none; } }
+
+/* ---------- Toolbar under the hero ---------- */
+.toolbar {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; flex: none;
+  min-height: 56px; padding: 8px 20px; background: var(--paper); border-bottom: 2px solid var(--line);
+}

@@ -1,6 +1,7 @@
 # APIGuard: Graph-Guided API Authorization & BOLA Detection Engine
 
 <p align="center">
+  <a href="https://code-breaker-ctrl.github.io/APIGuard/"><img src="https://img.shields.io/badge/Live%20Demo-GitHub%20Pages-10b981?style=flat-square&logo=githubpages&logoColor=white" alt="Live Demo"></a>
   <img src="https://img.shields.io/badge/Python-3.12-3776AB.svg?logo=python&logoColor=white&style=flat-square" alt="Python 3.12">
   <img src="https://img.shields.io/badge/FastAPI-0.115+-009688.svg?logo=fastapi&logoColor=white&style=flat-square" alt="FastAPI">
   <img src="https://img.shields.io/badge/React-19-61DAFB.svg?logo=react&logoColor=black&style=flat-square" alt="React 19">
@@ -28,13 +29,22 @@ Most DAST scanners test endpoints in isolation: they fuzz parameters, receive `4
 
 ---
 
-## 🌐 Live Demo
+## 🌐 Live Hosted Demo
 
-**https://code-breaker-ctrl.github.io/APIGuard/**
+👉 **[Launch APIGuard Live Demo (GitHub Pages)](https://code-breaker-ctrl.github.io/APIGuard/)**
 
-The hosted site is a static build with no backend, so it **replays recorded runs of the real engine** (graph, event stream, findings, dry-run plan and benchmark numbers are all genuine engine output captured by [`scripts/record_demo.py`](scripts/record_demo.py)). The footer says so on every page. Importing your own spec and calling a live model need the local backend; see *Setup & Quick Start* below.
+Try APIGuard directly in your browser with zero installation:
+- ⚡ **Interactive Dependency DAG:** Explore operation and resource dependencies with Dagre auto-layout.
+- 🎯 **Real-Time Audit Replay:** Click **"RUN EXECUTION AUDIT"** to watch live SSE event propagation and node transitions.
+- 🔍 **Differential Inspector:** Inspect leaked victim attributes side-by-side with reproduction cURL commands.
+- 📄 **Executive Audit Report Export:** Download formatted Markdown (`.md`) or printable HTML pentest reports.
+- 📊 **Empirical Benchmark Panel:** Review measured recall, precision, and ablation comparison tables.
 
-Re-record after changing the engine: `python scripts/record_demo.py`. The site redeploys on every push to `main` via `.github/workflows/pages.yml`.
+
+
+> **Note:** The hosted demo replays genuine engine runs captured by [`scripts/record_demo.py`](scripts/record_demo.py). Custom OpenAPI schema ingestion and live model calls require running the backend locally (see *Setup & Quick Start* below).
+
+
 
 ---
 
@@ -227,6 +237,18 @@ cd backend
 python -m app.engine.cli scan --dry-run   # print the plan, send nothing
 python -m app.engine.cli scan             # run the scan (add --mutations for PATCH/DELETE)
 ```
+
+---
+
+## 🗺️ Roadmap (Future Scope)
+
+Planned, not shipped. Full detail in [`docs/ROADMAP.md`](docs/ROADMAP.md).
+
+1. **Make it real:** configurable target, auth profiles (Bearer, API key, OAuth2), body-based and compound identifiers, spec-less discovery from HAR captures.
+2. **Detect more:** BFLA (API5), mass assignment / BOPLA (API3), safe cross-tenant write and delete checks, ID guessability scoring.
+3. **Smarter graph reasoning:** per-edge probabilistic propagation, a request-budget optimiser, a brute-force baseline, randomised benchmark targets.
+4. **Developer workflow:** CI/CD gate, SARIF export, regression guard, a verified auto-fix loop and a pull-request bot.
+5. **Platform:** workspaces and scan history, redacted evidence vault, compliance mapping, plugin SDK.
 
 ---
 

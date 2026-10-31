@@ -244,7 +244,7 @@ python -m app.engine.cli scan             # run the scan (add --mutations for PA
 
 Planned, not shipped. Full detail in [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
-1. **Make it real:** configurable target, auth profiles (Bearer, API key, OAuth2), body-based and compound identifiers, spec-less discovery from HAR captures.
+1. **Make it real:** analyze a GitHub repository from its link, configurable target, auth profiles (Bearer, API key, OAuth2), body-based and compound identifiers, spec-less discovery from HAR captures.
 2. **Detect more:** BFLA (API5), mass assignment / BOPLA (API3), safe cross-tenant write and delete checks, ID guessability scoring.
 3. **Smarter graph reasoning:** per-edge probabilistic propagation, a request-budget optimiser, a brute-force baseline, randomised benchmark targets.
 4. **Developer workflow:** CI/CD gate, SARIF export, regression guard, a verified auto-fix loop and a pull-request bot.

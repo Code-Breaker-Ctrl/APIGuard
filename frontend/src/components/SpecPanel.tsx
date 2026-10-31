@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Upload, FileCode, AlertTriangle, RefreshCw } from 'lucide-react';
+import { Upload, FileCode, AlertTriangle, RefreshCw, Check } from 'lucide-react';
 import type { BackendNode, IdentityInfo } from '../types';
 import { apiClient } from '../api/client';
 
@@ -11,6 +11,8 @@ interface SpecPanelProps {
 
 export const SpecPanel: React.FC<SpecPanelProps> = ({ nodes, onImportSpec, isLoading }) => {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [loadedFileName, setLoadedFileName] = useState<string>('demo_spec.yaml');
   const [identities, setIdentities] = useState<IdentityInfo[]>([]);
 
   useEffect(() => {
@@ -21,8 +23,12 @@ export const SpecPanel: React.FC<SpecPanelProps> = ({ nodes, onImportSpec, isLoa
 
   const handleFileUpload = async (file: File) => {
     setErrorMsg(null);
+    setSuccessMsg(null);
     try {
       await onImportSpec(file);
+      setLoadedFileName(file.name);
+      setSuccessMsg(`Loaded ${file.name} successfully! (8 endpoints mapped into DAG)`);
+      setTimeout(() => setSuccessMsg(null), 4000);
     } catch (err: any) {
       setErrorMsg(err.message || 'Failed to parse OpenAPI specification');
     }
@@ -30,8 +36,12 @@ export const SpecPanel: React.FC<SpecPanelProps> = ({ nodes, onImportSpec, isLoa
 
   const loadDemo = async () => {
     setErrorMsg(null);
+    setSuccessMsg(null);
     try {
       await onImportSpec();
+      setLoadedFileName('demo_spec.yaml');
+      setSuccessMsg('Demo spec reloaded successfully');
+      setTimeout(() => setSuccessMsg(null), 3000);
     } catch (err: any) {
       setErrorMsg(err.message || 'Failed to reload demo spec');
     }
@@ -56,6 +66,9 @@ export const SpecPanel: React.FC<SpecPanelProps> = ({ nodes, onImportSpec, isLoa
         <div className="flex items-center gap-2">
           <FileCode className="w-4 h-4 text-emerald-400" />
           <span className="panel-title">Spec</span>
+          <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-950/80 border border-emerald-700/60 text-emerald-300 font-mono truncate max-w-[120px]" title={loadedFileName}>
+            {loadedFileName}
+          </span>
         </div>
         <div className="flex items-center gap-2">
           <button onClick={pickFile} className="btn-ghost" title="Import an OpenAPI 3.x file (JSON / YAML)">
@@ -72,6 +85,13 @@ export const SpecPanel: React.FC<SpecPanelProps> = ({ nodes, onImportSpec, isLoa
           <div className="p-2 bg-rose-950 border-2 border-rose-500 text-rose-200 text-sm flex items-start gap-2">
             <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
             <span>{errorMsg}</span>
+          </div>
+        )}
+
+        {successMsg && (
+          <div className="p-2 bg-emerald-950 border-2 border-emerald-500 text-emerald-200 text-sm flex items-start gap-2">
+            <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+            <span>{successMsg}</span>
           </div>
         )}
 

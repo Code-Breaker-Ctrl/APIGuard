@@ -93,15 +93,15 @@ async def run_benchmark(
             # Metrics
             g_tp = len([f for f in graph_findings if any(v["endpoint"] == f.endpoint for v in gt_vulns)])
             g_recall = round(g_tp / gt_count, 2) if gt_count > 0 else None
-            g_prec = round(g_tp / len(graph_findings), 2) if graph_findings else (1.0 if gt_count == 0 else 0.0)
+            g_prec = round(g_tp / len(graph_findings), 2) if graph_findings else (1.0 if gt_count == 0 else None)
             g_req_per_find = round(graph_exec.requests_sent / len(graph_findings), 1) if graph_findings else None
-            g_time_to_first = round(t_graph / len(graph_findings), 1) if graph_findings else None
+            g_ms_per_finding = round(t_graph / len(graph_findings), 1) if graph_findings else None
 
             b_tp = len([f for f in base_findings if any(v["endpoint"] == f.endpoint for v in gt_vulns)])
             b_recall = round(b_tp / gt_count, 2) if gt_count > 0 else None
-            b_prec = round(b_tp / len(base_findings), 2) if base_findings else (1.0 if gt_count == 0 else 0.0)
+            b_prec = round(b_tp / len(base_findings), 2) if base_findings else (1.0 if gt_count == 0 else None)
             b_req_per_find = round(base_exec.requests_sent / len(base_findings), 1) if base_findings else None
-            b_time_to_first = round(t_base / len(base_findings), 1) if base_findings else None
+            b_ms_per_finding = round(t_base / len(base_findings), 1) if base_findings else None
 
             total_graph_confirmed += len(graph_findings)
             total_base_confirmed += len(base_findings)
@@ -119,7 +119,7 @@ async def run_benchmark(
                     "precision": g_prec,
                     "requests": graph_exec.requests_sent,
                     "req_per_finding": g_req_per_find,
-                    "time_to_first_ms": g_time_to_first,
+                    "avg_ms_per_finding": g_ms_per_finding,
                     "duration_ms": t_graph
                 },
                 "baseline": {
@@ -128,7 +128,7 @@ async def run_benchmark(
                     "precision": b_prec,
                     "requests": base_exec.requests_sent,
                     "req_per_finding": b_req_per_find,
-                    "time_to_first_ms": b_time_to_first,
+                    "avg_ms_per_finding": b_ms_per_finding,
                     "duration_ms": t_base
                 }
             }
@@ -157,7 +157,7 @@ async def run_benchmark(
         def _ablation_metrics(findings):
             tp = len([f for f in findings if any(v["endpoint"] == f.endpoint for v in gt_b)])
             recall = round(tp / len(gt_b), 2) if gt_b else None
-            precision = round(tp / len(findings), 2) if findings else (1.0 if not gt_b else 0.0)
+            precision = round(tp / len(findings), 2) if findings else (1.0 if not gt_b else None)
             return recall, precision
 
         np_recall, np_precision = _ablation_metrics(no_prop_findings)
@@ -172,7 +172,7 @@ async def run_benchmark(
                 "precision": np_precision,
                 "requests": no_prop_exec.requests_sent,
                 "duration_ms": t_no_prop,
-                "note": "Measured: scanner run with rule propagation disabled on the Defect B variant."
+                "note": "Measured: with propagation off the scanner stops after the main read route and never tests the nested routes."
             },
             "oracle_baseline_on_variant_b": {
                 "name": "Oracle Baseline (Manual Rules Hand-Tagged for Every Route)",
@@ -225,7 +225,7 @@ async def run_benchmark(
             f"*Measured automatically on {summary['timestamp']} against target: `{base_url}`*",
             "",
             "## Variant Comparison Table",
-            "| Variant | GT | Base Confirmed | Base Recall | Base Prec | Base Req/Fnd | APIGuard Confirmed | APIGuard Recall | APIGuard Prec | APIGuard Req/Fnd | Time 1st (ms) |",
+            "| Variant | GT | Base Confirmed | Base Recall | Base Prec | Base Req/Fnd | APIGuard Confirmed | APIGuard Recall | APIGuard Prec | APIGuard Req/Fnd | APIGuard Avg ms/Fnd |",
             "| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |"
         ]
 
@@ -236,10 +236,10 @@ async def run_benchmark(
             g_rec_str = f"{int(g['recall']*100)}%" if g['recall'] is not None else "n/a"
             b_rpf = f"{b['req_per_finding']}" if b['req_per_finding'] is not None else "-"
             g_rpf = f"{g['req_per_finding']}" if g['req_per_finding'] is not None else "-"
-            g_t1 = f"{g['time_to_first_ms']}ms" if g['time_to_first_ms'] is not None else "-"
+            g_ms = f"{g['avg_ms_per_finding']}ms" if g['avg_ms_per_finding'] is not None else "-"
 
             md_lines.append(
-                f"| `{vname}` | {vdata['ground_truth_count']} | {b['confirmed']} | {b_rec_str} | {int(b['precision']*100)}% | {b_rpf} | **{g['confirmed']}** | **{g_rec_str}** | **{int(g['precision']*100)}%** | **{g_rpf}** | {g_t1} |"
+                f"| `{vname}` | {vdata['ground_truth_count']} | {b['confirmed']} | {b_rec_str} | {_pct(b['precision'])} | {b_rpf} | **{g['confirmed']}** | **{g_rec_str}** | **{_pct(g['precision'])}** | **{g_rpf}** | {g_ms} |"
             )
 
         md_lines.extend([
@@ -248,12 +248,13 @@ async def run_benchmark(
             "| Configuration | Confirmed | Recall | Precision | Requests | Notes |",
             "| :--- | :---: | :---: | :---: | :---: | :--- |",
             f"| **APIGuard (Propagation ON)** | {variant_results['variant_b']['graph_guided']['confirmed']} | {_pct(variant_results['variant_b']['graph_guided']['recall'])} | {_pct(variant_results['variant_b']['graph_guided']['precision'])} | {variant_results['variant_b']['graph_guided']['requests']} | Full Graph-Guided Scanner |",
-            f"| **Ablation: Propagation OFF** | {len(no_prop_findings)} | {_pct(np_recall)} | {_pct(np_precision)} | {no_prop_exec.requests_sent} | Rule propagation disabled |",
+            f"| **Ablation: Propagation OFF** | {len(no_prop_findings)} | {_pct(np_recall)} | {_pct(np_precision)} | {no_prop_exec.requests_sent} | Propagation off: stops after the main read route |",
             f"| **Ablation: Oracle Baseline** | {len(oracle_findings)} | {_pct(or_recall)} | {_pct(or_precision)} | {oracle_exec.requests_sent} | Baseline with a manual rule for every route |",
             "",
             "## Key Takeaways",
-            "- **Defect B (Variant `variant_b`):** APIGuard achieves **100% recall** by propagating ownership rules to graph-adjacent operations. Baseline achieves **0% recall** because it evaluates `/export` without DAG context.",
+            "- **Defect B (Variant `variant_b`):** APIGuard achieves **100% recall** by propagating ownership rules to graph-adjacent operations. Baseline achieves **0% recall** because it only tests routes it was given a rule for, and it has none for `/export`.",
             "- **Zero False Positives:** In `variant_secure`, APIGuard maintains **100% precision** with 0 false positives.",
+            "- **Cost:** APIGuard sends more requests than the rules-only baseline because it also tests the nested routes. It finds more; it is not cheaper.",
             "- **Ablation:** See the ablation table above; all values are measured in this run."
         ])
 

@@ -133,8 +133,8 @@ async def test_defect_c_mutation_patch(real_uvicorn_server):
 async def test_zero_false_positives_when_secure_and_patched(real_uvicorn_server):
     """
     Asserts 0 findings when target is fully secure or in patched mode.
-    Exercises verifier traps (/summary returns 200-empty and /audit-log returns 404),
-    confirming neither is flagged.
+    The scans pass through the decoys the spec exposes: /summary (200 with an empty body) and
+    /members (not implemented, so even the owner gets 404). Neither may be flagged.
     """
     auth_reg = AuthRegistry(real_uvicorn_server)
     identities = await auth_reg.authenticate_all()

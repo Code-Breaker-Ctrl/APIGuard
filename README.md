@@ -23,8 +23,8 @@ Most DAST scanners test endpoints in isolation: they fuzz parameters, receive `4
 2. **Dynamic Multi-Identity State Harvest:** Automatically authenticates as **User A (Owner)** to create genuine state and harvest live resource IDs.
 3. **Graph-Guided Policy Inference & Propagation:** Observes authorization enforcement on parent endpoints and propagates candidate ownership policies along DAG edges to adjacent/nested endpoints (e.g., `GET /projects/{project_id}/export`).
 4. **Differential Payload Verification:** Probes the endpoint using **User B's (Attacker's)** credentials. Rather than blindly trusting status codes, it performs differential analysis on response bodies, confirming BOLA only when private owner-linked fields are leaked.
-5. **AI-Driven Surgical Remediation:** Bridges detection to remediation with context-infused prompting. Shows side-by-side comparisons of naive prompts ($v_1$) vs graph-guided prompts ($v_2$), generating production-ready FastAPI patches and Pytest unit tests.
-6. **Executive Audit Report Export:** Instantly exports comprehensive security assessment reports in GitHub-Flavored Markdown (`.md`) or printable executive HTML/PDF with one-click print styling, detailing affected routes, leaked tenant attributes, and cURL repro commands.
+5. **AI-Driven Surgical Remediation:** Bridges detection to remediation with context-infused prompting. Shows side-by-side comparisons of naive prompts ($v_1$) vs graph-guided prompts ($v_2$), generating draft FastAPI patches and pytest tests for a developer to review.
+6. **Executive Audit Report Export:** Instantly exports comprehensive security assessment reports in GitHub-Flavored Markdown (`.md`) or printable HTML (save as PDF from the browser print dialog), detailing affected routes, leaked tenant attributes, and cURL repro commands.
 
 ---
 
@@ -43,7 +43,7 @@ Re-record after changing the engine: `python scripts/record_demo.py`. The site r
 | Screen | Description |
 |---|---|
 | ![Graph Idle](docs/screenshots/01_graph_idle.png) | **React Flow DAG:** Operation, Resource, and Identifier nodes with Dagre auto-layout. |
-| ![Dry Run Preview](docs/screenshots/02_dry_run_table.png) | **Dry-Run Mode:** Planned multi-identity sequence table without sending socket traffic. |
+| ![Dry Run Preview](docs/screenshots/02_dry_run_table.png) | **Dry-Run Mode:** Planned multi-identity sequence table without sending any traffic. |
 | ![Live SSE Scan](docs/screenshots/05_graph_after_scan.png) | **Real-Time Audit:** Streaming console, live SSE event propagation, and red BOLA badge. |
 | ![Differential Finding Detail](docs/screenshots/06_finding_detail.png) | **Differential Inspector:** Aman vs Taaran response diff, leaked fields in red, and repro cURL. |
 | ![Empirical Benchmarks](docs/screenshots/03_benchmark_panel.png) | **Benchmark & Ablations:** 100% recall vs 0% baseline on Defect B, with ablation proofs. |
@@ -54,20 +54,26 @@ Re-record after changing the engine: `python scripts/record_demo.py`. The site r
 
 ## 📊 Measured Benchmark Results
 
-Every metric below was empirically measured against live target sockets (`http://127.0.0.1:8000/target`). Ground truth is loaded from `benchmarks/manifests/*.json` (never accessed by scanners during execution).
+Every metric below was measured by running both scanners against the bundled demo target API (`http://127.0.0.1:8000/target`); requests are delivered in-process, and the integration tests run the same scanners over real sockets. Ground truth is loaded from `benchmarks/manifests/*.json` (never accessed by scanners during execution). The numbers come straight from [`benchmarks/results.json`](benchmarks/results.json).
 
-| Test Variant | Target Description | Ground Truth | Baseline Recall | Baseline Reqs | APIGuard Recall | APIGuard Reqs | Time to 1st |
+| Test Variant | Target Description | Ground Truth | Baseline Recall | Baseline Reqs | APIGuard Recall | APIGuard Reqs | Avg ms / finding |
 |---|---|:---:|:---:|:---:|:---:|:---:|:---:|
-| **Variant A** | Direct BOLA on primary route (`GET /projects/{id}`) | 1 | 100% (1/1) | 7 | **100% (1/1)** | 13 | 15.2 ms |
-| **Variant B** | Indirect BOLA on export (`GET /projects/{id}/export`) | 1 | **0% (0/1)** | 7 | **100% (1/1)** | 13 | 13.0 ms |
-| **Variant C** | Mutation BOLA on update (`PATCH /projects/{id}`) | 1 | 100% (1/1) | 9 | **100% (1/1)** | 15 | 16.4 ms |
-| **Variant All** | Compound multi-defect scenario (A + B + C) | 3 | 67% (2/3) | 9 | **100% (3/3)** | 15 | 8.1 ms |
-| **Variant Secure** | Fully patched target + verifier traps | 0 | n/a (0 FP) | 7 | **n/a (0 FP)** | 11 | n/a |
+| **Variant A** | Direct BOLA on primary route (`GET /projects/{id}`) | 1 | 100% (1/1) | 7 | **100% (1/1)** | 15 | 8.3 ms |
+| **Variant B** | Indirect BOLA on export (`GET /projects/{id}/export`) | 1 | **0% (0/1)** | 7 | **100% (1/1)** | 15 | 6.5 ms |
+| **Variant C** | Mutation BOLA on update (`PATCH /projects/{id}`) | 1 | 100% (1/1) | 7 | **100% (1/1)** | 15 | 11.8 ms |
+| **Variant All** | Compound multi-defect scenario (A + B + C) | 3 | 67% (2/3) | 7 | **100% (3/3)** | 19 | 5.4 ms |
+| **Variant Secure** | Fully patched target + verifier traps | 0 | n/a (0 FP) | 7 | **n/a (0 FP)** | 13 | n/a |
 
 ### 🔬 Controlled Ablation Study
 
-- **Graph Scanner with Propagation OFF:** In our ablation, disabling propagation missed the indirect defect (1 defect, 1 target API).
-- **Oracle Baseline (Hand-Tagged Rules on Every Route):** Matches APIGuard at 100% recall, but requires humans to manually author security rules for every route in advance.
+- **Graph Scanner with Propagation OFF:** the scanner stops after the main read route and never tests the nested routes, so it misses the indirect defect (0 of 1, 6 requests).
+- **Oracle Baseline (Hand-Tagged Rules on Every Route):** Matches APIGuard at 100% recall (9 requests vs 15), but requires a human to write a security rule for every route in advance.
+
+**How to read these numbers**
+- The target and the answer key are ours, so this shows the method works on a controlled case, not real-world accuracy.
+- APIGuard sends **more** requests than the rules-only baseline (15 vs 7 on single-defect variants) because it also tests the nested routes. It finds more; it is not cheaper.
+- The baseline only tests routes it was given a rule for. There is no brute-force "test every route with two users" baseline yet.
+- "Avg ms / finding" is total scan time divided by findings, not time to the first finding.
 
 ---
 
@@ -93,7 +99,7 @@ Every metric below was empirically measured against live target sockets (`http:/
 │   │ Safe HTTP Executor  │◄──┤     TestPlanner     │◄──┤  Inference Engine    │   │
 │   │ (Budget, Allowlist) │   │ (Setup/Ctrl/Probe)  │   │ (DAG Rule Propagate) │   │
 │   └──────────┬──────────┘   └─────────────────────┘   └──────────────────────┘   │
-│              │ HTTP Socket                                                       │
+│              │ HTTP calls                                                        │
 └──────────────┼───────────────────────────────────────────────────────────────────┘
                ▼
 ┌──────────────────────────────────────────────────────────────────────────────────┐
@@ -118,10 +124,10 @@ Every metric below was empirically measured against live target sockets (`http:/
 
 | Category | Status | Details |
 |---|:---:|---|
-| **Real Engine Execution** | **100% Real** | All HTTP requests are executed against real network sockets (`127.0.0.1:8000`). Zero `setTimeout` mocks or hardcoded node arrays. |
+| **Real Engine Execution** | **Real** | Real HTTP requests handled by the real target application. The dashboard and benchmark deliver them in-process (ASGI); the integration tests and CLI use real network sockets. No timer-based mocks or hardcoded node arrays. |
 | **Deterministic Scanner** | **100% Real** | The scanner engine makes **no LLM calls**. Graph traversal, policy evaluation, and differential verification are completely deterministic. |
 | **AI Remediation Engine** | **Supported / Offline Fallback** | LLM via OpenRouter or Gemini (whichever is configured) is used strictly for post-scan surgical remediation ($v_1 \to v_2$). If no API key is provided, a deterministic offline template is badged. |
-| **Safe by Default** | **Working** | Requests are strictly restricted to allowlisted loopback hosts (`127.0.0.1`). Mutating requests (`PATCH`/`DELETE`) are blocked unless explicitly toggled. |
+| **Safe by Default** | **Working** | Requests are strictly restricted to allowlisted loopback hosts (`127.0.0.1`). Mutating requests (`PATCH`/`DELETE`) are blocked unless explicitly toggled. Each scan still creates one test record on the target (the setup step). |
 | **Git Commit History** | **Verified** | Clean, incremental commit history with tests passing at every stage. |
 
 ---
@@ -151,11 +157,15 @@ APIGuard/
 │   ├── src/
 │   │   ├── components/            # GraphView, AuditReportModal, FindingDetail, Modals
 │   │   ├── hooks/                 # useGraph, useScan (real-time SSE streaming)
+│   │   ├── demo/                  # Demo-mode client + recorded fixtures (hosted replay)
 │   │   └── App.tsx                # Main security dashboard
 │   ├── package.json
 │   └── vite.config.ts
 ├── benchmarks/                    # Ground truth manifests and empirical benchmark data
 ├── docs/                          # Architectural docs, screenshots, and demo script
+├── scripts/record_demo.py         # Records real engine runs for the hosted demo
+├── .github/workflows/pages.yml    # Deploys the hosted replay demo to GitHub Pages
+├── pitch.md                       # Hackathon pitch, concepts primer and judge Q&A
 ├── run_prototype.bat              # One-click dual-server launcher for Windows
 └── start.bat                      # Alternative startup runner
 ```
@@ -200,9 +210,20 @@ npm run dev
 ```
 Open `http://127.0.0.1:5173` in your browser.
 
+#### 3. Command line (optional)
+```bash
+cd backend
+python -m app.engine.cli scan --dry-run   # print the plan, send nothing
+python -m app.engine.cli scan             # run the scan (add --mutations for PATCH/DELETE)
+```
+
 ---
 
 ## ⚠️ Known Limitations
-1. **Mock Seed Target:** The bundled vulnerable target uses SQLite for local demonstration simplicity. In enterprise deployment, the scanner attaches via network proxies to staging clusters.
-2. **Identifier Scope:** The prototype extracts runtime resource identifiers primarily from path parameters (`{project_id}`); nested body-based compound keys are planned for upcoming releases.
-3. **Safe Mutation Gate:** Mutating HTTP verbs are turned off by default to protect target data integrity.
+1. **Demo target only:** the scanner is wired to the bundled demo API. The target URL, login flow, resource name (`Project`), owner field (`owner_id`) and create-request body are fixed. Importing another OpenAPI file changes which operations are listed, but scans still run against the demo target. Making the target configurable is the next milestone. The demo target keeps its data in memory.
+2. **Identifier scope:** the prototype extracts runtime resource identifiers primarily from path parameters (`{project_id}`); nested body-based compound keys are planned for upcoming releases.
+3. **Propagation scope:** once the main read route is seen to be owner-only, every other operation that takes an ID is tested. Propagated rules attach a hypothesis and confidence to each result; they do not yet narrow the set of routes tested.
+4. **Safe mutation gate:** mutating HTTP verbs are turned off by default to protect target data integrity. The setup step still creates one test record per scan and leaves it behind.
+5. **Dry run is a preview:** it lists a setup, control and probe step per route. The live scan reuses one created record, so it sends fewer requests.
+6. **Benchmark scope:** measured on our own target with our own answer key, against a baseline that only tests routes it has a rule for.
+7. **Hosted demo is a replay:** the GitHub Pages build replays recorded runs; importing a spec and calling a live model need the local backend.

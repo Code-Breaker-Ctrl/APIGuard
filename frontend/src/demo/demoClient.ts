@@ -52,6 +52,9 @@ export const demoClient = {
   },
 
   async triggerScan(options: { dry_run?: boolean; budget?: number; enable_mutations?: boolean }): Promise<{ scan_id: string }> {
+    if (options.dry_run) {
+      throw new Error('dry_run is not supported on /api/scan; use the dry-run preview');
+    }
     const key = `${patched ? 'patched' : 'vulnerable'}_${options.enable_mutations ? 'mut' : 'safe'}`;
     const recording = data.scans[key];
     const scanId = `scan_demo_${++scanCounter}`;

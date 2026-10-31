@@ -335,7 +335,7 @@
   "session_real_model_call_succeeded": false
  },
  "benchmark": {
-  "timestamp": "2026-10-31T08:59:56Z",
+  "timestamp": "2026-10-31T10:29:24Z",
   "target": "http://127.0.0.1:8000/target",
   "variants_tested": 5,
   "aggregate_metrics": {
@@ -362,8 +362,8 @@
      "precision": 1.0,
      "requests": 15,
      "req_per_finding": 15.0,
-     "time_to_first_ms": 15.4,
-     "duration_ms": 15.4
+     "avg_ms_per_finding": 8.3,
+     "duration_ms": 8.3
     },
     "baseline": {
      "confirmed": 1,
@@ -371,8 +371,8 @@
      "precision": 1.0,
      "requests": 7,
      "req_per_finding": 7.0,
-     "time_to_first_ms": 4.3,
-     "duration_ms": 4.3
+     "avg_ms_per_finding": 3.1,
+     "duration_ms": 3.1
     }
    },
    "variant_b": {
@@ -384,17 +384,17 @@
      "precision": 1.0,
      "requests": 15,
      "req_per_finding": 15.0,
-     "time_to_first_ms": 12.8,
-     "duration_ms": 12.8
+     "avg_ms_per_finding": 6.5,
+     "duration_ms": 6.5
     },
     "baseline": {
      "confirmed": 0,
      "recall": 0.0,
-     "precision": 0.0,
+     "precision": null,
      "requests": 7,
      "req_per_finding": null,
-     "time_to_first_ms": null,
-     "duration_ms": 5.2
+     "avg_ms_per_finding": null,
+     "duration_ms": 3.6
     }
    },
    "variant_c": {
@@ -406,8 +406,8 @@
      "precision": 1.0,
      "requests": 15,
      "req_per_finding": 15.0,
-     "time_to_first_ms": 9.7,
-     "duration_ms": 9.7
+     "avg_ms_per_finding": 11.8,
+     "duration_ms": 11.8
     },
     "baseline": {
      "confirmed": 1,
@@ -415,8 +415,8 @@
      "precision": 1.0,
      "requests": 7,
      "req_per_finding": 7.0,
-     "time_to_first_ms": 4.3,
-     "duration_ms": 4.3
+     "avg_ms_per_finding": 5.1,
+     "duration_ms": 5.1
     }
    },
    "variant_all": {
@@ -428,8 +428,8 @@
      "precision": 1.0,
      "requests": 19,
      "req_per_finding": 6.3,
-     "time_to_first_ms": 5.0,
-     "duration_ms": 14.9
+     "avg_ms_per_finding": 5.4,
+     "duration_ms": 16.1
     },
     "baseline": {
      "confirmed": 2,
@@ -437,8 +437,8 @@
      "precision": 1.0,
      "requests": 7,
      "req_per_finding": 3.5,
-     "time_to_first_ms": 2.2,
-     "duration_ms": 4.5
+     "avg_ms_per_finding": 3.2,
+     "duration_ms": 6.5
     }
    },
    "variant_secure": {
@@ -450,8 +450,8 @@
      "precision": 1.0,
      "requests": 13,
      "req_per_finding": null,
-     "time_to_first_ms": null,
-     "duration_ms": 62.6
+     "avg_ms_per_finding": null,
+     "duration_ms": 11.5
     },
     "baseline": {
      "confirmed": 0,
@@ -459,8 +459,8 @@
      "precision": 1.0,
      "requests": 7,
      "req_per_finding": null,
-     "time_to_first_ms": null,
-     "duration_ms": 6.6
+     "avg_ms_per_finding": null,
+     "duration_ms": 5.6
     }
    }
   },
@@ -470,10 +470,10 @@
     "ground_truth": 1,
     "confirmed": 0,
     "recall": 0.0,
-    "precision": 0.0,
+    "precision": null,
     "requests": 6,
-    "duration_ms": 5.1,
-    "note": "Measured: scanner run with rule propagation disabled on the Defect B variant."
+    "duration_ms": 5.2,
+    "note": "Measured: with propagation off the scanner stops after the main read route and never tests the nested routes."
    },
    "oracle_baseline_on_variant_b": {
     "name": "Oracle Baseline (Manual Rules Hand-Tagged for Every Route)",
@@ -482,7 +482,7 @@
     "recall": 1.0,
     "precision": 1.0,
     "requests": 9,
-    "duration_ms": 5.8,
+    "duration_ms": 7.8,
     "note": "Measured: baseline given a hand-written ownership rule for every route."
    }
   }
@@ -491,7 +491,7 @@
   "false": {
    "planned_steps": [
     {
-     "step_id": "step_setup_f1b0f3",
+     "step_id": "step_setup_c8b7d1",
      "operation_id": "createProject",
      "method": "POST",
      "url": "http://127.0.0.1:8000/target/projects",
@@ -509,7 +509,7 @@
      }
     },
     {
-     "step_id": "step_ctrl_1d2439",
+     "step_id": "step_ctrl_543bf6",
      "operation_id": "getProjectById",
      "method": "GET",
      "url": "http://127.0.0.1:8000/target/projects/{project_id}",
@@ -523,7 +523,7 @@
      "body_preview": {}
     },
     {
-     "step_id": "step_probe_3a7abc",
+     "step_id": "step_probe_4e2bdf",
      "operation_id": "getProjectById",
      "method": "GET",
      "url": "http://127.0.0.1:8000/target/projects/{project_id}",
@@ -537,7 +537,7 @@
      "body_preview": {}
     },
     {
-     "step_id": "step_setup_3168c0",
+     "step_id": "step_setup_e5b464",
      "operation_id": "createProject",
      "method": "POST",
      "url": "http://127.0.0.1:8000/target/projects",
@@ -555,7 +555,7 @@
      }
     },
     {
-     "step_id": "step_ctrl_8a03ea",
+     "step_id": "step_ctrl_399a83",
      "operation_id": "exportProjectBilling",
      "method": "GET",
      "url": "http://127.0.0.1:8000/target/projects/{project_id}/export",
@@ -569,7 +569,7 @@
      "body_preview": {}
     },
     {
-     "step_id": "step_probe_2e740d",
+     "step_id": "step_probe_bf376f",
      "operation_id": "exportProjectBilling",
      "method": "GET",
      "url": "http://127.0.0.1:8000/target/projects/{project_id}/export",
@@ -583,7 +583,7 @@
      "body_preview": {}
     },
     {
-     "step_id": "step_setup_dbf1e8",
+     "step_id": "step_setup_771469",
      "operation_id": "createProject",
      "method": "POST",
      "url": "http://127.0.0.1:8000/target/projects",
@@ -601,7 +601,7 @@
      }
     },
     {
-     "step_id": "step_ctrl_ac9375",
+     "step_id": "step_ctrl_c19cb3",
      "operation_id": "getProjectSummary",
      "method": "GET",
      "url": "http://127.0.0.1:8000/target/projects/{project_id}/summary",
@@ -615,7 +615,7 @@
      "body_preview": {}
     },
     {
-     "step_id": "step_probe_5e81a5",
+     "step_id": "step_probe_6315f3",
      "operation_id": "getProjectSummary",
      "method": "GET",
      "url": "http://127.0.0.1:8000/target/projects/{project_id}/summary",
@@ -629,7 +629,7 @@
      "body_preview": {}
     },
     {
-     "step_id": "step_setup_60dc67",
+     "step_id": "step_setup_053a7e",
      "operation_id": "createProject",
      "method": "POST",
      "url": "http://127.0.0.1:8000/target/projects",
@@ -647,7 +647,7 @@
      }
     },
     {
-     "step_id": "step_ctrl_66a7f9",
+     "step_id": "step_ctrl_d8141b",
      "operation_id": "getProjectMembers",
      "method": "GET",
      "url": "http://127.0.0.1:8000/target/projects/{project_id}/members",
@@ -661,7 +661,7 @@
      "body_preview": {}
     },
     {
-     "step_id": "step_probe_4eb085",
+     "step_id": "step_probe_2eb256",
      "operation_id": "getProjectMembers",
      "method": "GET",
      "url": "http://127.0.0.1:8000/target/projects/{project_id}/members",
@@ -683,7 +683,7 @@
   "true": {
    "planned_steps": [
     {
-     "step_id": "step_ctrl_691b77",
+     "step_id": "step_ctrl_850e97",
      "operation_id": "login",
      "method": "POST",
      "url": "http://127.0.0.1:8000/target/auth/login",
@@ -697,7 +697,7 @@
      "body_preview": {}
     },
     {
-     "step_id": "step_probe_d8d992",
+     "step_id": "step_probe_732cde",
      "operation_id": "login",
      "method": "POST",
      "url": "http://127.0.0.1:8000/target/auth/login",
@@ -711,7 +711,7 @@
      "body_preview": {}
     },
     {
-     "step_id": "step_ctrl_47d4d5",
+     "step_id": "step_ctrl_385924",
      "operation_id": "createProject",
      "method": "POST",
      "url": "http://127.0.0.1:8000/target/projects",
@@ -725,7 +725,7 @@
      "body_preview": {}
     },
     {
-     "step_id": "step_probe_fd28af",
+     "step_id": "step_probe_73c02f",
      "operation_id": "createProject",
      "method": "POST",
      "url": "http://127.0.0.1:8000/target/projects",
@@ -739,7 +739,7 @@
      "body_preview": {}
     },
     {
-     "step_id": "step_setup_1e97e8",
+     "step_id": "step_setup_84d8e3",
      "operation_id": "createProject",
      "method": "POST",
      "url": "http://127.0.0.1:8000/target/projects",
@@ -757,7 +757,7 @@
      }
     },
     {
-     "step_id": "step_ctrl_19e22c",
+     "step_id": "step_ctrl_450452",
      "operation_id": "getProjectById",
      "method": "GET",
      "url": "http://127.0.0.1:8000/target/projects/{project_id}",
@@ -771,7 +771,7 @@
      "body_preview": {}
     },
     {
-     "step_id": "step_probe_33e99a",
+     "step_id": "step_probe_2b4252",
      "operation_id": "getProjectById",
      "method": "GET",
      "url": "http://127.0.0.1:8000/target/projects/{project_id}",
@@ -785,7 +785,7 @@
      "body_preview": {}
     },
     {
-     "step_id": "step_setup_1fa06c",
+     "step_id": "step_setup_619db4",
      "operation_id": "createProject",
      "method": "POST",
      "url": "http://127.0.0.1:8000/target/projects",
@@ -803,7 +803,7 @@
      }
     },
     {
-     "step_id": "step_ctrl_bb50b5",
+     "step_id": "step_ctrl_f7a3aa",
      "operation_id": "updateProject",
      "method": "PATCH",
      "url": "http://127.0.0.1:8000/target/projects/{project_id}",
@@ -817,7 +817,7 @@
      "body_preview": {}
     },
     {
-     "step_id": "step_probe_b70d4c",
+     "step_id": "step_probe_943113",
      "operation_id": "updateProject",
      "method": "PATCH",
      "url": "http://127.0.0.1:8000/target/projects/{project_id}",
@@ -831,7 +831,7 @@
      "body_preview": {}
     },
     {
-     "step_id": "step_setup_45bafb",
+     "step_id": "step_setup_641aa5",
      "operation_id": "createProject",
      "method": "POST",
      "url": "http://127.0.0.1:8000/target/projects",
@@ -849,7 +849,7 @@
      }
     },
     {
-     "step_id": "step_ctrl_f55354",
+     "step_id": "step_ctrl_b1a33c",
      "operation_id": "deleteProject",
      "method": "DELETE",
      "url": "http://127.0.0.1:8000/target/projects/{project_id}",
@@ -863,7 +863,7 @@
      "body_preview": {}
     },
     {
-     "step_id": "step_probe_7670fa",
+     "step_id": "step_probe_c1d562",
      "operation_id": "deleteProject",
      "method": "DELETE",
      "url": "http://127.0.0.1:8000/target/projects/{project_id}",
@@ -877,7 +877,7 @@
      "body_preview": {}
     },
     {
-     "step_id": "step_setup_eaede8",
+     "step_id": "step_setup_235ed8",
      "operation_id": "createProject",
      "method": "POST",
      "url": "http://127.0.0.1:8000/target/projects",
@@ -895,7 +895,7 @@
      }
     },
     {
-     "step_id": "step_ctrl_dc03e4",
+     "step_id": "step_ctrl_2b8076",
      "operation_id": "exportProjectBilling",
      "method": "GET",
      "url": "http://127.0.0.1:8000/target/projects/{project_id}/export",
@@ -909,7 +909,7 @@
      "body_preview": {}
     },
     {
-     "step_id": "step_probe_6f2748",
+     "step_id": "step_probe_c52175",
      "operation_id": "exportProjectBilling",
      "method": "GET",
      "url": "http://127.0.0.1:8000/target/projects/{project_id}/export",
@@ -923,7 +923,7 @@
      "body_preview": {}
     },
     {
-     "step_id": "step_setup_8ca789",
+     "step_id": "step_setup_2f7954",
      "operation_id": "createProject",
      "method": "POST",
      "url": "http://127.0.0.1:8000/target/projects",
@@ -941,7 +941,7 @@
      }
     },
     {
-     "step_id": "step_ctrl_ca5d99",
+     "step_id": "step_ctrl_15ab30",
      "operation_id": "getProjectSummary",
      "method": "GET",
      "url": "http://127.0.0.1:8000/target/projects/{project_id}/summary",
@@ -955,7 +955,7 @@
      "body_preview": {}
     },
     {
-     "step_id": "step_probe_46d3b0",
+     "step_id": "step_probe_a031da",
      "operation_id": "getProjectSummary",
      "method": "GET",
      "url": "http://127.0.0.1:8000/target/projects/{project_id}/summary",
@@ -969,7 +969,7 @@
      "body_preview": {}
     },
     {
-     "step_id": "step_setup_b9ecd5",
+     "step_id": "step_setup_37751d",
      "operation_id": "createProject",
      "method": "POST",
      "url": "http://127.0.0.1:8000/target/projects",
@@ -987,7 +987,7 @@
      }
     },
     {
-     "step_id": "step_ctrl_28dabf",
+     "step_id": "step_ctrl_78fdb7",
      "operation_id": "getProjectMembers",
      "method": "GET",
      "url": "http://127.0.0.1:8000/target/projects/{project_id}/members",
@@ -1001,7 +1001,7 @@
      "body_preview": {}
     },
     {
-     "step_id": "step_probe_8adf23",
+     "step_id": "step_probe_4edf47",
      "operation_id": "getProjectMembers",
      "method": "GET",
      "url": "http://127.0.0.1:8000/target/projects/{project_id}/members",
@@ -1025,18 +1025,18 @@
   "vulnerable_safe": {
    "events": [
     {
-     "event_id": "ev_49db1e",
-     "scan_id": "scan_5d602aac",
-     "timestamp": 1793420485.3119133,
+     "event_id": "ev_a21ed6",
+     "scan_id": "scan_5a70893e",
+     "timestamp": 1793422765.992216,
      "event_type": "log",
      "phase": "A",
      "message": "[AUTH] Successfully acquired dynamic tokens for User A (aman@acme.corp) and User B (taaran@adversary.io)",
      "data": null
     },
     {
-     "event_id": "ev_69fd19",
-     "scan_id": "scan_5d602aac",
-     "timestamp": 1793420485.321412,
+     "event_id": "ev_ed9fb5",
+     "scan_id": "scan_5a70893e",
+     "timestamp": 1793422765.992216,
      "event_type": "request_sent",
      "phase": "A",
      "message": "[SETUP] Sending POST http://127.0.0.1:8000/target/projects as usr_aman_101",
@@ -1052,17 +1052,17 @@
      }
     },
     {
-     "event_id": "ev_944f65",
-     "scan_id": "scan_5d602aac",
-     "timestamp": 1793420485.3313358,
+     "event_id": "ev_48803f",
+     "scan_id": "scan_5a70893e",
+     "timestamp": 1793422766.0091224,
      "event_type": "response_received",
      "phase": "A",
-     "message": "[SETUP] Received HTTP 201 for POST http://127.0.0.1:8000/target/projects (1.14ms)",
+     "message": "[SETUP] Received HTTP 201 for POST http://127.0.0.1:8000/target/projects (1.34ms)",
      "data": {
       "step_id": "harvest_createProject",
       "operation_id": "createProject",
       "status_code": 201,
-      "duration_ms": 1.14,
+      "duration_ms": 1.34,
       "headers": {
        "content-length": "247",
        "content-type": "application/json"
@@ -1070,9 +1070,9 @@
      }
     },
     {
-     "event_id": "ev_16fc4e",
-     "scan_id": "scan_5d602aac",
-     "timestamp": 1793420485.3389666,
+     "event_id": "ev_44d565",
+     "scan_id": "scan_5a70893e",
+     "timestamp": 1793422766.0091224,
      "event_type": "request_sent",
      "phase": "A",
      "message": "[CONTROL_OWNER] Sending GET http://127.0.0.1:8000/target/projects/proj_43 as usr_aman_101",
@@ -1088,17 +1088,17 @@
      }
     },
     {
-     "event_id": "ev_11eee0",
-     "scan_id": "scan_5d602aac",
-     "timestamp": 1793420485.3472192,
+     "event_id": "ev_1adabb",
+     "scan_id": "scan_5a70893e",
+     "timestamp": 1793422766.0313075,
      "event_type": "response_received",
      "phase": "A",
-     "message": "[CONTROL_OWNER] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43 (0.79ms)",
+     "message": "[CONTROL_OWNER] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43 (1.21ms)",
      "data": {
       "step_id": "ctrl_getProjectById",
       "operation_id": "getProjectById",
       "status_code": 200,
-      "duration_ms": 0.79,
+      "duration_ms": 1.21,
       "headers": {
        "content-length": "247",
        "content-type": "application/json"
@@ -1106,9 +1106,9 @@
      }
     },
     {
-     "event_id": "ev_a1ee01",
-     "scan_id": "scan_5d602aac",
-     "timestamp": 1793420485.3563333,
+     "event_id": "ev_abfeb3",
+     "scan_id": "scan_5a70893e",
+     "timestamp": 1793422766.0313075,
      "event_type": "request_sent",
      "phase": "B",
      "message": "[PROBE_ADVERSARY] Sending GET http://127.0.0.1:8000/target/projects/proj_43 as usr_taaran_202",
@@ -1124,17 +1124,17 @@
      }
     },
     {
-     "event_id": "ev_3f1720",
-     "scan_id": "scan_5d602aac",
-     "timestamp": 1793420485.3634312,
+     "event_id": "ev_81e431",
+     "scan_id": "scan_5a70893e",
+     "timestamp": 1793422766.0505226,
      "event_type": "response_received",
      "phase": "B",
-     "message": "[PROBE_ADVERSARY] Received HTTP 403 for GET http://127.0.0.1:8000/target/projects/proj_43 (1.04ms)",
+     "message": "[PROBE_ADVERSARY] Received HTTP 403 for GET http://127.0.0.1:8000/target/projects/proj_43 (1.36ms)",
      "data": {
       "step_id": "probe_getProjectById",
       "operation_id": "getProjectById",
       "status_code": 403,
-      "duration_ms": 1.04,
+      "duration_ms": 1.36,
       "headers": {
        "content-length": "51",
        "content-type": "application/json"
@@ -1142,9 +1142,9 @@
      }
     },
     {
-     "event_id": "ev_ced168",
-     "scan_id": "scan_5d602aac",
-     "timestamp": 1793420485.371521,
+     "event_id": "ev_2e1da3",
+     "scan_id": "scan_5a70893e",
+     "timestamp": 1793422766.0588756,
      "event_type": "probe_denied",
      "phase": "A",
      "message": "[VERIFIER] Access denied for unauthorized probe on /projects/{project_id} (HTTP 403)",
@@ -1155,57 +1155,57 @@
      }
     },
     {
-     "event_id": "ev_6fc651",
-     "scan_id": "scan_5d602aac",
-     "timestamp": 1793420485.3784714,
+     "event_id": "ev_8726d5",
+     "scan_id": "scan_5a70893e",
+     "timestamp": 1793422766.0588756,
      "event_type": "hypothesis_validated",
      "phase": "A",
      "message": "[INFERENCE] Validated rule 'owner_only' on GET /projects/{project_id}",
      "data": {
-      "hypothesis_id": "hyp_5e19d2d2",
+      "hypothesis_id": "hyp_b76de053",
       "confidence": 0.85
      }
     },
     {
-     "event_id": "ev_384d31",
-     "scan_id": "scan_5d602aac",
-     "timestamp": 1793420485.3872068,
-     "event_type": "hypothesis_propagated",
-     "phase": "B",
-     "message": "[PROPAGATION] Propagated candidate ownership rule to exportProjectBilling",
-     "data": {
-      "candidate_id": "hyp_prop_2f93899e",
-      "confidence": 0.5
-     }
-    },
-    {
-     "event_id": "ev_599cbd",
-     "scan_id": "scan_5d602aac",
-     "timestamp": 1793420485.390301,
+     "event_id": "ev_82e1f2",
+     "scan_id": "scan_5a70893e",
+     "timestamp": 1793422766.0761578,
      "event_type": "hypothesis_propagated",
      "phase": "B",
      "message": "[PROPAGATION] Propagated candidate ownership rule to getProjectMembers",
      "data": {
-      "candidate_id": "hyp_prop_cb0cf559",
+      "candidate_id": "hyp_prop_1c6d3ae7",
       "confidence": 0.5
      }
     },
     {
-     "event_id": "ev_63ca80",
-     "scan_id": "scan_5d602aac",
-     "timestamp": 1793420485.4030528,
+     "event_id": "ev_1d4b42",
+     "scan_id": "scan_5a70893e",
+     "timestamp": 1793422766.093285,
      "event_type": "hypothesis_propagated",
      "phase": "B",
      "message": "[PROPAGATION] Propagated candidate ownership rule to getProjectSummary",
      "data": {
-      "candidate_id": "hyp_prop_25778e3d",
+      "candidate_id": "hyp_prop_187a9c7e",
       "confidence": 0.5
      }
     },
     {
-     "event_id": "ev_e11bfa",
-     "scan_id": "scan_5d602aac",
-     "timestamp": 1793420485.4105663,
+     "event_id": "ev_41452f",
+     "scan_id": "scan_5a70893e",
+     "timestamp": 1793422766.093285,
+     "event_type": "hypothesis_propagated",
+     "phase": "B",
+     "message": "[PROPAGATION] Propagated candidate ownership rule to exportProjectBilling",
+     "data": {
+      "candidate_id": "hyp_prop_76fc9648",
+      "confidence": 0.5
+     }
+    },
+    {
+     "event_id": "ev_af80c1",
+     "scan_id": "scan_5a70893e",
+     "timestamp": 1793422766.1085255,
      "event_type": "request_sent",
      "phase": "A",
      "message": "[CONTROL_OWNER] Sending GET http://127.0.0.1:8000/target/projects/proj_43/export as usr_aman_101",
@@ -1221,17 +1221,17 @@
      }
     },
     {
-     "event_id": "ev_d7c46b",
-     "scan_id": "scan_5d602aac",
-     "timestamp": 1793420485.4180288,
+     "event_id": "ev_526b47",
+     "scan_id": "scan_5a70893e",
+     "timestamp": 1793422766.1256192,
      "event_type": "response_received",
      "phase": "A",
-     "message": "[CONTROL_OWNER] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43/export (0.81ms)",
+     "message": "[CONTROL_OWNER] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43/export (1.82ms)",
      "data": {
       "step_id": "ctrl_exportProjectBilling",
       "operation_id": "exportProjectBilling",
       "status_code": 200,
-      "duration_ms": 0.81,
+      "duration_ms": 1.82,
       "headers": {
        "content-length": "155",
        "content-type": "application/json"
@@ -1239,9 +1239,9 @@
      }
     },
     {
-     "event_id": "ev_4c8161",
-     "scan_id": "scan_5d602aac",
-     "timestamp": 1793420485.4213264,
+     "event_id": "ev_1fbf1f",
+     "scan_id": "scan_5a70893e",
+     "timestamp": 1793422766.1271331,
      "event_type": "request_sent",
      "phase": "B",
      "message": "[PROBE_ADVERSARY] Sending GET http://127.0.0.1:8000/target/projects/proj_43/export as usr_taaran_202",
@@ -1257,17 +1257,17 @@
      }
     },
     {
-     "event_id": "ev_3e2265",
-     "scan_id": "scan_5d602aac",
-     "timestamp": 1793420485.4298186,
+     "event_id": "ev_08df3f",
+     "scan_id": "scan_5a70893e",
+     "timestamp": 1793422766.1527185,
      "event_type": "response_received",
      "phase": "B",
-     "message": "[PROBE_ADVERSARY] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43/export (0.81ms)",
+     "message": "[PROBE_ADVERSARY] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43/export (1.32ms)",
      "data": {
       "step_id": "probe_exportProjectBilling",
       "operation_id": "exportProjectBilling",
       "status_code": 200,
-      "duration_ms": 0.81,
+      "duration_ms": 1.32,
       "headers": {
        "content-length": "155",
        "content-type": "application/json"
@@ -1275,14 +1275,14 @@
      }
     },
     {
-     "event_id": "ev_5ed660",
-     "scan_id": "scan_5d602aac",
-     "timestamp": 1793420485.4423869,
+     "event_id": "ev_01ef73",
+     "scan_id": "scan_5a70893e",
+     "timestamp": 1793422766.1585705,
      "event_type": "finding_confirmed",
      "phase": "C",
      "message": "[ALERT] Confirmed BOLA at GET /projects/{project_id}/export",
      "data": {
-      "id": "fnd_bola_5c4069",
+      "id": "fnd_bola_cdce8d",
       "endpoint": "/projects/{project_id}/export",
       "method": "GET",
       "resource_type": "Project",
@@ -1294,7 +1294,7 @@
        "probe": "usr_taaran_202"
       },
       "hypothesis": {
-       "id": "hyp_prop_2f93899e",
+       "id": "hyp_prop_76fc9648",
        "rule": {
         "rule_type": "owner_only",
         "resource_type": "Project",
@@ -1359,9 +1359,9 @@
      }
     },
     {
-     "event_id": "ev_7d70bc",
-     "scan_id": "scan_5d602aac",
-     "timestamp": 1793420485.450763,
+     "event_id": "ev_9501ba",
+     "scan_id": "scan_5a70893e",
+     "timestamp": 1793422766.1753192,
      "event_type": "request_sent",
      "phase": "A",
      "message": "[CONTROL_OWNER] Sending GET http://127.0.0.1:8000/target/projects/proj_43/summary as usr_aman_101",
@@ -1377,17 +1377,17 @@
      }
     },
     {
-     "event_id": "ev_6356e2",
-     "scan_id": "scan_5d602aac",
-     "timestamp": 1793420485.456755,
+     "event_id": "ev_585a84",
+     "scan_id": "scan_5a70893e",
+     "timestamp": 1793422766.1753192,
      "event_type": "response_received",
      "phase": "A",
-     "message": "[CONTROL_OWNER] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43/summary (0.85ms)",
+     "message": "[CONTROL_OWNER] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43/summary (1.7ms)",
      "data": {
       "step_id": "ctrl_getProjectSummary",
       "operation_id": "getProjectSummary",
       "status_code": 200,
-      "duration_ms": 0.85,
+      "duration_ms": 1.7,
       "headers": {
        "content-length": "35",
        "content-type": "application/json"
@@ -1395,9 +1395,9 @@
      }
     },
     {
-     "event_id": "ev_b777f9",
-     "scan_id": "scan_5d602aac",
-     "timestamp": 1793420485.4674873,
+     "event_id": "ev_dafc2d",
+     "scan_id": "scan_5a70893e",
+     "timestamp": 1793422766.1919408,
      "event_type": "request_sent",
      "phase": "B",
      "message": "[PROBE_ADVERSARY] Sending GET http://127.0.0.1:8000/target/projects/proj_43/summary as usr_taaran_202",
@@ -1413,17 +1413,17 @@
      }
     },
     {
-     "event_id": "ev_a4847e",
-     "scan_id": "scan_5d602aac",
-     "timestamp": 1793420485.4754426,
+     "event_id": "ev_a37e20",
+     "scan_id": "scan_5a70893e",
+     "timestamp": 1793422766.2085912,
      "event_type": "response_received",
      "phase": "B",
-     "message": "[PROBE_ADVERSARY] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43/summary (0.81ms)",
+     "message": "[PROBE_ADVERSARY] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43/summary (1.53ms)",
      "data": {
       "step_id": "probe_getProjectSummary",
       "operation_id": "getProjectSummary",
       "status_code": 200,
-      "duration_ms": 0.81,
+      "duration_ms": 1.53,
       "headers": {
        "content-length": "2",
        "content-type": "application/json"
@@ -1431,9 +1431,9 @@
      }
     },
     {
-     "event_id": "ev_b87e04",
-     "scan_id": "scan_5d602aac",
-     "timestamp": 1793420485.4840434,
+     "event_id": "ev_80f5b6",
+     "scan_id": "scan_5a70893e",
+     "timestamp": 1793422766.2239237,
      "event_type": "probe_denied",
      "phase": "C",
      "message": "[VERIFIER] Trap evaluated on /projects/{project_id}/summary: empty response (no leak)",
@@ -1445,9 +1445,9 @@
      }
     },
     {
-     "event_id": "ev_f3bf57",
-     "scan_id": "scan_5d602aac",
-     "timestamp": 1793420485.4878318,
+     "event_id": "ev_e8235e",
+     "scan_id": "scan_5a70893e",
+     "timestamp": 1793422766.2283094,
      "event_type": "request_sent",
      "phase": "A",
      "message": "[CONTROL_OWNER] Sending GET http://127.0.0.1:8000/target/projects/proj_43/members as usr_aman_101",
@@ -1463,17 +1463,17 @@
      }
     },
     {
-     "event_id": "ev_4279ca",
-     "scan_id": "scan_5d602aac",
-     "timestamp": 1793420485.4990528,
+     "event_id": "ev_2bee47",
+     "scan_id": "scan_5a70893e",
+     "timestamp": 1793422766.242118,
      "event_type": "response_received",
      "phase": "A",
-     "message": "[CONTROL_OWNER] Received HTTP 404 for GET http://127.0.0.1:8000/target/projects/proj_43/members (0.53ms)",
+     "message": "[CONTROL_OWNER] Received HTTP 404 for GET http://127.0.0.1:8000/target/projects/proj_43/members (0.93ms)",
      "data": {
       "step_id": "ctrl_getProjectMembers",
       "operation_id": "getProjectMembers",
       "status_code": 404,
-      "duration_ms": 0.53,
+      "duration_ms": 0.93,
       "headers": {
        "content-length": "22",
        "content-type": "application/json"
@@ -1481,9 +1481,9 @@
      }
     },
     {
-     "event_id": "ev_e3bda3",
-     "scan_id": "scan_5d602aac",
-     "timestamp": 1793420485.5093234,
+     "event_id": "ev_a74e23",
+     "scan_id": "scan_5a70893e",
+     "timestamp": 1793422766.259063,
      "event_type": "test_inconclusive",
      "phase": "B",
      "message": "control failed (404), test inconclusive",
@@ -1495,9 +1495,9 @@
      }
     },
     {
-     "event_id": "ev_e156ed",
-     "scan_id": "scan_5d602aac",
-     "timestamp": 1793420485.5195181,
+     "event_id": "ev_e4dcdb",
+     "scan_id": "scan_5a70893e",
+     "timestamp": 1793422766.281929,
      "event_type": "scan_completed",
      "phase": "C",
      "message": "[DONE] Audit finished. 1 confirmed vulnerabilities recorded.",
@@ -1508,7 +1508,7 @@
    ],
    "findings": [
     {
-     "id": "fnd_bola_5c4069",
+     "id": "fnd_bola_cdce8d",
      "endpoint": "/projects/{project_id}/export",
      "method": "GET",
      "resource_type": "Project",
@@ -1520,7 +1520,7 @@
       "probe": "usr_taaran_202"
      },
      "hypothesis": {
-      "id": "hyp_prop_2f93899e",
+      "id": "hyp_prop_76fc9648",
       "rule": {
        "rule_type": "owner_only",
        "resource_type": "Project",
@@ -1588,18 +1588,18 @@
   "vulnerable_mut": {
    "events": [
     {
-     "event_id": "ev_a8c9f5",
-     "scan_id": "scan_426af1be",
-     "timestamp": 1793420485.5783346,
+     "event_id": "ev_b9eb69",
+     "scan_id": "scan_3896be44",
+     "timestamp": 1793422766.360908,
      "event_type": "log",
      "phase": "A",
      "message": "[AUTH] Successfully acquired dynamic tokens for User A (aman@acme.corp) and User B (taaran@adversary.io)",
      "data": null
     },
     {
-     "event_id": "ev_273412",
-     "scan_id": "scan_426af1be",
-     "timestamp": 1793420485.5880883,
+     "event_id": "ev_e104ee",
+     "scan_id": "scan_3896be44",
+     "timestamp": 1793422766.3639743,
      "event_type": "request_sent",
      "phase": "A",
      "message": "[SETUP] Sending POST http://127.0.0.1:8000/target/projects as usr_aman_101",
@@ -1615,17 +1615,17 @@
      }
     },
     {
-     "event_id": "ev_e65bc9",
-     "scan_id": "scan_426af1be",
-     "timestamp": 1793420485.5922427,
+     "event_id": "ev_20c92b",
+     "scan_id": "scan_3896be44",
+     "timestamp": 1793422766.3758173,
      "event_type": "response_received",
      "phase": "A",
-     "message": "[SETUP] Received HTTP 201 for POST http://127.0.0.1:8000/target/projects (0.86ms)",
+     "message": "[SETUP] Received HTTP 201 for POST http://127.0.0.1:8000/target/projects (1.19ms)",
      "data": {
       "step_id": "harvest_createProject",
       "operation_id": "createProject",
       "status_code": 201,
-      "duration_ms": 0.86,
+      "duration_ms": 1.19,
       "headers": {
        "content-length": "247",
        "content-type": "application/json"
@@ -1633,9 +1633,9 @@
      }
     },
     {
-     "event_id": "ev_07086a",
-     "scan_id": "scan_426af1be",
-     "timestamp": 1793420485.6037276,
+     "event_id": "ev_2d8314",
+     "scan_id": "scan_3896be44",
+     "timestamp": 1793422766.3758173,
      "event_type": "request_sent",
      "phase": "A",
      "message": "[CONTROL_OWNER] Sending GET http://127.0.0.1:8000/target/projects/proj_43 as usr_aman_101",
@@ -1651,17 +1651,17 @@
      }
     },
     {
-     "event_id": "ev_9be890",
-     "scan_id": "scan_426af1be",
-     "timestamp": 1793420485.611765,
+     "event_id": "ev_d3619b",
+     "scan_id": "scan_3896be44",
+     "timestamp": 1793422766.392093,
      "event_type": "response_received",
      "phase": "A",
-     "message": "[CONTROL_OWNER] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43 (0.77ms)",
+     "message": "[CONTROL_OWNER] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43 (1.16ms)",
      "data": {
       "step_id": "ctrl_getProjectById",
       "operation_id": "getProjectById",
       "status_code": 200,
-      "duration_ms": 0.77,
+      "duration_ms": 1.16,
       "headers": {
        "content-length": "247",
        "content-type": "application/json"
@@ -1669,9 +1669,9 @@
      }
     },
     {
-     "event_id": "ev_05a842",
-     "scan_id": "scan_426af1be",
-     "timestamp": 1793420485.6191905,
+     "event_id": "ev_fbb75f",
+     "scan_id": "scan_3896be44",
+     "timestamp": 1793422766.392093,
      "event_type": "request_sent",
      "phase": "B",
      "message": "[PROBE_ADVERSARY] Sending GET http://127.0.0.1:8000/target/projects/proj_43 as usr_taaran_202",
@@ -1687,17 +1687,17 @@
      }
     },
     {
-     "event_id": "ev_6d3a5c",
-     "scan_id": "scan_426af1be",
-     "timestamp": 1793420485.6273167,
+     "event_id": "ev_538aed",
+     "scan_id": "scan_3896be44",
+     "timestamp": 1793422766.4087117,
      "event_type": "response_received",
      "phase": "B",
-     "message": "[PROBE_ADVERSARY] Received HTTP 403 for GET http://127.0.0.1:8000/target/projects/proj_43 (1.06ms)",
+     "message": "[PROBE_ADVERSARY] Received HTTP 403 for GET http://127.0.0.1:8000/target/projects/proj_43 (1.66ms)",
      "data": {
       "step_id": "probe_getProjectById",
       "operation_id": "getProjectById",
       "status_code": 403,
-      "duration_ms": 1.06,
+      "duration_ms": 1.66,
       "headers": {
        "content-length": "51",
        "content-type": "application/json"
@@ -1705,9 +1705,9 @@
      }
     },
     {
-     "event_id": "ev_802802",
-     "scan_id": "scan_426af1be",
-     "timestamp": 1793420485.6363132,
+     "event_id": "ev_1c04f1",
+     "scan_id": "scan_3896be44",
+     "timestamp": 1793422766.4294856,
      "event_type": "probe_denied",
      "phase": "A",
      "message": "[VERIFIER] Access denied for unauthorized probe on /projects/{project_id} (HTTP 403)",
@@ -1718,57 +1718,57 @@
      }
     },
     {
-     "event_id": "ev_dc2e6d",
-     "scan_id": "scan_426af1be",
-     "timestamp": 1793420485.6441045,
+     "event_id": "ev_fb427d",
+     "scan_id": "scan_3896be44",
+     "timestamp": 1793422766.4294856,
      "event_type": "hypothesis_validated",
      "phase": "A",
      "message": "[INFERENCE] Validated rule 'owner_only' on GET /projects/{project_id}",
      "data": {
-      "hypothesis_id": "hyp_85f47fb5",
+      "hypothesis_id": "hyp_7a74a2f5",
       "confidence": 0.85
      }
     },
     {
-     "event_id": "ev_499ef9",
-     "scan_id": "scan_426af1be",
-     "timestamp": 1793420485.6497483,
-     "event_type": "hypothesis_propagated",
-     "phase": "B",
-     "message": "[PROPAGATION] Propagated candidate ownership rule to exportProjectBilling",
-     "data": {
-      "candidate_id": "hyp_prop_ddeaac3b",
-      "confidence": 0.5
-     }
-    },
-    {
-     "event_id": "ev_460cd4",
-     "scan_id": "scan_426af1be",
-     "timestamp": 1793420485.6580687,
+     "event_id": "ev_f33e7f",
+     "scan_id": "scan_3896be44",
+     "timestamp": 1793422766.4428895,
      "event_type": "hypothesis_propagated",
      "phase": "B",
      "message": "[PROPAGATION] Propagated candidate ownership rule to getProjectMembers",
      "data": {
-      "candidate_id": "hyp_prop_f2fa9bd0",
+      "candidate_id": "hyp_prop_f30e0940",
       "confidence": 0.5
      }
     },
     {
-     "event_id": "ev_889246",
-     "scan_id": "scan_426af1be",
-     "timestamp": 1793420485.6678934,
+     "event_id": "ev_04af6e",
+     "scan_id": "scan_3896be44",
+     "timestamp": 1793422766.4588754,
      "event_type": "hypothesis_propagated",
      "phase": "B",
      "message": "[PROPAGATION] Propagated candidate ownership rule to getProjectSummary",
      "data": {
-      "candidate_id": "hyp_prop_d0ac0c2b",
+      "candidate_id": "hyp_prop_10a699da",
       "confidence": 0.5
      }
     },
     {
-     "event_id": "ev_44fb6d",
-     "scan_id": "scan_426af1be",
-     "timestamp": 1793420485.6743867,
+     "event_id": "ev_70eeb0",
+     "scan_id": "scan_3896be44",
+     "timestamp": 1793422766.4628274,
+     "event_type": "hypothesis_propagated",
+     "phase": "B",
+     "message": "[PROPAGATION] Propagated candidate ownership rule to exportProjectBilling",
+     "data": {
+      "candidate_id": "hyp_prop_0b746b8d",
+      "confidence": 0.5
+     }
+    },
+    {
+     "event_id": "ev_003000",
+     "scan_id": "scan_3896be44",
+     "timestamp": 1793422766.4753022,
      "event_type": "request_sent",
      "phase": "A",
      "message": "[CONTROL_OWNER] Sending GET http://127.0.0.1:8000/target/projects/proj_43/export as usr_aman_101",
@@ -1784,17 +1784,17 @@
      }
     },
     {
-     "event_id": "ev_d020e0",
-     "scan_id": "scan_426af1be",
-     "timestamp": 1793420485.6850889,
+     "event_id": "ev_29cb3a",
+     "scan_id": "scan_3896be44",
+     "timestamp": 1793422766.4968348,
      "event_type": "response_received",
      "phase": "A",
-     "message": "[CONTROL_OWNER] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43/export (0.8ms)",
+     "message": "[CONTROL_OWNER] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43/export (1.58ms)",
      "data": {
       "step_id": "ctrl_exportProjectBilling",
       "operation_id": "exportProjectBilling",
       "status_code": 200,
-      "duration_ms": 0.8,
+      "duration_ms": 1.58,
       "headers": {
        "content-length": "155",
        "content-type": "application/json"
@@ -1802,9 +1802,9 @@
      }
     },
     {
-     "event_id": "ev_f4d7e1",
-     "scan_id": "scan_426af1be",
-     "timestamp": 1793420485.6904156,
+     "event_id": "ev_941e9f",
+     "scan_id": "scan_3896be44",
+     "timestamp": 1793422766.5091047,
      "event_type": "request_sent",
      "phase": "B",
      "message": "[PROBE_ADVERSARY] Sending GET http://127.0.0.1:8000/target/projects/proj_43/export as usr_taaran_202",
@@ -1820,17 +1820,17 @@
      }
     },
     {
-     "event_id": "ev_d1b589",
-     "scan_id": "scan_426af1be",
-     "timestamp": 1793420485.7035282,
+     "event_id": "ev_54ddf3",
+     "scan_id": "scan_3896be44",
+     "timestamp": 1793422766.5217326,
      "event_type": "response_received",
      "phase": "B",
-     "message": "[PROBE_ADVERSARY] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43/export (1.07ms)",
+     "message": "[PROBE_ADVERSARY] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43/export (1.36ms)",
      "data": {
       "step_id": "probe_exportProjectBilling",
       "operation_id": "exportProjectBilling",
       "status_code": 200,
-      "duration_ms": 1.07,
+      "duration_ms": 1.36,
       "headers": {
        "content-length": "155",
        "content-type": "application/json"
@@ -1838,14 +1838,14 @@
      }
     },
     {
-     "event_id": "ev_b0fdd9",
-     "scan_id": "scan_426af1be",
-     "timestamp": 1793420485.7069774,
+     "event_id": "ev_c7b077",
+     "scan_id": "scan_3896be44",
+     "timestamp": 1793422766.5301015,
      "event_type": "finding_confirmed",
      "phase": "C",
      "message": "[ALERT] Confirmed BOLA at GET /projects/{project_id}/export",
      "data": {
-      "id": "fnd_bola_319ed4",
+      "id": "fnd_bola_7bd2ed",
       "endpoint": "/projects/{project_id}/export",
       "method": "GET",
       "resource_type": "Project",
@@ -1857,7 +1857,7 @@
        "probe": "usr_taaran_202"
       },
       "hypothesis": {
-       "id": "hyp_prop_ddeaac3b",
+       "id": "hyp_prop_0b746b8d",
        "rule": {
         "rule_type": "owner_only",
         "resource_type": "Project",
@@ -1922,9 +1922,9 @@
      }
     },
     {
-     "event_id": "ev_12950c",
-     "scan_id": "scan_426af1be",
-     "timestamp": 1793420485.7201588,
+     "event_id": "ev_a41446",
+     "scan_id": "scan_3896be44",
+     "timestamp": 1793422766.5421066,
      "event_type": "request_sent",
      "phase": "A",
      "message": "[CONTROL_OWNER] Sending GET http://127.0.0.1:8000/target/projects/proj_43/summary as usr_aman_101",
@@ -1940,17 +1940,17 @@
      }
     },
     {
-     "event_id": "ev_ef0a34",
-     "scan_id": "scan_426af1be",
-     "timestamp": 1793420485.7356563,
+     "event_id": "ev_ceedd0",
+     "scan_id": "scan_3896be44",
+     "timestamp": 1793422766.5622616,
      "event_type": "response_received",
      "phase": "A",
-     "message": "[CONTROL_OWNER] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43/summary (1.29ms)",
+     "message": "[CONTROL_OWNER] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43/summary (2.53ms)",
      "data": {
       "step_id": "ctrl_getProjectSummary",
       "operation_id": "getProjectSummary",
       "status_code": 200,
-      "duration_ms": 1.29,
+      "duration_ms": 2.53,
       "headers": {
        "content-length": "35",
        "content-type": "application/json"
@@ -1958,9 +1958,9 @@
      }
     },
     {
-     "event_id": "ev_50fa99",
-     "scan_id": "scan_426af1be",
-     "timestamp": 1793420485.7459736,
+     "event_id": "ev_8c2f48",
+     "scan_id": "scan_3896be44",
+     "timestamp": 1793422766.5749004,
      "event_type": "request_sent",
      "phase": "B",
      "message": "[PROBE_ADVERSARY] Sending GET http://127.0.0.1:8000/target/projects/proj_43/summary as usr_taaran_202",
@@ -1976,17 +1976,17 @@
      }
     },
     {
-     "event_id": "ev_8f3c43",
-     "scan_id": "scan_426af1be",
-     "timestamp": 1793420485.7575233,
+     "event_id": "ev_25b820",
+     "scan_id": "scan_3896be44",
+     "timestamp": 1793422766.579988,
      "event_type": "response_received",
      "phase": "B",
-     "message": "[PROBE_ADVERSARY] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43/summary (1.13ms)",
+     "message": "[PROBE_ADVERSARY] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43/summary (2.05ms)",
      "data": {
       "step_id": "probe_getProjectSummary",
       "operation_id": "getProjectSummary",
       "status_code": 200,
-      "duration_ms": 1.13,
+      "duration_ms": 2.05,
       "headers": {
        "content-length": "2",
        "content-type": "application/json"
@@ -1994,9 +1994,9 @@
      }
     },
     {
-     "event_id": "ev_92dca1",
-     "scan_id": "scan_426af1be",
-     "timestamp": 1793420485.7634406,
+     "event_id": "ev_dfb92c",
+     "scan_id": "scan_3896be44",
+     "timestamp": 1793422766.5921838,
      "event_type": "probe_denied",
      "phase": "C",
      "message": "[VERIFIER] Trap evaluated on /projects/{project_id}/summary: empty response (no leak)",
@@ -2008,9 +2008,9 @@
      }
     },
     {
-     "event_id": "ev_c4ab2f",
-     "scan_id": "scan_426af1be",
-     "timestamp": 1793420485.771954,
+     "event_id": "ev_249dc3",
+     "scan_id": "scan_3896be44",
+     "timestamp": 1793422766.6086383,
      "event_type": "request_sent",
      "phase": "A",
      "message": "[CONTROL_OWNER] Sending GET http://127.0.0.1:8000/target/projects/proj_43/members as usr_aman_101",
@@ -2026,17 +2026,17 @@
      }
     },
     {
-     "event_id": "ev_778ee6",
-     "scan_id": "scan_426af1be",
-     "timestamp": 1793420485.7821736,
+     "event_id": "ev_7d9d14",
+     "scan_id": "scan_3896be44",
+     "timestamp": 1793422766.626424,
      "event_type": "response_received",
      "phase": "A",
-     "message": "[CONTROL_OWNER] Received HTTP 404 for GET http://127.0.0.1:8000/target/projects/proj_43/members (0.59ms)",
+     "message": "[CONTROL_OWNER] Received HTTP 404 for GET http://127.0.0.1:8000/target/projects/proj_43/members (1.28ms)",
      "data": {
       "step_id": "ctrl_getProjectMembers",
       "operation_id": "getProjectMembers",
       "status_code": 404,
-      "duration_ms": 0.59,
+      "duration_ms": 1.28,
       "headers": {
        "content-length": "22",
        "content-type": "application/json"
@@ -2044,9 +2044,9 @@
      }
     },
     {
-     "event_id": "ev_6be06c",
-     "scan_id": "scan_426af1be",
-     "timestamp": 1793420485.7876544,
+     "event_id": "ev_afc4e7",
+     "scan_id": "scan_3896be44",
+     "timestamp": 1793422766.6405568,
      "event_type": "test_inconclusive",
      "phase": "B",
      "message": "control failed (404), test inconclusive",
@@ -2058,9 +2058,9 @@
      }
     },
     {
-     "event_id": "ev_c7d2c5",
-     "scan_id": "scan_426af1be",
-     "timestamp": 1793420485.796063,
+     "event_id": "ev_191922",
+     "scan_id": "scan_3896be44",
+     "timestamp": 1793422766.6444356,
      "event_type": "request_sent",
      "phase": "A",
      "message": "[CONTROL_OWNER] Sending PATCH http://127.0.0.1:8000/target/projects/proj_43 as usr_aman_101",
@@ -2076,17 +2076,17 @@
      }
     },
     {
-     "event_id": "ev_1e18ed",
-     "scan_id": "scan_426af1be",
-     "timestamp": 1793420485.8042507,
+     "event_id": "ev_254127",
+     "scan_id": "scan_3896be44",
+     "timestamp": 1793422766.6588278,
      "event_type": "response_received",
      "phase": "A",
-     "message": "[CONTROL_OWNER] Received HTTP 200 for PATCH http://127.0.0.1:8000/target/projects/proj_43 (0.93ms)",
+     "message": "[CONTROL_OWNER] Received HTTP 200 for PATCH http://127.0.0.1:8000/target/projects/proj_43 (1.83ms)",
      "data": {
       "step_id": "ctrl_updateProject",
       "operation_id": "updateProject",
       "status_code": 200,
-      "duration_ms": 0.93,
+      "duration_ms": 1.83,
       "headers": {
        "content-length": "236",
        "content-type": "application/json"
@@ -2094,9 +2094,9 @@
      }
     },
     {
-     "event_id": "ev_a9ab3d",
-     "scan_id": "scan_426af1be",
-     "timestamp": 1793420485.8126256,
+     "event_id": "ev_e86c80",
+     "scan_id": "scan_3896be44",
+     "timestamp": 1793422766.6753078,
      "event_type": "request_sent",
      "phase": "B",
      "message": "[PROBE_ADVERSARY] Sending PATCH http://127.0.0.1:8000/target/projects/proj_43 as usr_taaran_202",
@@ -2112,17 +2112,17 @@
      }
     },
     {
-     "event_id": "ev_e472b0",
-     "scan_id": "scan_426af1be",
-     "timestamp": 1793420485.8230672,
+     "event_id": "ev_777476",
+     "scan_id": "scan_3896be44",
+     "timestamp": 1793422766.6919754,
      "event_type": "response_received",
      "phase": "B",
-     "message": "[PROBE_ADVERSARY] Received HTTP 403 for PATCH http://127.0.0.1:8000/target/projects/proj_43 (1.65ms)",
+     "message": "[PROBE_ADVERSARY] Received HTTP 403 for PATCH http://127.0.0.1:8000/target/projects/proj_43 (2.05ms)",
      "data": {
       "step_id": "probe_updateProject",
       "operation_id": "updateProject",
       "status_code": 403,
-      "duration_ms": 1.65,
+      "duration_ms": 2.05,
       "headers": {
        "content-length": "60",
        "content-type": "application/json"
@@ -2130,9 +2130,9 @@
      }
     },
     {
-     "event_id": "ev_84b204",
-     "scan_id": "scan_426af1be",
-     "timestamp": 1793420485.8302827,
+     "event_id": "ev_becf66",
+     "scan_id": "scan_3896be44",
+     "timestamp": 1793422766.6919754,
      "event_type": "probe_denied",
      "phase": "C",
      "message": "[VERIFIER] Access denied for unauthorized probe on /projects/{project_id} (HTTP 403)",
@@ -2144,14 +2144,14 @@
      }
     },
     {
-     "event_id": "ev_826235",
-     "scan_id": "scan_426af1be",
-     "timestamp": 1793420485.8396525,
+     "event_id": "ev_f85a00",
+     "scan_id": "scan_3896be44",
+     "timestamp": 1793422766.7086954,
      "event_type": "request_sent",
      "phase": "A",
      "message": "[SETUP] Sending POST http://127.0.0.1:8000/target/projects as usr_aman_101",
      "data": {
-      "step_id": "disp_del_setup_27fe",
+      "step_id": "disp_del_setup_2ab5",
       "operation_id": "createProject",
       "identity": "usr_aman_101",
       "method": "POST",
@@ -2162,17 +2162,17 @@
      }
     },
     {
-     "event_id": "ev_828f14",
-     "scan_id": "scan_426af1be",
-     "timestamp": 1793420485.8482676,
+     "event_id": "ev_92eb2c",
+     "scan_id": "scan_3896be44",
+     "timestamp": 1793422766.7258043,
      "event_type": "response_received",
      "phase": "A",
-     "message": "[SETUP] Received HTTP 201 for POST http://127.0.0.1:8000/target/projects (1.23ms)",
+     "message": "[SETUP] Received HTTP 201 for POST http://127.0.0.1:8000/target/projects (1.85ms)",
      "data": {
-      "step_id": "disp_del_setup_27fe",
+      "step_id": "disp_del_setup_2ab5",
       "operation_id": "createProject",
       "status_code": 201,
-      "duration_ms": 1.23,
+      "duration_ms": 1.85,
       "headers": {
        "content-length": "233",
        "content-type": "application/json"
@@ -2180,9 +2180,9 @@
      }
     },
     {
-     "event_id": "ev_2ac9c5",
-     "scan_id": "scan_426af1be",
-     "timestamp": 1793420485.8567019,
+     "event_id": "ev_432f0c",
+     "scan_id": "scan_3896be44",
+     "timestamp": 1793422766.7309184,
      "event_type": "request_sent",
      "phase": "B",
      "message": "[PROBE_ADVERSARY] Sending DELETE http://127.0.0.1:8000/target/projects/proj_45 as usr_taaran_202",
@@ -2198,17 +2198,17 @@
      }
     },
     {
-     "event_id": "ev_3cd9c7",
-     "scan_id": "scan_426af1be",
-     "timestamp": 1793420485.8641102,
+     "event_id": "ev_d6df76",
+     "scan_id": "scan_3896be44",
+     "timestamp": 1793422766.7438667,
      "event_type": "response_received",
      "phase": "B",
-     "message": "[PROBE_ADVERSARY] Received HTTP 403 for DELETE http://127.0.0.1:8000/target/projects/proj_45 (0.78ms)",
+     "message": "[PROBE_ADVERSARY] Received HTTP 403 for DELETE http://127.0.0.1:8000/target/projects/proj_45 (1.13ms)",
      "data": {
       "step_id": "probe_del_proj_45",
       "operation_id": "deleteProject",
       "status_code": 403,
-      "duration_ms": 0.78,
+      "duration_ms": 1.13,
       "headers": {
        "content-length": "45",
        "content-type": "application/json"
@@ -2216,9 +2216,9 @@
      }
     },
     {
-     "event_id": "ev_4bee2e",
-     "scan_id": "scan_426af1be",
-     "timestamp": 1793420485.8706725,
+     "event_id": "ev_3e3a53",
+     "scan_id": "scan_3896be44",
+     "timestamp": 1793422766.7605505,
      "event_type": "request_sent",
      "phase": "A",
      "message": "[CONTROL_OWNER] Sending DELETE http://127.0.0.1:8000/target/projects/proj_45 as usr_aman_101",
@@ -2234,17 +2234,17 @@
      }
     },
     {
-     "event_id": "ev_315d04",
-     "scan_id": "scan_426af1be",
-     "timestamp": 1793420485.879164,
+     "event_id": "ev_c3a633",
+     "scan_id": "scan_3896be44",
+     "timestamp": 1793422766.7747881,
      "event_type": "response_received",
      "phase": "A",
-     "message": "[CONTROL_OWNER] Received HTTP 200 for DELETE http://127.0.0.1:8000/target/projects/proj_45 (0.95ms)",
+     "message": "[CONTROL_OWNER] Received HTTP 200 for DELETE http://127.0.0.1:8000/target/projects/proj_45 (1.77ms)",
      "data": {
       "step_id": "ctrl_del_proj_45",
       "operation_id": "deleteProject",
       "status_code": 200,
-      "duration_ms": 0.95,
+      "duration_ms": 1.77,
       "headers": {
        "content-length": "35",
        "content-type": "application/json"
@@ -2252,9 +2252,9 @@
      }
     },
     {
-     "event_id": "ev_0b2928",
-     "scan_id": "scan_426af1be",
-     "timestamp": 1793420485.8876185,
+     "event_id": "ev_e746de",
+     "scan_id": "scan_3896be44",
+     "timestamp": 1793422766.7886539,
      "event_type": "probe_denied",
      "phase": "C",
      "message": "[VERIFIER] Access denied for unauthorized DELETE on /projects/{project_id} (HTTP 403); cleanup succeeded",
@@ -2265,9 +2265,9 @@
      }
     },
     {
-     "event_id": "ev_ebd74c",
-     "scan_id": "scan_426af1be",
-     "timestamp": 1793420485.9038818,
+     "event_id": "ev_4d8a17",
+     "scan_id": "scan_3896be44",
+     "timestamp": 1793422766.8087754,
      "event_type": "scan_completed",
      "phase": "C",
      "message": "[DONE] Audit finished. 1 confirmed vulnerabilities recorded.",
@@ -2278,7 +2278,7 @@
    ],
    "findings": [
     {
-     "id": "fnd_bola_319ed4",
+     "id": "fnd_bola_7bd2ed",
      "endpoint": "/projects/{project_id}/export",
      "method": "GET",
      "resource_type": "Project",
@@ -2290,7 +2290,7 @@
       "probe": "usr_taaran_202"
      },
      "hypothesis": {
-      "id": "hyp_prop_ddeaac3b",
+      "id": "hyp_prop_0b746b8d",
       "rule": {
        "rule_type": "owner_only",
        "resource_type": "Project",
@@ -2358,18 +2358,18 @@
   "patched_safe": {
    "events": [
     {
-     "event_id": "ev_d3fc70",
-     "scan_id": "scan_26db4de6",
-     "timestamp": 1793420485.9589117,
+     "event_id": "ev_080d28",
+     "scan_id": "scan_f0bf7556",
+     "timestamp": 1793422766.8920407,
      "event_type": "log",
      "phase": "A",
      "message": "[AUTH] Successfully acquired dynamic tokens for User A (aman@acme.corp) and User B (taaran@adversary.io)",
      "data": null
     },
     {
-     "event_id": "ev_fb859a",
-     "scan_id": "scan_26db4de6",
-     "timestamp": 1793420485.9691792,
+     "event_id": "ev_a33505",
+     "scan_id": "scan_f0bf7556",
+     "timestamp": 1793422766.9086301,
      "event_type": "request_sent",
      "phase": "A",
      "message": "[SETUP] Sending POST http://127.0.0.1:8000/target/projects as usr_aman_101",
@@ -2385,17 +2385,17 @@
      }
     },
     {
-     "event_id": "ev_fe80db",
-     "scan_id": "scan_26db4de6",
-     "timestamp": 1793420485.9787195,
+     "event_id": "ev_4ff6ef",
+     "scan_id": "scan_f0bf7556",
+     "timestamp": 1793422766.9255404,
      "event_type": "response_received",
      "phase": "A",
-     "message": "[SETUP] Received HTTP 201 for POST http://127.0.0.1:8000/target/projects (0.86ms)",
+     "message": "[SETUP] Received HTTP 201 for POST http://127.0.0.1:8000/target/projects (2.68ms)",
      "data": {
       "step_id": "harvest_createProject",
       "operation_id": "createProject",
       "status_code": 201,
-      "duration_ms": 0.86,
+      "duration_ms": 2.68,
       "headers": {
        "content-length": "247",
        "content-type": "application/json"
@@ -2403,9 +2403,9 @@
      }
     },
     {
-     "event_id": "ev_01d34d",
-     "scan_id": "scan_26db4de6",
-     "timestamp": 1793420485.986168,
+     "event_id": "ev_043bc6",
+     "scan_id": "scan_f0bf7556",
+     "timestamp": 1793422766.930938,
      "event_type": "request_sent",
      "phase": "A",
      "message": "[CONTROL_OWNER] Sending GET http://127.0.0.1:8000/target/projects/proj_43 as usr_aman_101",
@@ -2421,17 +2421,17 @@
      }
     },
     {
-     "event_id": "ev_1f136b",
-     "scan_id": "scan_26db4de6",
-     "timestamp": 1793420486.0275724,
+     "event_id": "ev_35f2d7",
+     "scan_id": "scan_f0bf7556",
+     "timestamp": 1793422766.9501498,
      "event_type": "response_received",
      "phase": "A",
-     "message": "[CONTROL_OWNER] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43 (0.87ms)",
+     "message": "[CONTROL_OWNER] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43 (1.75ms)",
      "data": {
       "step_id": "ctrl_getProjectById",
       "operation_id": "getProjectById",
       "status_code": 200,
-      "duration_ms": 0.87,
+      "duration_ms": 1.75,
       "headers": {
        "content-length": "247",
        "content-type": "application/json"
@@ -2439,9 +2439,9 @@
      }
     },
     {
-     "event_id": "ev_eb37dc",
-     "scan_id": "scan_26db4de6",
-     "timestamp": 1793420486.0346763,
+     "event_id": "ev_6c94bb",
+     "scan_id": "scan_f0bf7556",
+     "timestamp": 1793422766.959674,
      "event_type": "request_sent",
      "phase": "B",
      "message": "[PROBE_ADVERSARY] Sending GET http://127.0.0.1:8000/target/projects/proj_43 as usr_taaran_202",
@@ -2457,17 +2457,17 @@
      }
     },
     {
-     "event_id": "ev_e4e45f",
-     "scan_id": "scan_26db4de6",
-     "timestamp": 1793420486.0450492,
+     "event_id": "ev_5013b4",
+     "scan_id": "scan_f0bf7556",
+     "timestamp": 1793422766.97482,
      "event_type": "response_received",
      "phase": "B",
-     "message": "[PROBE_ADVERSARY] Received HTTP 403 for GET http://127.0.0.1:8000/target/projects/proj_43 (1.5ms)",
+     "message": "[PROBE_ADVERSARY] Received HTTP 403 for GET http://127.0.0.1:8000/target/projects/proj_43 (1.78ms)",
      "data": {
       "step_id": "probe_getProjectById",
       "operation_id": "getProjectById",
       "status_code": 403,
-      "duration_ms": 1.5,
+      "duration_ms": 1.78,
       "headers": {
        "content-length": "51",
        "content-type": "application/json"
@@ -2475,9 +2475,9 @@
      }
     },
     {
-     "event_id": "ev_e4c9dc",
-     "scan_id": "scan_26db4de6",
-     "timestamp": 1793420486.053467,
+     "event_id": "ev_6452ea",
+     "scan_id": "scan_f0bf7556",
+     "timestamp": 1793422766.975691,
      "event_type": "probe_denied",
      "phase": "A",
      "message": "[VERIFIER] Access denied for unauthorized probe on /projects/{project_id} (HTTP 403)",
@@ -2488,57 +2488,57 @@
      }
     },
     {
-     "event_id": "ev_84e6ef",
-     "scan_id": "scan_26db4de6",
-     "timestamp": 1793420486.0592983,
+     "event_id": "ev_c2df87",
+     "scan_id": "scan_f0bf7556",
+     "timestamp": 1793422766.9919925,
      "event_type": "hypothesis_validated",
      "phase": "A",
      "message": "[INFERENCE] Validated rule 'owner_only' on GET /projects/{project_id}",
      "data": {
-      "hypothesis_id": "hyp_256a1e5a",
+      "hypothesis_id": "hyp_ad2ad6eb",
       "confidence": 0.85
      }
     },
     {
-     "event_id": "ev_2be770",
-     "scan_id": "scan_26db4de6",
-     "timestamp": 1793420486.067701,
-     "event_type": "hypothesis_propagated",
-     "phase": "B",
-     "message": "[PROPAGATION] Propagated candidate ownership rule to exportProjectBilling",
-     "data": {
-      "candidate_id": "hyp_prop_3f8f3e77",
-      "confidence": 0.5
-     }
-    },
-    {
-     "event_id": "ev_c8a1b9",
-     "scan_id": "scan_26db4de6",
-     "timestamp": 1793420486.0760999,
+     "event_id": "ev_0450ff",
+     "scan_id": "scan_f0bf7556",
+     "timestamp": 1793422767.010971,
      "event_type": "hypothesis_propagated",
      "phase": "B",
      "message": "[PROPAGATION] Propagated candidate ownership rule to getProjectMembers",
      "data": {
-      "candidate_id": "hyp_prop_f40c64ac",
+      "candidate_id": "hyp_prop_e3f739ba",
       "confidence": 0.5
      }
     },
     {
-     "event_id": "ev_43ddb9",
-     "scan_id": "scan_26db4de6",
-     "timestamp": 1793420486.0850272,
+     "event_id": "ev_b5fecc",
+     "scan_id": "scan_f0bf7556",
+     "timestamp": 1793422767.0259972,
      "event_type": "hypothesis_propagated",
      "phase": "B",
      "message": "[PROPAGATION] Propagated candidate ownership rule to getProjectSummary",
      "data": {
-      "candidate_id": "hyp_prop_56a3ff42",
+      "candidate_id": "hyp_prop_2f32804d",
       "confidence": 0.5
      }
     },
     {
-     "event_id": "ev_0777c4",
-     "scan_id": "scan_26db4de6",
-     "timestamp": 1793420486.0862193,
+     "event_id": "ev_c61373",
+     "scan_id": "scan_f0bf7556",
+     "timestamp": 1793422767.0312233,
+     "event_type": "hypothesis_propagated",
+     "phase": "B",
+     "message": "[PROPAGATION] Propagated candidate ownership rule to exportProjectBilling",
+     "data": {
+      "candidate_id": "hyp_prop_158e7d91",
+      "confidence": 0.5
+     }
+    },
+    {
+     "event_id": "ev_9aa1fb",
+     "scan_id": "scan_f0bf7556",
+     "timestamp": 1793422767.0421486,
      "event_type": "request_sent",
      "phase": "A",
      "message": "[CONTROL_OWNER] Sending GET http://127.0.0.1:8000/target/projects/proj_43/export as usr_aman_101",
@@ -2554,17 +2554,17 @@
      }
     },
     {
-     "event_id": "ev_3e6f9a",
-     "scan_id": "scan_26db4de6",
-     "timestamp": 1793420486.1022863,
+     "event_id": "ev_f3ca5e",
+     "scan_id": "scan_f0bf7556",
+     "timestamp": 1793422767.058851,
      "event_type": "response_received",
      "phase": "A",
-     "message": "[CONTROL_OWNER] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43/export (0.98ms)",
+     "message": "[CONTROL_OWNER] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43/export (1.45ms)",
      "data": {
       "step_id": "ctrl_exportProjectBilling",
       "operation_id": "exportProjectBilling",
       "status_code": 200,
-      "duration_ms": 0.98,
+      "duration_ms": 1.45,
       "headers": {
        "content-length": "155",
        "content-type": "application/json"
@@ -2572,9 +2572,9 @@
      }
     },
     {
-     "event_id": "ev_1cd3d6",
-     "scan_id": "scan_26db4de6",
-     "timestamp": 1793420486.1091547,
+     "event_id": "ev_b69ce5",
+     "scan_id": "scan_f0bf7556",
+     "timestamp": 1793422767.058851,
      "event_type": "request_sent",
      "phase": "B",
      "message": "[PROBE_ADVERSARY] Sending GET http://127.0.0.1:8000/target/projects/proj_43/export as usr_taaran_202",
@@ -2590,17 +2590,17 @@
      }
     },
     {
-     "event_id": "ev_e1926f",
-     "scan_id": "scan_26db4de6",
-     "timestamp": 1793420486.1194115,
+     "event_id": "ev_e718ed",
+     "scan_id": "scan_f0bf7556",
+     "timestamp": 1793422767.0881476,
      "event_type": "response_received",
      "phase": "B",
-     "message": "[PROBE_ADVERSARY] Received HTTP 403 for GET http://127.0.0.1:8000/target/projects/proj_43/export (1.28ms)",
+     "message": "[PROBE_ADVERSARY] Received HTTP 403 for GET http://127.0.0.1:8000/target/projects/proj_43/export (1.54ms)",
      "data": {
       "step_id": "probe_exportProjectBilling",
       "operation_id": "exportProjectBilling",
       "status_code": 403,
-      "duration_ms": 1.28,
+      "duration_ms": 1.54,
       "headers": {
        "content-length": "58",
        "content-type": "application/json"
@@ -2608,9 +2608,9 @@
      }
     },
     {
-     "event_id": "ev_292e26",
-     "scan_id": "scan_26db4de6",
-     "timestamp": 1793420486.1253595,
+     "event_id": "ev_e083e1",
+     "scan_id": "scan_f0bf7556",
+     "timestamp": 1793422767.091909,
      "event_type": "probe_denied",
      "phase": "C",
      "message": "[VERIFIER] Access denied for unauthorized probe on /projects/{project_id}/export (HTTP 403)",
@@ -2622,9 +2622,9 @@
      }
     },
     {
-     "event_id": "ev_55cddc",
-     "scan_id": "scan_26db4de6",
-     "timestamp": 1793420486.1392045,
+     "event_id": "ev_504dda",
+     "scan_id": "scan_f0bf7556",
+     "timestamp": 1793422767.1089458,
      "event_type": "request_sent",
      "phase": "A",
      "message": "[CONTROL_OWNER] Sending GET http://127.0.0.1:8000/target/projects/proj_43/summary as usr_aman_101",
@@ -2640,17 +2640,17 @@
      }
     },
     {
-     "event_id": "ev_46953b",
-     "scan_id": "scan_26db4de6",
-     "timestamp": 1793420486.1507206,
+     "event_id": "ev_b75871",
+     "scan_id": "scan_f0bf7556",
+     "timestamp": 1793422767.1255991,
      "event_type": "response_received",
      "phase": "A",
-     "message": "[CONTROL_OWNER] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43/summary (1.78ms)",
+     "message": "[CONTROL_OWNER] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43/summary (3.07ms)",
      "data": {
       "step_id": "ctrl_getProjectSummary",
       "operation_id": "getProjectSummary",
       "status_code": 200,
-      "duration_ms": 1.78,
+      "duration_ms": 3.07,
       "headers": {
        "content-length": "35",
        "content-type": "application/json"
@@ -2658,9 +2658,9 @@
      }
     },
     {
-     "event_id": "ev_1156ec",
-     "scan_id": "scan_26db4de6",
-     "timestamp": 1793420486.170815,
+     "event_id": "ev_c97fd5",
+     "scan_id": "scan_f0bf7556",
+     "timestamp": 1793422767.1364486,
      "event_type": "request_sent",
      "phase": "B",
      "message": "[PROBE_ADVERSARY] Sending GET http://127.0.0.1:8000/target/projects/proj_43/summary as usr_taaran_202",
@@ -2676,17 +2676,17 @@
      }
     },
     {
-     "event_id": "ev_54b8af",
-     "scan_id": "scan_26db4de6",
-     "timestamp": 1793420486.1803217,
+     "event_id": "ev_7d5d75",
+     "scan_id": "scan_f0bf7556",
+     "timestamp": 1793422767.1418824,
      "event_type": "response_received",
      "phase": "B",
-     "message": "[PROBE_ADVERSARY] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43/summary (1.1ms)",
+     "message": "[PROBE_ADVERSARY] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43/summary (1.54ms)",
      "data": {
       "step_id": "probe_getProjectSummary",
       "operation_id": "getProjectSummary",
       "status_code": 200,
-      "duration_ms": 1.1,
+      "duration_ms": 1.54,
       "headers": {
        "content-length": "2",
        "content-type": "application/json"
@@ -2694,9 +2694,9 @@
      }
     },
     {
-     "event_id": "ev_d3a7f9",
-     "scan_id": "scan_26db4de6",
-     "timestamp": 1793420486.1898706,
+     "event_id": "ev_de6f5f",
+     "scan_id": "scan_f0bf7556",
+     "timestamp": 1793422767.1587093,
      "event_type": "probe_denied",
      "phase": "C",
      "message": "[VERIFIER] Trap evaluated on /projects/{project_id}/summary: empty response (no leak)",
@@ -2708,9 +2708,9 @@
      }
     },
     {
-     "event_id": "ev_9f07ed",
-     "scan_id": "scan_26db4de6",
-     "timestamp": 1793420486.201243,
+     "event_id": "ev_5e1213",
+     "scan_id": "scan_f0bf7556",
+     "timestamp": 1793422767.1587093,
      "event_type": "request_sent",
      "phase": "A",
      "message": "[CONTROL_OWNER] Sending GET http://127.0.0.1:8000/target/projects/proj_43/members as usr_aman_101",
@@ -2726,17 +2726,17 @@
      }
     },
     {
-     "event_id": "ev_f47903",
-     "scan_id": "scan_26db4de6",
-     "timestamp": 1793420486.2080948,
+     "event_id": "ev_dc8e1c",
+     "scan_id": "scan_f0bf7556",
+     "timestamp": 1793422767.1846647,
      "event_type": "response_received",
      "phase": "A",
-     "message": "[CONTROL_OWNER] Received HTTP 404 for GET http://127.0.0.1:8000/target/projects/proj_43/members (0.55ms)",
+     "message": "[CONTROL_OWNER] Received HTTP 404 for GET http://127.0.0.1:8000/target/projects/proj_43/members (0.96ms)",
      "data": {
       "step_id": "ctrl_getProjectMembers",
       "operation_id": "getProjectMembers",
       "status_code": 404,
-      "duration_ms": 0.55,
+      "duration_ms": 0.96,
       "headers": {
        "content-length": "22",
        "content-type": "application/json"
@@ -2744,9 +2744,9 @@
      }
     },
     {
-     "event_id": "ev_327e32",
-     "scan_id": "scan_26db4de6",
-     "timestamp": 1793420486.2161427,
+     "event_id": "ev_3aa40e",
+     "scan_id": "scan_f0bf7556",
+     "timestamp": 1793422767.1918943,
      "event_type": "test_inconclusive",
      "phase": "B",
      "message": "control failed (404), test inconclusive",
@@ -2758,9 +2758,9 @@
      }
     },
     {
-     "event_id": "ev_9ee082",
-     "scan_id": "scan_26db4de6",
-     "timestamp": 1793420486.2257667,
+     "event_id": "ev_12fb3e",
+     "scan_id": "scan_f0bf7556",
+     "timestamp": 1793422767.2086558,
      "event_type": "scan_completed",
      "phase": "C",
      "message": "[DONE] Audit finished. 0 confirmed vulnerabilities recorded.",
@@ -2774,18 +2774,18 @@
   "patched_mut": {
    "events": [
     {
-     "event_id": "ev_07b8b4",
-     "scan_id": "scan_af8220e1",
-     "timestamp": 1793420486.2824845,
+     "event_id": "ev_cc12e0",
+     "scan_id": "scan_31a279fa",
+     "timestamp": 1793422767.296972,
      "event_type": "log",
      "phase": "A",
      "message": "[AUTH] Successfully acquired dynamic tokens for User A (aman@acme.corp) and User B (taaran@adversary.io)",
      "data": null
     },
     {
-     "event_id": "ev_398b49",
-     "scan_id": "scan_af8220e1",
-     "timestamp": 1793420486.2937124,
+     "event_id": "ev_8eded4",
+     "scan_id": "scan_31a279fa",
+     "timestamp": 1793422767.3099315,
      "event_type": "request_sent",
      "phase": "A",
      "message": "[SETUP] Sending POST http://127.0.0.1:8000/target/projects as usr_aman_101",
@@ -2801,17 +2801,17 @@
      }
     },
     {
-     "event_id": "ev_d0f552",
-     "scan_id": "scan_af8220e1",
-     "timestamp": 1793420486.3023243,
+     "event_id": "ev_220b24",
+     "scan_id": "scan_31a279fa",
+     "timestamp": 1793422767.3200753,
      "event_type": "response_received",
      "phase": "A",
-     "message": "[SETUP] Received HTTP 201 for POST http://127.0.0.1:8000/target/projects (0.94ms)",
+     "message": "[SETUP] Received HTTP 201 for POST http://127.0.0.1:8000/target/projects (1.3ms)",
      "data": {
       "step_id": "harvest_createProject",
       "operation_id": "createProject",
       "status_code": 201,
-      "duration_ms": 0.94,
+      "duration_ms": 1.3,
       "headers": {
        "content-length": "247",
        "content-type": "application/json"
@@ -2819,9 +2819,9 @@
      }
     },
     {
-     "event_id": "ev_7abca8",
-     "scan_id": "scan_af8220e1",
-     "timestamp": 1793420486.3070784,
+     "event_id": "ev_41bacb",
+     "scan_id": "scan_31a279fa",
+     "timestamp": 1793422767.3267365,
      "event_type": "request_sent",
      "phase": "A",
      "message": "[CONTROL_OWNER] Sending GET http://127.0.0.1:8000/target/projects/proj_43 as usr_aman_101",
@@ -2837,17 +2837,17 @@
      }
     },
     {
-     "event_id": "ev_6a62e4",
-     "scan_id": "scan_af8220e1",
-     "timestamp": 1793420486.319077,
+     "event_id": "ev_b759f1",
+     "scan_id": "scan_31a279fa",
+     "timestamp": 1793422767.3412993,
      "event_type": "response_received",
      "phase": "A",
-     "message": "[CONTROL_OWNER] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43 (0.94ms)",
+     "message": "[CONTROL_OWNER] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43 (1.52ms)",
      "data": {
       "step_id": "ctrl_getProjectById",
       "operation_id": "getProjectById",
       "status_code": 200,
-      "duration_ms": 0.94,
+      "duration_ms": 1.52,
       "headers": {
        "content-length": "247",
        "content-type": "application/json"
@@ -2855,9 +2855,9 @@
      }
     },
     {
-     "event_id": "ev_070bd6",
-     "scan_id": "scan_af8220e1",
-     "timestamp": 1793420486.3234024,
+     "event_id": "ev_dfbbe7",
+     "scan_id": "scan_31a279fa",
+     "timestamp": 1793422767.344721,
      "event_type": "request_sent",
      "phase": "B",
      "message": "[PROBE_ADVERSARY] Sending GET http://127.0.0.1:8000/target/projects/proj_43 as usr_taaran_202",
@@ -2873,17 +2873,17 @@
      }
     },
     {
-     "event_id": "ev_b50e9a",
-     "scan_id": "scan_af8220e1",
-     "timestamp": 1793420486.3362346,
+     "event_id": "ev_d6c7af",
+     "scan_id": "scan_31a279fa",
+     "timestamp": 1793422767.36228,
      "event_type": "response_received",
      "phase": "B",
-     "message": "[PROBE_ADVERSARY] Received HTTP 403 for GET http://127.0.0.1:8000/target/projects/proj_43 (0.83ms)",
+     "message": "[PROBE_ADVERSARY] Received HTTP 403 for GET http://127.0.0.1:8000/target/projects/proj_43 (1.49ms)",
      "data": {
       "step_id": "probe_getProjectById",
       "operation_id": "getProjectById",
       "status_code": 403,
-      "duration_ms": 0.83,
+      "duration_ms": 1.49,
       "headers": {
        "content-length": "51",
        "content-type": "application/json"
@@ -2891,9 +2891,9 @@
      }
     },
     {
-     "event_id": "ev_1c0575",
-     "scan_id": "scan_af8220e1",
-     "timestamp": 1793420486.346094,
+     "event_id": "ev_e088a8",
+     "scan_id": "scan_31a279fa",
+     "timestamp": 1793422767.3737006,
      "event_type": "probe_denied",
      "phase": "A",
      "message": "[VERIFIER] Access denied for unauthorized probe on /projects/{project_id} (HTTP 403)",
@@ -2904,57 +2904,57 @@
      }
     },
     {
-     "event_id": "ev_d01917",
-     "scan_id": "scan_af8220e1",
-     "timestamp": 1793420486.3535554,
+     "event_id": "ev_39e248",
+     "scan_id": "scan_31a279fa",
+     "timestamp": 1793422767.375565,
      "event_type": "hypothesis_validated",
      "phase": "A",
      "message": "[INFERENCE] Validated rule 'owner_only' on GET /projects/{project_id}",
      "data": {
-      "hypothesis_id": "hyp_adfcf019",
+      "hypothesis_id": "hyp_8688cdc1",
       "confidence": 0.85
      }
     },
     {
-     "event_id": "ev_b60b88",
-     "scan_id": "scan_af8220e1",
-     "timestamp": 1793420486.3565154,
-     "event_type": "hypothesis_propagated",
-     "phase": "B",
-     "message": "[PROPAGATION] Propagated candidate ownership rule to exportProjectBilling",
-     "data": {
-      "candidate_id": "hyp_prop_8a835137",
-      "confidence": 0.5
-     }
-    },
-    {
-     "event_id": "ev_b39a49",
-     "scan_id": "scan_af8220e1",
-     "timestamp": 1793420486.364559,
+     "event_id": "ev_a78cbe",
+     "scan_id": "scan_31a279fa",
+     "timestamp": 1793422767.391867,
      "event_type": "hypothesis_propagated",
      "phase": "B",
      "message": "[PROPAGATION] Propagated candidate ownership rule to getProjectMembers",
      "data": {
-      "candidate_id": "hyp_prop_9f6d69be",
+      "candidate_id": "hyp_prop_b8c18caf",
       "confidence": 0.5
      }
     },
     {
-     "event_id": "ev_3578b4",
-     "scan_id": "scan_af8220e1",
-     "timestamp": 1793420486.3729572,
+     "event_id": "ev_c03222",
+     "scan_id": "scan_31a279fa",
+     "timestamp": 1793422767.4071913,
      "event_type": "hypothesis_propagated",
      "phase": "B",
      "message": "[PROPAGATION] Propagated candidate ownership rule to getProjectSummary",
      "data": {
-      "candidate_id": "hyp_prop_1f123894",
+      "candidate_id": "hyp_prop_3384bc88",
       "confidence": 0.5
      }
     },
     {
-     "event_id": "ev_dc6225",
-     "scan_id": "scan_af8220e1",
-     "timestamp": 1793420486.3850083,
+     "event_id": "ev_2e3975",
+     "scan_id": "scan_31a279fa",
+     "timestamp": 1793422767.4125488,
+     "event_type": "hypothesis_propagated",
+     "phase": "B",
+     "message": "[PROPAGATION] Propagated candidate ownership rule to exportProjectBilling",
+     "data": {
+      "candidate_id": "hyp_prop_87e812be",
+      "confidence": 0.5
+     }
+    },
+    {
+     "event_id": "ev_a387e0",
+     "scan_id": "scan_31a279fa",
+     "timestamp": 1793422767.425202,
      "event_type": "request_sent",
      "phase": "A",
      "message": "[CONTROL_OWNER] Sending GET http://127.0.0.1:8000/target/projects/proj_43/export as usr_aman_101",
@@ -2970,17 +2970,17 @@
      }
     },
     {
-     "event_id": "ev_33bcc1",
-     "scan_id": "scan_af8220e1",
-     "timestamp": 1793420486.3894405,
+     "event_id": "ev_9be6ce",
+     "scan_id": "scan_31a279fa",
+     "timestamp": 1793422767.4423873,
      "event_type": "response_received",
      "phase": "A",
-     "message": "[CONTROL_OWNER] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43/export (0.84ms)",
+     "message": "[CONTROL_OWNER] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43/export (2.7ms)",
      "data": {
       "step_id": "ctrl_exportProjectBilling",
       "operation_id": "exportProjectBilling",
       "status_code": 200,
-      "duration_ms": 0.84,
+      "duration_ms": 2.7,
       "headers": {
        "content-length": "155",
        "content-type": "application/json"
@@ -2988,9 +2988,9 @@
      }
     },
     {
-     "event_id": "ev_0de75d",
-     "scan_id": "scan_af8220e1",
-     "timestamp": 1793420486.4009185,
+     "event_id": "ev_529f62",
+     "scan_id": "scan_31a279fa",
+     "timestamp": 1793422767.4423873,
      "event_type": "request_sent",
      "phase": "B",
      "message": "[PROBE_ADVERSARY] Sending GET http://127.0.0.1:8000/target/projects/proj_43/export as usr_taaran_202",
@@ -3006,17 +3006,17 @@
      }
     },
     {
-     "event_id": "ev_9d0fbd",
-     "scan_id": "scan_af8220e1",
-     "timestamp": 1793420486.4101238,
+     "event_id": "ev_9273c1",
+     "scan_id": "scan_31a279fa",
+     "timestamp": 1793422767.4587104,
      "event_type": "response_received",
      "phase": "B",
-     "message": "[PROBE_ADVERSARY] Received HTTP 403 for GET http://127.0.0.1:8000/target/projects/proj_43/export (1.16ms)",
+     "message": "[PROBE_ADVERSARY] Received HTTP 403 for GET http://127.0.0.1:8000/target/projects/proj_43/export (1.78ms)",
      "data": {
       "step_id": "probe_exportProjectBilling",
       "operation_id": "exportProjectBilling",
       "status_code": 403,
-      "duration_ms": 1.16,
+      "duration_ms": 1.78,
       "headers": {
        "content-length": "58",
        "content-type": "application/json"
@@ -3024,9 +3024,9 @@
      }
     },
     {
-     "event_id": "ev_3bff10",
-     "scan_id": "scan_af8220e1",
-     "timestamp": 1793420486.4220774,
+     "event_id": "ev_be1461",
+     "scan_id": "scan_31a279fa",
+     "timestamp": 1793422767.4752696,
      "event_type": "probe_denied",
      "phase": "C",
      "message": "[VERIFIER] Access denied for unauthorized probe on /projects/{project_id}/export (HTTP 403)",
@@ -3038,9 +3038,9 @@
      }
     },
     {
-     "event_id": "ev_42263b",
-     "scan_id": "scan_af8220e1",
-     "timestamp": 1793420486.4336665,
+     "event_id": "ev_5bfc32",
+     "scan_id": "scan_31a279fa",
+     "timestamp": 1793422767.494194,
      "event_type": "request_sent",
      "phase": "A",
      "message": "[CONTROL_OWNER] Sending GET http://127.0.0.1:8000/target/projects/proj_43/summary as usr_aman_101",
@@ -3056,17 +3056,17 @@
      }
     },
     {
-     "event_id": "ev_0968e9",
-     "scan_id": "scan_af8220e1",
-     "timestamp": 1793420486.4474163,
+     "event_id": "ev_c58ea0",
+     "scan_id": "scan_31a279fa",
+     "timestamp": 1793422767.498203,
      "event_type": "response_received",
      "phase": "A",
-     "message": "[CONTROL_OWNER] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43/summary (1.0ms)",
+     "message": "[CONTROL_OWNER] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43/summary (1.47ms)",
      "data": {
       "step_id": "ctrl_getProjectSummary",
       "operation_id": "getProjectSummary",
       "status_code": 200,
-      "duration_ms": 1.0,
+      "duration_ms": 1.47,
       "headers": {
        "content-length": "35",
        "content-type": "application/json"
@@ -3074,9 +3074,9 @@
      }
     },
     {
-     "event_id": "ev_31d55f",
-     "scan_id": "scan_af8220e1",
-     "timestamp": 1793420486.4576852,
+     "event_id": "ev_8c0fcd",
+     "scan_id": "scan_31a279fa",
+     "timestamp": 1793422767.5107558,
      "event_type": "request_sent",
      "phase": "B",
      "message": "[PROBE_ADVERSARY] Sending GET http://127.0.0.1:8000/target/projects/proj_43/summary as usr_taaran_202",
@@ -3092,17 +3092,17 @@
      }
     },
     {
-     "event_id": "ev_0d88a1",
-     "scan_id": "scan_af8220e1",
-     "timestamp": 1793420486.4693193,
+     "event_id": "ev_bfac4c",
+     "scan_id": "scan_31a279fa",
+     "timestamp": 1793422767.531687,
      "event_type": "response_received",
      "phase": "B",
-     "message": "[PROBE_ADVERSARY] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43/summary (1.11ms)",
+     "message": "[PROBE_ADVERSARY] Received HTTP 200 for GET http://127.0.0.1:8000/target/projects/proj_43/summary (1.33ms)",
      "data": {
       "step_id": "probe_getProjectSummary",
       "operation_id": "getProjectSummary",
       "status_code": 200,
-      "duration_ms": 1.11,
+      "duration_ms": 1.33,
       "headers": {
        "content-length": "2",
        "content-type": "application/json"
@@ -3110,9 +3110,9 @@
      }
     },
     {
-     "event_id": "ev_e951ac",
-     "scan_id": "scan_af8220e1",
-     "timestamp": 1793420486.4830446,
+     "event_id": "ev_c10112",
+     "scan_id": "scan_31a279fa",
+     "timestamp": 1793422767.544803,
      "event_type": "probe_denied",
      "phase": "C",
      "message": "[VERIFIER] Trap evaluated on /projects/{project_id}/summary: empty response (no leak)",
@@ -3124,9 +3124,9 @@
      }
     },
     {
-     "event_id": "ev_865cc6",
-     "scan_id": "scan_af8220e1",
-     "timestamp": 1793420486.4911852,
+     "event_id": "ev_6e6306",
+     "scan_id": "scan_31a279fa",
+     "timestamp": 1793422767.544803,
      "event_type": "request_sent",
      "phase": "A",
      "message": "[CONTROL_OWNER] Sending GET http://127.0.0.1:8000/target/projects/proj_43/members as usr_aman_101",
@@ -3142,17 +3142,17 @@
      }
     },
     {
-     "event_id": "ev_5d06b0",
-     "scan_id": "scan_af8220e1",
-     "timestamp": 1793420486.5009747,
+     "event_id": "ev_f8d986",
+     "scan_id": "scan_31a279fa",
+     "timestamp": 1793422767.5586948,
      "event_type": "response_received",
      "phase": "A",
-     "message": "[CONTROL_OWNER] Received HTTP 404 for GET http://127.0.0.1:8000/target/projects/proj_43/members (0.43ms)",
+     "message": "[CONTROL_OWNER] Received HTTP 404 for GET http://127.0.0.1:8000/target/projects/proj_43/members (1.04ms)",
      "data": {
       "step_id": "ctrl_getProjectMembers",
       "operation_id": "getProjectMembers",
       "status_code": 404,
-      "duration_ms": 0.43,
+      "duration_ms": 1.04,
       "headers": {
        "content-length": "22",
        "content-type": "application/json"
@@ -3160,9 +3160,9 @@
      }
     },
     {
-     "event_id": "ev_3e6cbb",
-     "scan_id": "scan_af8220e1",
-     "timestamp": 1793420486.5086432,
+     "event_id": "ev_8f464b",
+     "scan_id": "scan_31a279fa",
+     "timestamp": 1793422767.5753,
      "event_type": "test_inconclusive",
      "phase": "B",
      "message": "control failed (404), test inconclusive",
@@ -3174,9 +3174,9 @@
      }
     },
     {
-     "event_id": "ev_69382f",
-     "scan_id": "scan_af8220e1",
-     "timestamp": 1793420486.5179777,
+     "event_id": "ev_ebf5fb",
+     "scan_id": "scan_31a279fa",
+     "timestamp": 1793422767.5914307,
      "event_type": "request_sent",
      "phase": "A",
      "message": "[CONTROL_OWNER] Sending PATCH http://127.0.0.1:8000/target/projects/proj_43 as usr_aman_101",
@@ -3192,17 +3192,17 @@
      }
     },
     {
-     "event_id": "ev_e991ae",
-     "scan_id": "scan_af8220e1",
-     "timestamp": 1793420486.5276852,
+     "event_id": "ev_b814f9",
+     "scan_id": "scan_31a279fa",
+     "timestamp": 1793422767.603912,
      "event_type": "response_received",
      "phase": "A",
-     "message": "[CONTROL_OWNER] Received HTTP 200 for PATCH http://127.0.0.1:8000/target/projects/proj_43 (1.05ms)",
+     "message": "[CONTROL_OWNER] Received HTTP 200 for PATCH http://127.0.0.1:8000/target/projects/proj_43 (1.77ms)",
      "data": {
       "step_id": "ctrl_updateProject",
       "operation_id": "updateProject",
       "status_code": 200,
-      "duration_ms": 1.05,
+      "duration_ms": 1.77,
       "headers": {
        "content-length": "236",
        "content-type": "application/json"
@@ -3210,9 +3210,9 @@
      }
     },
     {
-     "event_id": "ev_c21cc3",
-     "scan_id": "scan_af8220e1",
-     "timestamp": 1793420486.5347366,
+     "event_id": "ev_748ce2",
+     "scan_id": "scan_31a279fa",
+     "timestamp": 1793422767.6086354,
      "event_type": "request_sent",
      "phase": "B",
      "message": "[PROBE_ADVERSARY] Sending PATCH http://127.0.0.1:8000/target/projects/proj_43 as usr_taaran_202",
@@ -3228,17 +3228,17 @@
      }
     },
     {
-     "event_id": "ev_bf789c",
-     "scan_id": "scan_af8220e1",
-     "timestamp": 1793420486.5430722,
+     "event_id": "ev_12e4c6",
+     "scan_id": "scan_31a279fa",
+     "timestamp": 1793422767.6283224,
      "event_type": "response_received",
      "phase": "B",
-     "message": "[PROBE_ADVERSARY] Received HTTP 403 for PATCH http://127.0.0.1:8000/target/projects/proj_43 (1.03ms)",
+     "message": "[PROBE_ADVERSARY] Received HTTP 403 for PATCH http://127.0.0.1:8000/target/projects/proj_43 (1.82ms)",
      "data": {
       "step_id": "probe_updateProject",
       "operation_id": "updateProject",
       "status_code": 403,
-      "duration_ms": 1.03,
+      "duration_ms": 1.82,
       "headers": {
        "content-length": "60",
        "content-type": "application/json"
@@ -3246,9 +3246,9 @@
      }
     },
     {
-     "event_id": "ev_fa1566",
-     "scan_id": "scan_af8220e1",
-     "timestamp": 1793420486.551146,
+     "event_id": "ev_2053f6",
+     "scan_id": "scan_31a279fa",
+     "timestamp": 1793422767.6420982,
      "event_type": "probe_denied",
      "phase": "C",
      "message": "[VERIFIER] Access denied for unauthorized probe on /projects/{project_id} (HTTP 403)",
@@ -3260,14 +3260,14 @@
      }
     },
     {
-     "event_id": "ev_f5194f",
-     "scan_id": "scan_af8220e1",
-     "timestamp": 1793420486.5593307,
+     "event_id": "ev_00fda0",
+     "scan_id": "scan_31a279fa",
+     "timestamp": 1793422767.648196,
      "event_type": "request_sent",
      "phase": "A",
      "message": "[SETUP] Sending POST http://127.0.0.1:8000/target/projects as usr_aman_101",
      "data": {
-      "step_id": "disp_del_setup_1c69",
+      "step_id": "disp_del_setup_788f",
       "operation_id": "createProject",
       "identity": "usr_aman_101",
       "method": "POST",
@@ -3278,17 +3278,17 @@
      }
     },
     {
-     "event_id": "ev_d227d0",
-     "scan_id": "scan_af8220e1",
-     "timestamp": 1793420486.567558,
+     "event_id": "ev_a4c5ab",
+     "scan_id": "scan_31a279fa",
+     "timestamp": 1793422767.6585543,
      "event_type": "response_received",
      "phase": "A",
-     "message": "[SETUP] Received HTTP 201 for POST http://127.0.0.1:8000/target/projects (0.77ms)",
+     "message": "[SETUP] Received HTTP 201 for POST http://127.0.0.1:8000/target/projects (1.68ms)",
      "data": {
-      "step_id": "disp_del_setup_1c69",
+      "step_id": "disp_del_setup_788f",
       "operation_id": "createProject",
       "status_code": 201,
-      "duration_ms": 0.77,
+      "duration_ms": 1.68,
       "headers": {
        "content-length": "233",
        "content-type": "application/json"
@@ -3296,9 +3296,9 @@
      }
     },
     {
-     "event_id": "ev_af77cc",
-     "scan_id": "scan_af8220e1",
-     "timestamp": 1793420486.5755966,
+     "event_id": "ev_4678cc",
+     "scan_id": "scan_31a279fa",
+     "timestamp": 1793422767.6752102,
      "event_type": "request_sent",
      "phase": "B",
      "message": "[PROBE_ADVERSARY] Sending DELETE http://127.0.0.1:8000/target/projects/proj_44 as usr_taaran_202",
@@ -3314,17 +3314,17 @@
      }
     },
     {
-     "event_id": "ev_56093b",
-     "scan_id": "scan_af8220e1",
-     "timestamp": 1793420486.5839136,
+     "event_id": "ev_43ba8f",
+     "scan_id": "scan_31a279fa",
+     "timestamp": 1793422767.6752102,
      "event_type": "response_received",
      "phase": "B",
-     "message": "[PROBE_ADVERSARY] Received HTTP 403 for DELETE http://127.0.0.1:8000/target/projects/proj_44 (0.97ms)",
+     "message": "[PROBE_ADVERSARY] Received HTTP 403 for DELETE http://127.0.0.1:8000/target/projects/proj_44 (1.59ms)",
      "data": {
       "step_id": "probe_del_proj_44",
       "operation_id": "deleteProject",
       "status_code": 403,
-      "duration_ms": 0.97,
+      "duration_ms": 1.59,
       "headers": {
        "content-length": "45",
        "content-type": "application/json"
@@ -3332,9 +3332,9 @@
      }
     },
     {
-     "event_id": "ev_776f7a",
-     "scan_id": "scan_af8220e1",
-     "timestamp": 1793420486.5923235,
+     "event_id": "ev_2efd7b",
+     "scan_id": "scan_31a279fa",
+     "timestamp": 1793422767.6921966,
      "event_type": "request_sent",
      "phase": "A",
      "message": "[CONTROL_OWNER] Sending DELETE http://127.0.0.1:8000/target/projects/proj_44 as usr_aman_101",
@@ -3350,17 +3350,17 @@
      }
     },
     {
-     "event_id": "ev_99169b",
-     "scan_id": "scan_af8220e1",
-     "timestamp": 1793420486.6006284,
+     "event_id": "ev_d4936a",
+     "scan_id": "scan_31a279fa",
+     "timestamp": 1793422767.7105274,
      "event_type": "response_received",
      "phase": "A",
-     "message": "[CONTROL_OWNER] Received HTTP 200 for DELETE http://127.0.0.1:8000/target/projects/proj_44 (0.85ms)",
+     "message": "[CONTROL_OWNER] Received HTTP 200 for DELETE http://127.0.0.1:8000/target/projects/proj_44 (1.67ms)",
      "data": {
       "step_id": "ctrl_del_proj_44",
       "operation_id": "deleteProject",
       "status_code": 200,
-      "duration_ms": 0.85,
+      "duration_ms": 1.67,
       "headers": {
        "content-length": "35",
        "content-type": "application/json"
@@ -3368,9 +3368,9 @@
      }
     },
     {
-     "event_id": "ev_2c357a",
-     "scan_id": "scan_af8220e1",
-     "timestamp": 1793420486.6088822,
+     "event_id": "ev_2e576c",
+     "scan_id": "scan_31a279fa",
+     "timestamp": 1793422767.7105274,
      "event_type": "probe_denied",
      "phase": "C",
      "message": "[VERIFIER] Access denied for unauthorized DELETE on /projects/{project_id} (HTTP 403); cleanup succeeded",
@@ -3381,9 +3381,9 @@
      }
     },
     {
-     "event_id": "ev_b137a7",
-     "scan_id": "scan_af8220e1",
-     "timestamp": 1793420486.616957,
+     "event_id": "ev_ef3364",
+     "scan_id": "scan_31a279fa",
+     "timestamp": 1793422767.7328784,
      "event_type": "scan_completed",
      "phase": "C",
      "message": "[DONE] Audit finished. 0 confirmed vulnerabilities recorded.",
@@ -3396,9 +3396,9 @@
   }
  },
  "remediation": {
-  "id": "rem_70e17d8b",
-  "finding_id": "fnd_bola_5c4069",
-  "timestamp": 1793420486.6395378,
+  "id": "rem_2e10f962",
+  "finding_id": "fnd_bola_cdce8d",
+  "timestamp": 1793422767.7587047,
   "endpoint": "/projects/{project_id}/export",
   "source": "offline_template",
   "provider": "offline",

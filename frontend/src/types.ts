@@ -155,19 +155,19 @@ export interface BenchmarkData {
     graph_guided: {
       confirmed: number;
       recall: number | null;
-      precision: number;
+      precision: number | null;
       requests: number;
       req_per_finding: number | null;
-      time_to_first_ms: number | null;
+      avg_ms_per_finding: number | null;
       duration_ms: number;
     };
     baseline: {
       confirmed: number;
       recall: number | null;
-      precision: number;
+      precision: number | null;
       requests: number;
       req_per_finding: number | null;
-      time_to_first_ms: number | null;
+      avg_ms_per_finding: number | null;
       duration_ms: number;
     };
   }>;

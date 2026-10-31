@@ -167,7 +167,8 @@ def get_project_summary(project_id: str, authorization: Optional[str] = Header(N
 
 @target_app.get("/projects/{project_id}/audit-log")
 def get_project_audit_log(project_id: str, authorization: Optional[str] = Header(None)):
-    """Trap 2: Returns 404 for unauthorized users (must NOT be flagged)"""
+    """Decoy: returns 404 for non-owners (must NOT be flagged). Not listed in the demo OpenAPI spec, so the
+    spec-driven scanner never visits it; it is kept for manual testing."""
     user = get_current_user(authorization)
     project = PROJECTS_STORE.get(project_id)
     if not project or (project["owner_id"] != user["id"] and user["role"] != "admin"):

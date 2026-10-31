@@ -117,6 +117,12 @@ class ScanTriggerInput(BaseModel):
 
 @app.post("/api/scan")
 async def trigger_scan(opts: ScanTriggerInput):
+    if opts.dry_run:
+        # A live scan always sends traffic. Previewing the plan is a separate, traffic-free endpoint.
+        raise HTTPException(
+            status_code=400,
+            detail="dry_run is not supported on /api/scan; use POST /api/scan/dry-run to preview the plan without sending traffic",
+        )
     scan_id = f"scan_{uuid.uuid4().hex[:8]}"
     await save_scan(scan_id, "http://127.0.0.1:8000/target")
     queue = asyncio.Queue()

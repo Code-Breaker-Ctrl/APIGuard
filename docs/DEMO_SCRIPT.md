@@ -1,90 +1,62 @@
-# APIGuard — Live Demo Script & Technical Presentation Defense
+# APIGuard: Live Demo Script
 
-> **Open Source API Authorization & BOLA Detection Engine**
+> A short on-stage walkthrough. For the full pitch, the concepts primer (what OpenAPI, BOLA, a DAG and so on mean) and the judge Q&A, see [`pitch.md`](../pitch.md).
 
----
+## Before you start
 
-## ⏱️ The 3-Minute Live Showcase Walkthrough
+1. Start the backend: `cd backend`, then `python -m uvicorn app.main:app --host 127.0.0.1 --port 8000`.
+2. Start the frontend: `cd frontend`, then `npm run dev` (or double-click `run_prototype.bat`).
+3. Open `http://127.0.0.1:5173` and click the reset icon (circular arrow) so the target and history are clean.
+4. Leave **Mutations** off for the first run.
 
-### Act 1: The Problem — The Vulnerability in Plain Sight (0:00 – 0:45)
-1. **Open Dashboard (`http://127.0.0.1:5173`)**:
-   - Point to the **Honesty Strip** at the bottom:
-     - `Working: Real REST + SSE Engine`
-     - `Working: React Flow + Dagre DAG`
-     - `model call: tested (or offline template only)`
-     - `Working: Empirical Ground Truth Benchmarks`
-   - *"Most security scanners test endpoints in silos. When an endpoint returns HTTP 200, uptime monitors and CI pipelines assume everything is fine. This is BOLA (OWASP API #1) — it doesn't crash the server, it quietly leaks private tenant data."*
-2. **Examine the React Flow DAG (Center Panel)**:
-   - Click on the node `GET /projects/{project_id}` and `GET /projects/{project_id}/export`.
-   - Explain the edges:
-     - `POST /projects` **PRODUCES** `projects_id`.
-     - `GET /projects/{project_id}` **CONSUMES** `projects_id`.
-     - `GET /projects/{project_id}/export` is **NESTED_UNDER** the project entity with candidate policy propagated along the graph.
+**The screen:** the top bar has the `Dry run` and `Mutations` toggles, five icon buttons (guided demo, benchmarks, dry-run table, export report, reset) and the gold **BEGIN AUDIT** button. Left: the spec's identities and endpoints. Centre: the dependency graph. Right: the Event Stream above the Findings list.
 
----
+> With **Dry run** on, the main button becomes **PREVIEW PLAN** and opens the plan table instead of sending traffic.
 
-### Act 2: Safe Planning & Execution Audit (0:45 – 1:45)
-1. **Show Safe Dry-Run (Click "Dry-Run Table" in navbar)**:
-   - *"Before executing any probes, APIGuard plans the exact multi-identity test sequence. Notice that mutating HTTP methods (DELETE/PATCH) are blocked by default for production safety unless explicitly enabled."*
-   - Close modal or click *"Execute Live Audit Now"*.
-2. **Trigger the Live Audit**:
-   - Click **"RUN EXECUTION AUDIT"**:
-   - Watch the **Scan Console** stream real-time HTTP requests:
-     - **Phase A (State Harvest)**: Authenticates Aman (`usr_aman_101`), creates a project via `POST /projects` (HTTP 201), extracts dynamic `project_id`.
-     - **Phase A (Policy Inference)**: Executes control read as Aman (HTTP 200) and baseline probe as Taaran (`usr_taaran_202`, HTTP 403 Forbidden). Engine validates `owner_only` rule.
-     - **Phase B (Graph Propagation)**: Propagates ownership rule to adjacent child routes (`/export` and `/summary`).
-     - **Phase C (Differential Probe)**: Probes `/export` using Taaran's credentials. The endpoint returns HTTP 200 OK — differential verifier extracts leaked owner fields (`owner_email`, `financial_payload.budget`, `financial_payload.billing`).
-   - The React Flow node `GET /projects/{project_id}/export` pulses in real-time and turns **red** with a **BOLA LEAK** badge.
-   - The Confirmed Findings badge updates to **1**.
+## The 3-minute walkthrough
 
----
+### Act 1: The problem and the map (0:00 to 0:45)
 
-### Act 3: Proof, AI Remediation & Benchmark (1:45 – 3:00)
-1. **Click the Confirmed Finding (`GET /projects/{project_id}/export`)**:
-   - Show the **Side-by-Side Differential Inspector**:
-     - Left: Aman's Control response.
-     - Right: Taaran's Probe response with leaked fields highlighted in red.
-   - Show the **Graph Propagation Path**: `getProjectById -> (NESTED_UNDER) -> exportProjectBilling`.
-   - Show the **Sanitized cURL Command** and copy button.
-2. **Open AI Remediation (Click "AI Remediation")**:
-   - *"Prompting Bonus demonstration:"*
-   - Show **Naive Prompt (v1)**: Generic prompt causes model to check `if not user:` (only checks authentication, misses tenant ownership).
-   - Show **Graph-Guided Prompt (v2)**: Context-infused prompt includes DAG relations, resource ownership context, and leaked field context. Generates the exact tenant check: `if project.owner_id != current_user.id:` plus an automated Pytest test case.
-3. **Open Benchmarks Panel (Click "Benchmarks" or press 'D')**:
-   - Show empirical comparison across 5 target variants:
-     - **Defect B (Indirect BOLA)**: Baseline Recall = 0% vs APIGuard Recall = 100%.
-     - **Secure Variant**: 0 false positives (100% precision).
-   - Point to the **Controlled Ablation Study**:
-     - *Rule Propagation OFF*: In our ablation, disabling propagation missed the indirect defect (1 defect, 1 target API).
+- *"Most scanners test API routes one at a time. When a route returns 200, nobody is alerted and everything looks fine. This is BOLA, OWASP API #1: it doesn't crash anything, it quietly returns someone else's data."*
+- Point at the graph. Blue boxes at the top are setup (login, create project). The orange key is the ID that creating a project produces. Below it are the routes that use the ID, and below those the routes nested under a project. Solid lines come from the OpenAPI file; dashed lines are inferred nesting.
+- Edges: `POST /projects` **produces** `project_id`; `GET /projects/{id}` **consumes** it; `/export`, `/summary` and `/members` are **nested under** the project route.
 
----
+### Act 2: Plan and run (0:45 to 1:45)
 
-## 🎯 Judge Cross-Questioning Defense Cheat Sheet
+1. Click the chip icon (dry-run table): *"This previews the plan: create as the owner, read as the owner, read as the attacker. Nothing is sent. The live scan reuses one created record, so it sends fewer requests."* Close it.
+2. Click **BEGIN AUDIT** and narrate the Event Stream:
+   - `[AUTH]` logs in as Aman (owner) and Taaran (attacker).
+   - `[SETUP]` Aman creates a project (HTTP 201) and we keep its real ID.
+   - `[CONTROL_OWNER]` / `[PROBE_ADVERSARY]` on the main read route: owner gets 200, attacker gets 403. `[INFERENCE]` records the rule `owner_only`.
+   - `[PROPAGATION]` hands that rule to the nested routes, and each is tested the same way.
+3. On the graph: the main route turns **SAFE**, `/summary` shows **SAFE** too (it returned 200 with an empty body, so nothing leaked), `/members` shows **UNSURE** (the route isn't implemented, so even the owner gets 404), and `/export` turns red: **LEAK**.
 
-### Q1: "Are these results real or simulated?"
-> **Answer:**  
-> *"Every single result on this screen was generated by real HTTP requests executed against our live local target server over real sockets (127.0.0.1:8000). You can check our open git log: we have 20 automated pytest integration tests verifying socket transmission, dynamic token generation, and response comparison. We do not use mock timeouts or fake findings."*
+### Act 3: Proof, fix and benchmark (1:45 to 3:00)
 
----
+1. Click the finding. Left is the owner's response, right is the attacker's with the leaked fields highlighted (`owner_email`, `financial_payload.budget`, `financial_payload.billing`). Show the graph path (`getProjectById -> (NESTED_UNDER) -> exportProjectBilling`) and the reproduction cURL.
+2. Click **AI Remediation**. A naive prompt (v1) is shown next to a prompt that includes the resource and the leaked field names (v2). Without an API key, the offline template is shown and labelled "not model output".
+3. Click **Apply reference fix & re-scan**. This switches the demo target to its built-in patched mode (it does not run the AI's patch) and re-scans: one confirmed leak becomes zero.
+4. Click the bar-chart icon (benchmarks): five variants, six planted bugs. APIGuard finds 6 of 6 with no false alarms on the patched variant; a baseline that only tests routes it has a rule for finds 4 of 6. Point out that APIGuard sends more requests, because it also tests the nested routes. The ablation shows that without the neighbour-testing stage the indirect bug is missed.
 
-### Q2: "How does APIGuard compare to traditional DAST tools like OWASP ZAP or Burp Suite?"
-> **Answer:**  
-> *"Traditional DAST tools test endpoints in isolation. They fuzz parameters or replay saved requests without understanding resource dependencies. On Defect B (`/projects/{id}/export`), a standard DAST scanner has no configured rule for `/export`, receives an HTTP 200 OK, and mistakenly marks it as healthy. APIGuard models the API as a Resource DAG, extracts the runtime ID from the producer, observes the ownership rule on the parent endpoint, propagates the rule to the child endpoint, and proves the vulnerability using differential payload comparison."*
+## Quick answers to common cross-questions
 
----
+**Are these results real or simulated?**
+Real HTTP requests, handled by the real target application code, with no mocked responses. In the dashboard and the benchmark the requests are delivered in-process (no network socket); the 22 automated tests include integration tests that start a real server on a real port and run the same scanner over it.
 
-### Q3: "Why is the scanner engine deterministic instead of using an LLM to find the bugs?"
-> **Answer:**  
-> *"For vulnerability detection, predictability and auditability are non-negotiable. An LLM in the core scanning loop introduces hallucinated findings, non-deterministic flakiness, token latency, and high cost per scan. APIGuard uses a 100% deterministic graph engine for detection. We utilize the LLM via OpenRouter or Gemini (whichever is configured) strictly in the remediation phase, where graph context transforms vague prompt suggestions into surgical, test-verified code patches."*
+**How is this different from ZAP or Burp Suite?**
+Those are general-purpose tools and they can test authorization, but you have to set it up (two logins, the rules, what counts as a violation). APIGuard automates the two-user workflow and uses the API's structure (which route creates the ID, which routes sit under it) to decide what to test next. We cover a gap rather than replace them.
 
----
+**Why isn't the scanner an LLM?**
+Detection has to be predictable and auditable: the same input gives the same result, and there are no hallucinated findings. The LLM (OpenRouter or Gemini, whichever is configured) is used only after a bug is proven, to draft a fix and a test. The model sees the route, method, resource type and leaked field names, never response bodies or tokens.
 
-### Q4: "How does your Differential Verifier prevent false positives on public endpoints?"
-> **Answer:**  
-> *"We do not conclude a vulnerability based solely on HTTP 200 OK. Our verifier extracts dynamic tenant-identifying values from the control payload (e.g. owner email, organization ID, credit card hashes) and checks if the unauthorized probe body contains those exact owner-linked values. We specifically built verifier trap tests: when an endpoint returns HTTP 200 with an empty object `{}` or public stats, our verifier marks it as `potential`, never falsely marking it `confirmed`."*
+**How does the verifier avoid false positives?**
+It doesn't trust a 200 on its own. It collects the owner's sensitive-looking values (email, billing, card, budget and so on) from the control response and confirms a leak only if those exact values appear in the attacker's response. An empty body, or a 404 for everyone, is never reported as a confirmed leak.
 
----
+**What about APIs with multi-step dependencies?**
+One level today: the scanner finds the route that creates the ID and creates one record. Deeper chains (A needs B needs C) are not built yet; if a prerequisite can't be created, the test is skipped or reported as inconclusive rather than guessed.
 
-### Q5: "What happens if an API has complex multi-step dependencies?"
-> **Answer:**  
-> *"APIGuard's `TestPlanner` performs Breadth-First Search (BFS) traversal over the dependency DAG. If Endpoint C requires an ID from Endpoint B, and Endpoint B requires an ID from Endpoint A, the planner generates the topological execution chain: `Setup A -> Setup B -> Control C -> Adversary Probe C`. If any prerequisite cannot be satisfied, the engine reports `unknown` rather than fabricating false security."*
+**Does it work on my API?**
+Not yet. The scanner is wired to the bundled demo API; making the target address, login flow and create-request body configurable is the next milestone.
+
+**Is it safe to run?**
+There are guardrails: a host allowlist (loopback only), a request budget, a mutation gate that blocks PATCH and DELETE unless switched on, and secret redaction. It does create a test record on the target, so use it on test systems only.

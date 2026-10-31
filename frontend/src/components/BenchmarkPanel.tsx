@@ -3,6 +3,27 @@ import { BarChart3, RefreshCw, X, ShieldCheck, Zap, Info } from 'lucide-react';
 import type { BenchmarkData } from '../types';
 import { apiClient } from '../api/client';
 
+type Variants = BenchmarkData['variants'];
+
+// Precision is null when a scanner reported nothing, so those variants are skipped
+const worstPrecision = (variants: Variants, who: 'graph_guided' | 'baseline') => {
+  const values = Object.values(variants)
+    .map((v) => v[who].precision)
+    .filter((p): p is number => p !== null);
+  return values.length > 0 ? Math.min(...values) : null;
+};
+
+const asPercent = (value: number | null) => (value === null ? 'n/a' : `${(value * 100).toFixed(0)}%`);
+
+// The trade-off note quotes the measured numbers instead of typing them in
+const tradeOffNote = (variants: Variants) => {
+  const direct = variants.variant_a;
+  const g = direct?.graph_guided.req_per_finding;
+  const base = direct?.baseline.req_per_finding;
+  const counts = g != null && base != null ? ` (${g.toFixed(1)} vs ${base.toFixed(1)} on the direct-defect variant)` : '';
+  return `APIGuard sends more requests per finding${counts} because it also tests nested routes, such as the indirect defect the rules-only baseline never visits.`;
+};
+
 interface BenchmarkPanelProps {
   onClose: () => void;
 }
@@ -51,7 +72,7 @@ export const BenchmarkPanel: React.FC<BenchmarkPanelProps> = ({ onClose }) => {
           <BarChart3 className="w-4 h-4 text-cyan-400" />
           <span className="font-bold text-slate-100 text-sm">Empirical Benchmark & Controlled Ablation</span>
           <span className="px-2 py-0.5 rounded bg-cyan-950/60 border border-cyan-800/40 text-cyan-300 font-bold text-[10px]">
-            REAL TARGET DATA · STRICT GROUND TRUTH
+            MEASURED ON THE DEMO TARGET · HIDDEN ANSWER KEY
           </span>
         </div>
         <div className="flex items-center gap-2">
@@ -113,11 +134,13 @@ export const BenchmarkPanel: React.FC<BenchmarkPanelProps> = ({ onClose }) => {
               </div>
 
               <div className="p-3.5 rounded-xl bg-[#1e1812] border border-[#382e23]">
-                <div className="text-[10px] text-slate-400 uppercase tracking-wider">Precision (All Variants)</div>
+                <div className="text-[10px] text-slate-400 uppercase tracking-wider">Precision (Worst Variant)</div>
                 <div className="text-2xl font-black text-cyan-400 mt-1">
-                  100% <span className="text-xs font-normal text-slate-400">vs 100% Base</span>
+                  {asPercent(worstPrecision(data.variants, 'graph_guided'))} <span className="text-xs font-normal text-slate-400">vs {asPercent(worstPrecision(data.variants, 'baseline'))} Base</span>
                 </div>
-                <div className="text-[10px] text-slate-500 mt-0.5">0 False Positives on Secure Suite</div>
+                <div className="text-[10px] text-slate-500 mt-0.5">
+                  {data.variants.variant_secure ? `${data.variants.variant_secure.graph_guided.confirmed} False Positives on Secure Suite` : 'Secure variant not run'}
+                </div>
               </div>
 
               <div className="p-3.5 rounded-xl bg-[#1e1812] border border-[#382e23]">
@@ -136,7 +159,7 @@ export const BenchmarkPanel: React.FC<BenchmarkPanelProps> = ({ onClose }) => {
               <Info className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
               <div>
                 <strong className="text-cyan-300">Efficiency & Coverage Trade-Off:</strong>{' '}
-                APIGuard uses more requests per finding on single-defect variants (13.0 vs 7.0) but finds the indirect defect the baseline misses.
+                {tradeOffNote(data.variants)}
               </div>
             </div>
 
@@ -160,15 +183,15 @@ export const BenchmarkPanel: React.FC<BenchmarkPanelProps> = ({ onClose }) => {
                       <th className="py-2.5 px-3 text-center text-emerald-400">APIGuard Recall</th>
                       <th className="py-2.5 px-3 text-center text-emerald-400">APIGuard Prec</th>
                       <th className="py-2.5 px-3 text-center text-emerald-400">APIGuard Req/Fnd</th>
-                      <th className="py-2.5 px-3 text-center text-cyan-400">Time to 1st</th>
+                      <th className="py-2.5 px-3 text-center text-cyan-400">Avg ms/Fnd</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[#2a221a]">
                     {Object.entries(data.variants).map(([vKey, vVal]) => {
                       const baseRecall = vVal.baseline.recall === null ? 'n/a' : `${(vVal.baseline.recall * 100).toFixed(0)}%`;
                       const graphRecall = vVal.graph_guided.recall === null ? 'n/a' : `${(vVal.graph_guided.recall * 100).toFixed(0)}%`;
-                      const basePrecision = `${(vVal.baseline.precision * 100).toFixed(0)}%`;
-                      const graphPrecision = `${(vVal.graph_guided.precision * 100).toFixed(0)}%`;
+                      const basePrecision = asPercent(vVal.baseline.precision);
+                      const graphPrecision = asPercent(vVal.graph_guided.precision);
                       const baseRpf = vVal.baseline.req_per_finding !== null ? vVal.baseline.req_per_finding.toFixed(1) : 'n/a';
                       const graphRpf = vVal.graph_guided.req_per_finding !== null ? vVal.graph_guided.req_per_finding.toFixed(1) : 'n/a';
 
@@ -188,7 +211,7 @@ export const BenchmarkPanel: React.FC<BenchmarkPanelProps> = ({ onClose }) => {
                           <td className="py-2.5 px-3 text-center font-mono font-bold text-emerald-300">{graphPrecision}</td>
                           <td className="py-2.5 px-3 text-center font-mono font-bold text-emerald-300">{graphRpf}</td>
                           <td className="py-2.5 px-3 text-center font-mono text-cyan-300">
-                            {vVal.graph_guided.time_to_first_ms ? `${vVal.graph_guided.time_to_first_ms}ms` : 'n/a'}
+                            {vVal.graph_guided.avg_ms_per_finding ? `${vVal.graph_guided.avg_ms_per_finding}ms` : 'n/a'}
                           </td>
                         </tr>
                       );

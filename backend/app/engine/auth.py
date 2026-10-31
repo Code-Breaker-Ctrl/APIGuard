@@ -32,7 +32,7 @@ DEFAULT_CREDENTIALS = {
 class AuthRegistry:
     """
     Manages test identities and dynamically logs in via the target's /auth/login endpoint
-    to obtain real signed bearer tokens.
+    to obtain the bearer tokens the target issues (opaque strings in the demo target).
     """
     def __init__(self, base_url: str = "http://127.0.0.1:8000/target"):
         self.base_url = base_url.rstrip("/")

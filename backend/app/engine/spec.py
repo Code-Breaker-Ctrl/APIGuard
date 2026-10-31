@@ -171,7 +171,6 @@ components:
     bearerAuth:
       type: http
       scheme: bearer
-      bearerFormat: JWT
 
   schemas:
     LoginRequest:

@@ -76,7 +76,7 @@ export const DryRunModal: React.FC<DryRunModalProps> = ({
             <div className="p-3 rounded-lg bg-amber-950/20 border border-amber-800/40 text-amber-200/90 text-[11px] flex items-center gap-2">
               <ShieldAlert className="w-4 h-4 text-amber-400 shrink-0" />
               <span>
-                <strong>Dry-Run Mode:</strong> The engine synthesized the full multi-identity execution plan using OpenAPI DAG traversal without sending any network traffic to the target socket.
+                <strong>Dry-Run Mode:</strong> The engine synthesized the full multi-identity execution plan using OpenAPI DAG traversal without sending any network traffic to the target.
               </span>
             </div>
 

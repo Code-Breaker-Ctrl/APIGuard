@@ -24,7 +24,7 @@ export const GuidedDemoModal: React.FC<GuidedDemoModalProps> = ({
       icon: <GitBranch className="w-5 h-5 text-cyan-400" />,
       tagline: 'Deterministic schema parsing without invented properties',
       description:
-        'APIGuard ingests standard OpenAPI 3.x YAML/JSON specs and parses them with openapi-spec-validator. It maps endpoints to resource entities, identifies producer operations (e.g., POST /projects creates {project_id}), and builds a typed resource DAG using Dagre layout.',
+        'APIGuard ingests standard OpenAPI 3.x YAML/JSON specs and parses them with openapi-spec-validator. It maps endpoints to resource entities, identifies producer operations (e.g., POST /projects creates {project_id}), and builds a typed resource DAG, which Dagre lays out for display.',
       actionLabel: 'Reload Spec & Reset State',
       action: () => onLoadSpec(),
     },
@@ -33,7 +33,7 @@ export const GuidedDemoModal: React.FC<GuidedDemoModalProps> = ({
       icon: <Cpu className="w-5 h-5 text-amber-400" />,
       tagline: 'Multi-identity test sequencing with zero network traffic',
       description:
-        'Before probing the target, the TestPlanner analyzes parameter dependencies and allocates request budgets. Mutating HTTP verbs (PATCH/DELETE) are blocked by default unless explicitly allowed. The Dry-Run table previews every planned setup, control, and probe step.',
+        'Before probing the target, the TestPlanner works out which record each route needs and lists the setup, control, and probe steps. Mutating HTTP verbs (PATCH/DELETE) are blocked by default unless explicitly allowed. The Dry-Run table previews the plan; the live scan reuses one created record, so it sends fewer requests.',
       actionLabel: 'Preview Dry-Run Table',
       action: () => {
         onClose();
@@ -43,7 +43,7 @@ export const GuidedDemoModal: React.FC<GuidedDemoModalProps> = ({
     {
       title: '3. Real Execution Audit & Graph Propagation',
       icon: <Play className="w-5 h-5 text-emerald-400 fill-emerald-400" />,
-      tagline: 'Real HTTP requests against 127.0.0.1 with live SSE telemetry',
+      tagline: 'Real HTTP requests to the demo target with live SSE telemetry',
       description:
         'Watch the terminal stream live HTTP requests. User A (Aman) establishes resource state; the engine observes authorization on GET /projects/{id} and propagates candidate ownership rules along DAG edges to adjacent endpoints. When Aman’s export endpoint is probed with Taaran’s token, HTTP 200 OK leaks confidential billing data, triggering a CONFIRMED finding.',
       actionLabel: 'Trigger Live Audit',
@@ -134,7 +134,7 @@ export const GuidedDemoModal: React.FC<GuidedDemoModalProps> = ({
 
           <div className="p-3.5 rounded-lg bg-slate-900/40 border border-slate-800 text-[11px] text-slate-400 flex items-center justify-between">
             <span>
-              💡 <strong>Judge Cross-Questioning Tip:</strong> Judges will ask if findings are real or simulated. State clearly that every finding is confirmed via differential HTTP analysis against live uvicorn sockets.
+              💡 <strong>Judge Cross-Questioning Tip:</strong> Judges will ask if findings are real or simulated. State clearly that every finding is confirmed by comparing real HTTP responses (owner vs attacker) from the demo target. The dashboard delivers them in-process; the integration tests run the same scanner over real sockets.
             </span>
           </div>
         </div>

@@ -113,12 +113,22 @@ export default function App() {
     checkBackendHealth();
   }, [checkBackendHealth]);
 
-  const handleRunScan = async () => {
+  // Always sends real traffic, and only to the allowlisted target
+  const runLiveScan = async () => {
     await startScan({
-      dry_run: dryRun,
+      dry_run: false,
       budget: 30,
       enable_mutations: enableMutations,
     });
+  };
+
+  // With "Dry run" on, the main button previews the plan instead of sending anything
+  const handleRunScan = async () => {
+    if (dryRun) {
+      await handleOpenDryRun();
+      return;
+    }
+    await runLiveScan();
   };
 
   const handleReset = async () => {
@@ -215,7 +225,7 @@ export default function App() {
         </div>
 
         <div className="flex items-center gap-2">
-          <button className="btn-ghost" aria-pressed={dryRun} onClick={() => setDryRun(!dryRun)} title="Plan the scan without sending traffic">
+          <button className="btn-ghost" aria-pressed={dryRun} onClick={() => setDryRun(!dryRun)} title="When on, the main button previews the plan instead of sending traffic">
             Dry run
           </button>
           <button className="btn-ghost" aria-pressed={enableMutations} onClick={() => setEnableMutations(!enableMutations)} title="Allow PATCH / DELETE probes">
@@ -236,7 +246,7 @@ export default function App() {
             className="btn-grace ml-2"
           >
             <Play className={`w-4 h-4 ${isScanning ? 'animate-spin' : ''}`} />
-            {isScanning ? 'AUDITING' : 'BEGIN AUDIT'}
+            {isScanning ? 'AUDITING' : dryRun ? 'PREVIEW PLAN' : 'BEGIN AUDIT'}
           </button>
         </div>
       </header>
@@ -349,7 +359,7 @@ export default function App() {
               onClose={() => setShowDryRunModal(false)}
               onExecuteLive={() => {
                 setShowDryRunModal(false);
-                handleRunScan();
+                runLiveScan();
               }}
             />
           </div>
@@ -387,7 +397,7 @@ export default function App() {
                 handleReset();
               }}
               onOpenDryRun={() => handleOpenDryRun()}
-              onRunAudit={() => handleRunScan()}
+              onRunAudit={() => runLiveScan()}
               onOpenBenchmark={() => setShowBenchmarkModal(true)}
             />
           </div>
@@ -398,7 +408,7 @@ export default function App() {
         isOpen={showReportModal}
         onClose={() => setShowReportModal(false)}
         findings={findings}
-        nodeCount={nodes.length}
+        operationCount={nodes.filter((n) => n.type === 'operation').length}
         edgeCount={edges.length}
         targetUrl="http://127.0.0.1:8000/target"
         isTargetPatched={isTargetPatched}
